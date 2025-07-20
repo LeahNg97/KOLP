@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:8080/api';
 
 // Login user, lúc đăng nhập sẽ nhận token từ server
 export const loginUser = async (credentials) => {

@@ -30,23 +30,23 @@ export default function Register() {//khởi tạo component Register
   // Hàm kiểm tra dữ liệu người dùng nhập vào form trc khi gửi lên server
   const validateForm = () => {
     if (!formData.name.trim()) {
-      setError('Tên không được để trống');
+      setError('Name shouldn\'t be empty');
       return false;
     }
     if (!formData.email.trim()) {
-      setError('Email không được để trống');
+      setError('Email shouldn\'t be empty');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Email không hợp lệ');
+      setError('Email is invalid');
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      setError('Password must be at least 6 characters');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp');
+      setError('Passwords do not match');
       return false;
     }
     return true;
@@ -72,7 +72,7 @@ export default function Register() {//khởi tạo component Register
         role: formData.role
       });
 
-      setSuccess('Đăng ký thành công! Đang chuyển hướng...');
+      setSuccess('Registration successful! You can now log in.');
       
       // Redirect to login after 2 seconds
       setTimeout(() => {
@@ -80,7 +80,7 @@ export default function Register() {//khởi tạo component Register
       }, 2000);
 
     } catch (err) {
-      setError(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -91,8 +91,8 @@ export default function Register() {//khởi tạo component Register
     <div className="register-container">
       <div className="register-card">
         <div className="register-header">
-          <h1 className="register-title">Đăng ký</h1>
-          <p className="register-subtitle">Tạo tài khoản mới để bắt đầu</p>
+          <h1 className="register-title">Register</h1>
+          <p className="register-subtitle">Create account to start</p>
         </div>
         
         {error && (
@@ -114,7 +114,7 @@ export default function Register() {//khởi tạo component Register
                 type="text"
                 name="name"
                 className="form-input"
-                placeholder="Họ và tên"
+                placeholder="Name (Full Name)"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -130,9 +130,9 @@ export default function Register() {//khởi tạo component Register
                 onChange={handleChange}
                 disabled={loading}
               >
-                <option value="student">Sinh viên</option>
-                <option value="instructor">Giảng viên</option>
-                <option value="admin">Quản trị viên</option>
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function Register() {//khởi tạo component Register
                 type="password"
                 name="password"
                 className="form-input"
-                placeholder="Mật khẩu"
+                placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -169,7 +169,7 @@ export default function Register() {//khởi tạo component Register
                 type="password"
                 name="confirmPassword"
                 className="form-input"
-                placeholder="Xác nhận mật khẩu"
+                placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
@@ -184,14 +184,14 @@ export default function Register() {//khởi tạo component Register
             disabled={loading}
           >
             {loading && <span className="loading"></span>}
-            {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+            {loading ? 'Loading' : 'Register'}
           </button>
         </form>
 
         <div className="login-link">
-          <p>Đã có tài khoản?</p>
+          <p>Already have account?</p>
           <Link to="/login" className="login-button-link">
-            Đăng nhập ngay
+            Log in now  
           </Link>
         </div>
       </div>

@@ -30,9 +30,12 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>// context provider để quản lý trạng thái xác thực người dùng, người dùng là ai
-      <BrowserRouter>// Router để quản lý các route trong ứng dụng, các đường dẫn URL
-        <AppContent />// Component chính của ứng dụng, nơi chứa các route và nội dung chính
+    <AuthProvider>
+       {/* // context provider để quản lý trạng thái xác thực người dùng, người dùng là ai */}
+      <BrowserRouter> 
+      {/* // Router để quản lý các route trong ứng dụng, các đường dẫn URL */}
+        <AppContent /> 
+        {/* // Component chính của ứng dụng, nơi chứa các route và nội dung chính */}
       </BrowserRouter>
     </AuthProvider>
   );

@@ -6,7 +6,10 @@ const authRoutes = require('./routes/auth.routes');// Import authentication rout
 
 // cấu hình express app, khởi tạo ứng dụng express
 const app = express();
-app.use(cors()); // Enable CORS for all routes, cho phép tất cả các nguồn truy cập vào ứng dụng, 
+app.use(cors({
+  origin: 'http://localhost:3000', // Cho phép frontend truy cập
+  credentials: true,               // Cho phép gửi cookie/token nếu có
+}));
 app.use(express.json());// Parse JSON request bodies, phân tích cú pháp các yêu cầu JSON từ client
 
 // Routes
@@ -14,7 +17,7 @@ app.use('/api/auth', authRoutes);// Use authentication routes, sử dụng các 
 
 app.get('/', (req, res) => res.send('KOLP Backend is running'));// Root route to check if the server is running, route gốc để kiểm tra xem server có đang chạy hay không
 
-const PORT = process.env.PORT || 5000;// 1 port to run the server, nếu không có biến môi trường PORT thì sử dụng 5000, 1 port lấy từ env hoặc 5000 nếu không có
+const PORT = process.env.PORT || 8080;// 1 port to run the server, nếu không có biến môi trường PORT thì sử dụng 5000, 1 port lấy từ env hoặc 5000 nếu không có
 
 // Connect to the database and start the server
 // Kết nối tới cơ sở dữ liệu và khởi động server

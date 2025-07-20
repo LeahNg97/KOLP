@@ -27,15 +27,15 @@ export default function Login() {
 
   const validateForm = () => {
     if (!formData.email.trim()) {
-      setError('Email không được để trống');
+      setError('Email should not be empty');
       return false;
     }
     if (!formData.password.trim()) {
-      setError('Mật khẩu không được để trống');
+      setError('Password should not be empty');
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      setError('Password must be at least 6 characters');
       return false;
     }
     return true;
@@ -63,7 +63,7 @@ export default function Login() {
       // Use AuthContext to handle login
       login(response.user, response.token);
 
-      setSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+      setSuccess('Log in succesful');
 
       // Navigate based on user role
       const role = response.user.role;
@@ -88,14 +88,14 @@ export default function Login() {
       
       if (err.response) {
         // Server responded with error
-        const errorMessage = err.response.data?.message || 'Đăng nhập thất bại';
+        const errorMessage = err.response.data?.message || 'Log in fail';
         setError(errorMessage);
       } else if (err.request) {
         // Network error
-        setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+        setError('Cannot connect to server.');
       } else {
         // Other error
-        setError('Có lỗi xảy ra. Vui lòng thử lại.');
+        setError('Error, please try again.');
       }
     } finally {
       setLoading(false);
@@ -112,8 +112,8 @@ export default function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1 className="login-title">Đăng nhập</h1>
-          <p className="login-subtitle">Vui lòng nhập thông tin đăng nhập của bạn</p>
+          <h1 className="login-title">Log In</h1>
+          <p className="login-subtitle">Please fill your information</p>
         </div>
         
         {error && (
@@ -136,7 +136,7 @@ export default function Login() {
               name="email"
               type="email"
               className={`form-input ${error && !formData.email ? 'error' : ''}`}
-              placeholder="Nhập email của bạn"
+              placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
               onKeyPress={handleKeyPress}
@@ -147,13 +147,13 @@ export default function Login() {
           </div>
           
           <div className="form-group">
-            <label htmlFor="password" className="form-label">Mật khẩu</label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               id="password"
               name="password"
               type="password"
               className={`form-input ${error && !formData.password ? 'error' : ''}`}
-              placeholder="Nhập mật khẩu của bạn"
+              placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
               onKeyPress={handleKeyPress}
@@ -171,25 +171,25 @@ export default function Login() {
             {loading ? (
               <>
                 <span className="loading-spinner"></span>
-                Đang đăng nhập...
+                Loading...
               </>
             ) : (
-              'Đăng nhập'
+              'Log In'
             )}
           </button>
         </form>
 
         <div className="login-footer">
           <div className="register-link">
-            <p>Chưa có tài khoản?</p>
+            <p>Don't have account yet?</p>
             <Link to="/register" className="register-button-link">
-              Đăng ký ngay
+              Please register
             </Link>
           </div>
           
           <div className="test-accounts">
             <details>
-              <summary>Tài khoản test</summary>
+              <summary>Test Accounts</summary>
               <div className="test-accounts-list">
                 <div><strong>Student:</strong> alice@student.kolp.vn / password123</div>
                 <div><strong>Instructor:</strong> bob@instructor.kolp.vn / password123</div>
