@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Navbar.css';
+import './Navbar.css'; // Assuming you have a CSS file for styling the Navbar
 
 //
 export default function Navbar() {
@@ -60,7 +60,7 @@ export default function Navbar() {
         </div>
         <button onClick={handleLogout} className="logout-button">
           <span className="logout-icon"></span>
-          Đăng xuất
+          Log out
         </button>
       </div>
     </nav>

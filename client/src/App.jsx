@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './auth/Login';
 import Register from './auth/Register';
+import StudentDashboard from './student/pages/StudentDashboard';
 
 // tạo nội dung chính của ứng dụng
 function AppContent() {
@@ -22,7 +23,7 @@ function AppContent() {
         {/* Instructor routes */}
         {/* <Route path="/instructor/courses" element={<InstructorCourses />} /> */}
         {/* Student routes */}
-        {/* <Route path="/student" element={<StudentDashboard />} /> */}
+        <Route path="/student" element={<StudentDashboard />} />
       </Routes>
     </>
   );

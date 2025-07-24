@@ -191,7 +191,7 @@ export default function Register() {//khởi tạo component Register
         <div className="login-link">
           <p>Already have account?</p>
           <Link to="/login" className="login-button-link">
-            Log in now  
+            Sign in now  
           </Link>
         </div>
       </div>

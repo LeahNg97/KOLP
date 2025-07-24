@@ -1,20 +1,25 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { loginUser } from './api/authApi';
-import './style/Login.css';
+import { useState } from 'react'; // Import useState hook to manage state
+import { useNavigate, Link } from 'react-router-dom';// Import useNavigate for navigation and Link for routing
+import { useAuth } from '../context/AuthContext';// Import useAuth to access authentication context
+import { loginUser } from './api/authApi';// Import loginUser function to handle login API call
+import './style/Login.css';// Import CSS styles for the Login component
 
+// Define the Login component
+// This component handles user login functionality
+// It allows users to enter their email and password, validates the input, and communicates with the server to authenticate the user
 export default function Login() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);// State to manage loading state during API calls
+  const [error, setError] = useState('');// State to manage error messages
+  const [success, setSuccess] = useState('');// State to manage success messages after login
+  const navigate = useNavigate();// Hook to programmatically navigate to different routes
+  const { login } = useAuth();// Use the login function from AuthContext to handle user authentication
 
+  // Handle input changes in the form
+  // This function updates the formData state with the user's input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -25,9 +30,10 @@ export default function Login() {
     if (error) setError('');
   };
 
+  // Validate form data before submitting
   const validateForm = () => {
     if (!formData.email.trim()) {
-      setError('Email should not be empty');
+      setError('Email should not be empty');// Check if email is empty
       return false;
     }
     if (!formData.password.trim()) {
@@ -41,11 +47,14 @@ export default function Login() {
     return true;
   };
 
+  // Handle form submission
+  // This function is called when the user submits the login form
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) return;
 
+    // Set loading state and reset messages
     setLoading(true);
     setError('');
     setSuccess('');
@@ -63,7 +72,7 @@ export default function Login() {
       // Use AuthContext to handle login
       login(response.user, response.token);
 
-      setSuccess('Log in succesful');
+      setSuccess('Login succesful');
 
       // Navigate based on user role
       const role = response.user.role;
@@ -88,7 +97,7 @@ export default function Login() {
       
       if (err.response) {
         // Server responded with error
-        const errorMessage = err.response.data?.message || 'Log in fail';
+        const errorMessage = err.response.data?.message || 'Login fail';
         setError(errorMessage);
       } else if (err.request) {
         // Network error
@@ -174,7 +183,7 @@ export default function Login() {
                 Loading...
               </>
             ) : (
-              'Log In'
+              'Login'
             )}
           </button>
         </form>
@@ -183,7 +192,7 @@ export default function Login() {
           <div className="register-link">
             <p>Don't have account yet?</p>
             <Link to="/register" className="register-button-link">
-              Please register
+              Register Now
             </Link>
           </div>
           

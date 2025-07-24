@@ -8,10 +8,10 @@ exports.login = async (req, res) => {
 
   try {
     const user = await findUserByEmail(email);
-    if (!user) return res.status(400).json({ message: 'Email không tồn tại' });
+    if (!user) return res.status(400).json({ message: "Email doesn't exist" });
 
     const match = await verifyPassword(password, user.password);
-    if (!match) return res.status(400).json({ message: 'Mật khẩu không đúng' });
+    if (!match) return res.status(400).json({ message: 'Incorrect password' });
 
     const token = signToken({ id: user._id, role: user.role });
 
@@ -20,7 +20,7 @@ exports.login = async (req, res) => {
       user: { id: user._id, name: user.name, role: user.role }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server Error: ' + err.message });
   }
 };
 exports.register = async (req, res) => {
@@ -28,17 +28,17 @@ exports.register = async (req, res) => {
   
     try {
       const existingUser = await User.findOne({ email });
-      if (existingUser) return res.status(400).json({ message: 'Email đã tồn tại' });
+      if (existingUser) return res.status(400).json({ message: 'Email already exists' });
   
       const hashed = await bcrypt.hash(password, 10);
       const newUser = await User.create({ name, email, password: hashed, role });
   
       res.status(201).json({
-        message: 'Đăng ký thành công',
+        message: 'User registered successfully',
         user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }
       });
     } catch (err) {
-      res.status(500).json({ message: 'Lỗi server: ' + err.message });
+      res.status(500).json({ message: 'Server Error: ' + err.message });
     }
   };
 
@@ -48,17 +48,17 @@ exports.changePassword = async (req, res) => {
   
     try {
       const user = await User.findById(req.user.id);
-      if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      if (!user) return res.status(404).json({ message: "User doesn't exist" });
   
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) return res.status(400).json({ message: 'Mật khẩu hiện tại không đúng' });
+      if (!isMatch) return res.status(400).json({ message: 'Incorrect Password' });
   
       user.password = await bcrypt.hash(newPassword, 10);
       await user.save();
   
-      res.json({ message: 'Đổi mật khẩu thành công' });
+      res.json({ message: 'Password changed successfully' });
     } catch (err) {
-      res.status(500).json({ message: 'Lỗi server: ' + err.message });
+      res.status(500).json({ message: 'Server Error: ' + err.message });
     }
   };
 
@@ -66,7 +66,7 @@ exports.changePassword = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+    if (!user) return res.status(404).json({ message: "User doesn't exist" });
     
     res.json({
       user: { 
@@ -77,6 +77,6 @@ exports.getMe = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server Error: ' + err.message });
   }
 };
