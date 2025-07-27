@@ -1,26 +1,38 @@
-require('dotenv').config();// Load environment variables from .env file, lấy các biến môi trường từ file .env
-const express = require('express');// Import express for routing, thư viện của Node.js để xây dựng ứng dụng web
-const cors = require('cors');// middleware to enable CORS (Cross-Origin Resource Sharing), cho phép các yêu cầu từ các nguồn khác nhau
-const connectDB = require('./Configs/DB');// Import the database connection function, kết nối tới MongoDB
-const authRoutes = require('./routes/auth.routes');// Import authentication routes, các route liên quan đến xác thực người dùng
-
-// cấu hình express app, khởi tạo ứng dụng express
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./configs/db');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
+const courseRoutes = require('./routes/course.routes');
+const enrollmentRoutes = require('./routes/enrollment.routes');
+const quizRoutes = require('./routes/quiz.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
+const certRoutes = require('./routes/certificate.routes');
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:3000', // Cho phép frontend truy cập
-  credentials: true,               // Cho phép gửi cookie/token nếu có
-}));
-app.use(express.json());// Parse JSON request bodies, phân tích cú pháp các yêu cầu JSON từ client
+app.use(cors());
+app.use(express.json());
 
 // Routes
-app.use('/api/auth', authRoutes);// Use authentication routes, sử dụng các route xác thực người dùng
+app.use('/api/auth', authRoutes);
 
-app.get('/', (req, res) => res.send('KOLP Backend is running'));// Root route to check if the server is running, route gốc để kiểm tra xem server có đang chạy hay không
+app.get('/', (req, res) => res.send('KOLP Backend is running 🚀'));
 
-const PORT = process.env.PORT || 8080;// 1 port to run the server, nếu không có biến môi trường PORT thì sử dụng 5000, 1 port lấy từ env hoặc 5000 nếu không có
+app.use('/api/user', userRoutes);
 
-// Connect to the database and start the server
-// Kết nối tới cơ sở dữ liệu và khởi động server
+app.use('/api/courses', courseRoutes);
+
+app.use('/api/enrollments', enrollmentRoutes);
+
+app.use('/api/quizzes', quizRoutes);
+
+app.use('/api/certificates', certRoutes);
+
+app.use('/api/dashboard', dashboardRoutes);
+
+app.use('/api/users', userRoutes);
+const PORT = process.env.PORT || 8080;
+
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

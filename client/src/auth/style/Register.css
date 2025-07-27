@@ -3,20 +3,42 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: url('../../../public/images/a.jpeg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
 }
 
+
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+
 .register-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   padding: 40px;
   width: 100%;
   max-width: 450px;
   animation: slideUp 0.6s ease-out;
+  position: relative;
+  z-index: 2;
 }
+
 
 @keyframes slideUp {
   from {
@@ -29,23 +51,29 @@
   }
 }
 
+
 .register-header {
   text-align: center;
   margin-bottom: 30px;
 }
 
+
 .register-title {
-  color: #333;
+  color: #ffffff;
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+
 .register-subtitle {
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   font-weight: 400;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
+
 
 .register-form {
   display: flex;
@@ -53,67 +81,178 @@
   gap: 20px;
 }
 
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
 
+
 .form-group {
   position: relative;
 }
+
 
 .form-group.full-width {
   grid-column: 1 / -1;
 }
 
+
 .form-input {
   width: 100%;
   padding: 15px 20px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   font-size: 16px;
   transition: all 0.3s ease;
-  background: #f8f9fa;
-  color: #333;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
+
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
+
 .form-input::placeholder {
-  color: #999;
+  color: rgba(255, 255, 255, 0.7);
 }
+
+
+/* Override browser autofill styles */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+
+.form-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.15) inset !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
 
 .form-select {
   width: 100%;
   padding: 15px 20px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   font-size: 16px;
   transition: all 0.3s ease;
-  background: #f8f9fa;
-  color: #333;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   box-sizing: border-box;
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
+
 
 .form-select:focus {
   outline: none;
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
+
+.form-select:-webkit-autofill,
+.form-select:-webkit-autofill:hover,
+.form-select:-webkit-autofill:focus,
+.form-select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+
+.form-select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.15) inset !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+
+/* Ensure text color is always visible */
+.form-input,
+.form-input:focus,
+.form-input:active,
+.form-input:hover,
+.form-select,
+.form-select:focus,
+.form-select:active,
+.form-select:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+
+.form-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  color: #ffffff !important;
+}
+
+
+.form-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  color: #ffffff !important;
+}
+
+
+/* Additional overrides for all possible states */
+.form-input[type="email"],
+.form-input[type="password"],
+.form-input[type="text"],
+.form-input[type="name"],
+.form-select {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+
+.form-input[type="email"]:focus,
+.form-input[type="password"]:focus,
+.form-input[type="text"]:focus,
+.form-input[type="name"]:focus,
+.form-select:focus {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+
 .register-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   padding: 15px 20px;
   border-radius: 12px;
   font-size: 16px;
@@ -121,16 +260,23 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
+
 
 .register-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
+
 
 .register-button:active {
   transform: translateY(0);
 }
+
 
 .register-button:disabled {
   opacity: 0.6;
@@ -138,25 +284,32 @@
   transform: none;
 }
 
+
 .error-message {
-  background: #fee;
-  color: #c33;
+  background: rgba(255, 107, 107, 0.2);
+  color: #ffffff;
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
   margin-bottom: 20px;
-  border-left: 4px solid #c33;
+  border-left: 4px solid #ff6b6b;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
+
 .success-message {
-  background: #efe;
-  color: #363;
+  background: rgba(76, 175, 80, 0.2);
+  color: #ffffff;
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
   margin-bottom: 20px;
-  border-left: 4px solid #363;
+  border-left: 4px solid #4caf50;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
+
 
 .loading {
   display: inline-block;
@@ -169,30 +322,35 @@
   margin-right: 10px;
 }
 
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+
 .login-link {
   text-align: center;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #e1e5e9;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+
 .login-link p {
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   margin-bottom: 15px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
+
 
 .login-button-link {
   display: inline-block;
   background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.5);
   padding: 12px 24px;
   border-radius: 12px;
   font-size: 14px;
@@ -200,14 +358,18 @@
   text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
+
 .login-button-link:hover {
-  background: #667eea;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
+
 
 /* Responsive design */
 @media (max-width: 480px) {
@@ -215,61 +377,64 @@
     padding: 30px 20px;
     margin: 10px;
   }
-  
+ 
   .register-title {
     font-size: 24px;
   }
-  
+ 
   .form-row {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+ 
   .form-input,
   .form-select {
     padding: 12px 16px;
     font-size: 14px;
   }
-  
+ 
   .register-button {
     padding: 12px 16px;
     font-size: 14px;
   }
 }
 
-/* Dark mode support */
+
+/* Dark mode support - Override for background image */
 @media (prefers-color-scheme: dark) {
   .register-card {
-    background: #1a1a1a;
+    background: rgba(255, 255, 255, 0.15);
     color: white;
   }
-  
+ 
   .register-title {
     color: white;
   }
-  
+ 
   .register-subtitle {
-    color: #ccc;
+    color: rgba(255, 255, 255, 0.9);
   }
-  
+ 
   .form-input,
   .form-select {
-    background: #2a2a2a;
-    border-color: #444;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
     color: white;
   }
-  
+ 
   .form-input:focus,
   .form-select:focus {
-    background: #333;
-    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #ffffff;
   }
-  
+ 
   .form-input::placeholder {
-    color: #888;
+    color: rgba(255, 255, 255, 0.7);
   }
-  
+ 
   .login-link {
-    color: #ccc;
+    color: rgba(255, 255, 255, 0.9);
   }
 }
+
