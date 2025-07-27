@@ -129,12 +129,13 @@ exports.submitQuiz = async (req, res) => {
 exports.createQuiz = async (req, res) => {
     const { courseId, quizSets } = req.body;
    
+    // Log the incoming data for debugging, in ra xem có lấy dữ liệu trên FE đúng k
     console.log('Creating quiz with data:', { courseId, quizSets });
     console.log('QuizSets type:', typeof quizSets);
     console.log('QuizSets length:', quizSets?.length);
     console.log('QuizSets content:', JSON.stringify(quizSets, null, 2));
    
-    // Validate input
+    // Validate input, kiếm tra dữ liệu có hợp lệ không
     if (!courseId) {
         return res.status(400).json({ message: 'Course ID is required' });
     }
@@ -143,7 +144,7 @@ exports.createQuiz = async (req, res) => {
         return res.status(400).json({ message: 'Quiz sets are required and must be an array' });
     }
    
-    // Validate each quiz set
+    // Validate each quiz set, duyệt mảng quizSets
     for (let i = 0; i < quizSets.length; i++) {
         const quizSet = quizSets[i];
         if (!quizSet.name || !quizSet.questions || !Array.isArray(quizSet.questions)) {
@@ -354,7 +355,7 @@ exports.getQuizByCourse = async (req, res) => {
 // Instructor lấy quiz theo course (có đáp án)
 exports.getQuizByCourseForInstructor = async (req, res) => {
     const quiz = await Quiz.findOne({ courseId: req.params.courseId });
-    if (!quiz) return res.status(404).json({ message: 'Chưa có quiz cho khoá học này' });
+    if (!quiz) return res.status(404).json({ message: 'Quiz for this course is not available' });
 
 
     console.log('Instructor - Quiz found for course:', req.params.courseId);
@@ -578,7 +579,23 @@ exports.getStudentQuizProgress = async (req, res) => {
     }
 };
 
+// Instructor lấy toàn bộ quiz mình tạo
+exports.getQuizzesByInstructor = async (req, res) => {
+    try {
+        // Get all courses owned by this instructor
+        const Course = require('../models/course.model');
+        const courses = await Course.find({ instructorId: req.user.id });
+        const courseIds = courses.map(course => course._id);
 
+        // Get all quizzes for these courses
+        const quizzes = await Quiz.find({ courseId: { $in: courseIds } })
+            .populate('courseId', 'title');
+
+        res.json(quizzes);
+    } catch (err) {
+        res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    }
+};
 
 
 

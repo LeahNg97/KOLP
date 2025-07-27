@@ -125,8 +125,8 @@ export default function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1 className="login-title">Đăng nhập</h1>
-          <p className="login-subtitle">Vui lòng nhập thông tin đăng nhập của bạn</p>
+          <h1 className="login-title">Welcome to KOLP</h1>
+          <p className="login-subtitle">Please login to your account</p>
         </div>
        
         {error && (
@@ -151,7 +151,7 @@ export default function Login() {
               name="email"
               type="email"
               className={`form-input ${error && !formData.email ? 'error' : ''}`}
-              placeholder="Nhập email của bạn"
+              placeholder="Please enter your email"
               value={formData.email}
               onChange={handleChange}
               onKeyPress={handleKeyPress}
@@ -162,13 +162,13 @@ export default function Login() {
           </div>
          
           <div className="form-group">
-            <label htmlFor="password" className="form-label">Mật khẩu</label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               id="password"
               name="password"
               type="password"
               className={`form-input ${error && !formData.password ? 'error' : ''}`}
-              placeholder="Nhập mật khẩu của bạn"
+              placeholder="Please enter your password"
               value={formData.password}
               onChange={handleChange}
               onKeyPress={handleKeyPress}
@@ -186,10 +186,10 @@ export default function Login() {
             {loading ? (
               <>
                 <span className="loading-spinner"></span>
-                Đang đăng nhập...
+                Loading...
               </>
             ) : (
-              'Đăng nhập'
+              'Login'
             )}
           </button>
         </form>
@@ -197,7 +197,7 @@ export default function Login() {
 
         <div className="login-footer">
           <div className="register-link">
-            <p>Chưa có tài khoản?</p>
+            <p>Don't have an account yet?</p>
             <Link to="/register" className="register-button-link">
               Đăng ký ngay
             </Link>
