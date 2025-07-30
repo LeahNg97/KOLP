@@ -30,15 +30,15 @@ export default function Login() {
 
   const validateForm = () => {
     if (!formData.email.trim()) {
-      setError('Email không được để trống');
+      setError('Email should not be empty');
       return false;
     }
     if (!formData.password.trim()) {
-      setError('Mật khẩu không được để trống');
+      setError('Password should not be empty');
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      setError('Password must be at least 6 characters long');
       return false;
     }
     return true;
@@ -72,7 +72,7 @@ export default function Login() {
       login(response.user, response.token);
 
 
-      setSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+      setSuccess('Login successfully! Redirecting...');
 
 
       // Navigate based on user role
@@ -99,14 +99,14 @@ export default function Login() {
      
       if (err.response) {
         // Server responded with error
-        const errorMessage = err.response.data?.message || 'Đăng nhập thất bại';
+        const errorMessage = err.response.data?.message || 'Login failed. Please try again.';
         setError(errorMessage);
       } else if (err.request) {
         // Network error
-        setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+        setError('Network error. Please check your connection.');
       } else {
         // Other error
-        setError('Có lỗi xảy ra. Vui lòng thử lại.');
+        setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -199,11 +199,11 @@ export default function Login() {
           <div className="register-link">
             <p>Don't have an account yet?</p>
             <Link to="/register" className="register-button-link">
-              Đăng ký ngay
+              Register Now
             </Link>
           </div>
          
-          <div className="test-accounts">
+          {/* <div className="test-accounts">
             <details>
               <summary> Tài khoản test</summary>
               <div className="test-accounts-list">
@@ -212,7 +212,7 @@ export default function Login() {
                 <div><strong>Admin:</strong> admin@kolp.vn / password123</div>
               </div>
             </details>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

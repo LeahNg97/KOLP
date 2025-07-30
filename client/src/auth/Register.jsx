@@ -92,7 +92,7 @@ export default function Register() {//khởi tạo component Register
       <div className="register-card">
         <div className="register-header">
           <h1 className="register-title">Register</h1>
-          <p className="register-subtitle">Create account to start</p>
+          <p className="register-subtitle">Create an account to start</p>
         </div>
         
         {error && (
@@ -189,7 +189,7 @@ export default function Register() {//khởi tạo component Register
         </form>
 
         <div className="login-link">
-          <p>Already have account?</p>
+          <p>Already have an account?</p>
           <Link to="/login" className="login-button-link">
             Sign in now  
           </Link>

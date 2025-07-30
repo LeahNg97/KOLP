@@ -1,5 +1,5 @@
 
-// 
+// Import necessary modules
 const jwt = require('jsonwebtoken');
 
 exports.verifyToken = (req, res, next) => {// Middleware to verify JWT token

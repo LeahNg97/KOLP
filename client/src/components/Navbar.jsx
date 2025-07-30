@@ -32,7 +32,7 @@ export default function Navbar() {
       <div className="navbar-brand">
         <Link to="/" className="navbar-logo">
           <span className="logo-text">KOLP</span>
-          <span className="logo-subtitle">Learning Platform</span>
+          <span className="logo-subtitle">Online Learning Platform</span>
         </Link>
       </div>
 
@@ -79,7 +79,7 @@ export default function Navbar() {
         </div>
         <button onClick={handleLogout} className="logout-button">
           <span className="logout-icon">🚪</span>
-          Đăng xuất
+          Log Out
         </button>
       </div>
 

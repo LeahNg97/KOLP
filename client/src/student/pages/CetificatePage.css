@@ -1,0 +1,23 @@
+.view-cert-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.13);
+  cursor: pointer;
+  display: inline-block;
+}
+.view-cert-btn:hover {
+  background: linear-gradient(135deg, #4c51bf 0%, #5f2c82 100%);
+  transform: translateY(-2px) scale(1.04);
+  color: #fff;
+  text-decoration: none;
+}
+
+
+

@@ -28,7 +28,7 @@ export default function Footer() {
             <div className="pro-footer-section-title">Contact</div>
             <div className="pro-footer-contact-row">
               <span>Email:</span>
-              <a href="mailto:support@eduplatform.com">support@kolp.com</a>
+              <a href="mailto:support@kolp.com">support@kolp.com</a>
             </div>
             <div className="pro-footer-contact-row">
               <span>Phone:</span>

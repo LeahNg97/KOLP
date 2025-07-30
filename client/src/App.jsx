@@ -5,6 +5,10 @@ import Navbar from './components/Navbar';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import StudentDashboard from './student/pages/StudentDashboard';
+import StudentCourse from './student/pages/StudentCourse';
+import CourseDetail from './student/pages/CourseDetail';
+import CertificatePage from './student/pages/CetificatePage';
+import CertificateDetail from './student/pages/CetificateDetail';
 
 // tạo nội dung chính của ứng dụng
 function AppContent() {
@@ -24,6 +28,10 @@ function AppContent() {
         {/* <Route path="/instructor/courses" element={<InstructorCourses />} /> */}
         {/* Student routes */}
         <Route path="/student" element={<StudentDashboard />} />
+        <Route path="/student/my-courses" element={<StudentCourse />} />
+        <Route path="/student/courses/:courseId" element={<CourseDetail />} />
+        <Route path="/student/certificates" element={<CertificatePage />} />
+        <Route path="/student/certificates/:certificateId" element={<CertificateDetail />} />
       </Routes>
     </>
   );
