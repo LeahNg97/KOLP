@@ -1,0 +1,68 @@
+.analytics-page {
+  padding: 32px 40px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.analytics-page h1 {
+  font-size: 2.2rem;
+  margin-bottom: 28px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.analytics-cards {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.analytics-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 28px 36px;
+  min-width: 180px;
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+.analytics-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+.card-title {
+  font-size: 1.1rem;
+  color: #718096;
+  margin-bottom: 10px;
+}
+.card-value {
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: #3182ce;
+}
+
+.analytics-section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 32px 36px;
+  margin-top: 18px;
+}
+.analytics-section h2 {
+  font-size: 1.3rem;
+  color: #2d3748;
+  margin-bottom: 18px;
+}
+.analytics-chart-placeholder {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0aec0;
+  font-size: 1.1rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+} 

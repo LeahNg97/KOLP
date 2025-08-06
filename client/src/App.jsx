@@ -9,6 +9,13 @@ import StudentCourse from './student/pages/StudentCourse';
 import CourseDetail from './student/pages/CourseDetail';
 import CertificatePage from './student/pages/CetificatePage';
 import CertificateDetail from './student/pages/CetificateDetail';
+import InstructorCourses from './instructor/pages/InstructorCourses'; 
+import CourseStudents from './instructor/pages/CourseStudents';
+import CourseContentManagement from './instructor/pages/CourseContentManagement';
+import CreateCourse from './instructor/pages/CreateCourse';
+import QuizManagement from './instructor/pages/QuizManagement';
+import StudentManagement from './instructor/pages/StudentManagement';
+import InstructorAnalytics from './instructor/pages/Analytics';
 
 // tạo nội dung chính của ứng dụng
 function AppContent() {
@@ -24,14 +31,25 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
         {/* Admin routes */}
         {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+
         {/* Instructor routes */}
-        {/* <Route path="/instructor/courses" element={<InstructorCourses />} /> */}
+        <Route path="/instructor/courses" element={<InstructorCourses />} />
+        <Route path="/instructor/courses/create" element={<CreateCourse />} />
+        <Route path="/instructor/courses/:courseId/students" element={<CourseStudents />} />
+        <Route path="/instructor/courses/:courseId/content" element={<CourseContentManagement />} />
+        <Route path="/instructor/courses/:courseId/quiz" element={<QuizManagement />} />
+        <Route path="/instructor/students" element={<StudentManagement />} />
+        <Route path="/instructor/analytics" element={<InstructorAnalytics />} />
+       
+
         {/* Student routes */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/my-courses" element={<StudentCourse />} />
         <Route path="/student/courses/:courseId" element={<CourseDetail />} />
         <Route path="/student/certificates" element={<CertificatePage />} />
         <Route path="/student/certificates/:certificateId" element={<CertificateDetail />} />
+
+    
       </Routes>
     </>
   );

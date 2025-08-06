@@ -50,7 +50,8 @@
 .student-search-bar {
   margin-bottom: 24px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  padding-left: 20px;
 }
 
 

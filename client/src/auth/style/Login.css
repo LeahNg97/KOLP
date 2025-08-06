@@ -188,8 +188,8 @@
 .form-input[type="password"],
 .form-input[type="text"] {
   background: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: black !important;
+  -webkit-text-fill-color: black !important;
 }
 
 
@@ -197,8 +197,8 @@
 .form-input[type="password"]:focus,
 .form-input[type="text"]:focus {
   background: rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: black !important;
+  -webkit-text-fill-color: black !important;
 }
 
 

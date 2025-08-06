@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 // The generated token can be used to authenticate users in subsequent requests
 // dung cho viec xac thuc nguoi dung trong cac yeu cau tiep theo, xac thuc dang nhap phan quyen nguoi dung, bao ve routes va tao token
 function signToken(payload) {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30m' });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 }
 
 module.exports = { signToken };// Export the signToken function for use in other parts of the application

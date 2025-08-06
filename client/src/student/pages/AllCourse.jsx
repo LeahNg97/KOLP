@@ -20,7 +20,7 @@ export default function AllCourses() {
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/courses/active', {
+        const res = await axios.get('http://localhost:/api/courses/active', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -41,7 +41,7 @@ export default function AllCourses() {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/enrollments', { courseId }, {
+      await axios.post('http://localhost:8080/api/enrollments', { courseId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Show success message or redirect
