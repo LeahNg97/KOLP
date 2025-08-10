@@ -16,6 +16,11 @@ import CreateCourse from './instructor/pages/CreateCourse';
 import QuizManagement from './instructor/pages/QuizManagement';
 import StudentManagement from './instructor/pages/StudentManagement';
 import InstructorAnalytics from './instructor/pages/Analytics';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import UserManagement from './admin/pages/UserManagement';
+import CourseManagement from './admin/pages/CourseManagement';
+import CertificateManagement from './admin/pages/CertificateManagement';
+import QuizResultsAnalytics from './admin/pages/QuizResultsAnalytics';
 
 // tạo nội dung chính của ứng dụng
 function AppContent() {
@@ -29,9 +34,14 @@ function AppContent() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* Admin routes */}
-        {/* <Route path="/admin" element={<AdminDashboard />} /> */}
 
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/admin/courses" element={<CourseManagement />} />
+        <Route path="/admin/certificates" element={<CertificateManagement />} />
+        <Route path="/admin/analytics" element={<QuizResultsAnalytics />} />
+        
         {/* Instructor routes */}
         <Route path="/instructor/courses" element={<InstructorCourses />} />
         <Route path="/instructor/courses/create" element={<CreateCourse />} />

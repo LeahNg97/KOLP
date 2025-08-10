@@ -1,0 +1,94 @@
+.user-table-wrapper {
+  margin-top: 30px;
+  overflow-x: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  overflow: hidden;
+}
+
+.user-table th, .user-table td {
+  padding: 14px 18px;
+  text-align: left;
+}
+
+.user-table th {
+  background: #f5f6fa;
+  color: #667eea;
+  font-weight: 700;
+  font-size: 15px;
+  border-bottom: 2px solid #e1e5e9;
+}
+
+.user-table tr {
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.user-table tr:last-child {
+  border-bottom: none;
+}
+
+.user-table td {
+  font-size: 15px;
+  color: #333;
+}
+
+.user-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.user-update {
+  background: #e9eafc;
+  color: #667eea;
+  border: 1px solid #667eea;
+}
+
+.user-update:hover {
+  background: #667eea;
+  color: white;
+}
+
+.user-delete {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #c33;
+}
+
+.user-delete:hover {
+  background: #c33;
+  color: white;
+}
+
+.user-loading, .user-error {
+  margin-top: 30px;
+  font-size: 16px;
+  color: #667eea;
+  text-align: center;
+}
+
+.user-error {
+  color: #c33;
+}
+
+@media (max-width: 600px) {
+  .user-table th, .user-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  .user-btn {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+} 

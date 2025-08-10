@@ -1,0 +1,273 @@
+/* Certificate Management Styles */
+.cert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.cert-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.cert-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.stat-item {
+  background: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6c757d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item strong {
+  color: #667eea;
+  font-weight: 700;
+}
+
+.cert-table-wrapper {
+  margin-top: 30px;
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  overflow: hidden;
+}
+
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.cert-table th, .cert-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.cert-table th {
+  background: #f5f6fa;
+  color: #667eea;
+  font-weight: 700;
+  font-size: 15px;
+  border-bottom: 2px solid #e1e5e9;
+}
+
+.cert-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cert-table td {
+  font-size: 15px;
+  color: #333;
+  vertical-align: middle;
+}
+
+.student-info, .course-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name, .course-title {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.cert-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cert-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cert-issue {
+  background: #e9eafc;
+  color: #667eea;
+  border: 1px solid #667eea;
+}
+
+.cert-issue:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.cert-revoke {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #c33;
+}
+
+.cert-revoke:hover:not(:disabled) {
+  background: #c33;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.cert-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.issued {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.cert-loading, .cert-error {
+  margin-top: 30px;
+  font-size: 16px;
+  color: #667eea;
+  text-align: center;
+  padding: 40px;
+}
+
+.cert-error {
+  color: #c33;
+}
+
+.cert-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  margin-top: 30px;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.cert-empty h3 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.cert-empty p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .cert-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .cert-stats {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 900px) {
+  .cert-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .cert-table th, .cert-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .cert-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .cert-stats {
+    gap: 10px;
+  }
+  
+  .stat-item {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cert-table-wrapper {
+    margin-top: 20px;
+  }
+  
+  .cert-table th, .cert-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  
+  .cert-btn {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  
+  .cert-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .cert-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .stat-item {
+    text-align: center;
+  }
+  
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  
+  .cert-empty {
+    padding: 40px 15px;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+  }
+  
+  .cert-empty h3 {
+    font-size: 1.3rem;
+  }
+} 
