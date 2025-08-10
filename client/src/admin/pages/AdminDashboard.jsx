@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
 import { Pie, Line } from 'react-chartjs-2';
-import AdminSidebar from '../components/AdminSidebar';
 import './AdminDashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
@@ -132,7 +131,6 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="admin-layout">
-        <AdminSidebar />
         <main className="admin-main">
           <div className="dashboard-loading">Loading dashboard...</div>
         </main>
@@ -143,7 +141,6 @@ export default function AdminDashboard() {
   if (error) {
     return (
       <div className="admin-layout">
-        <AdminSidebar />
         <main className="admin-main">
           <div className="dashboard-error">{error}</div>
         </main>
@@ -153,7 +150,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-layout">
-      <AdminSidebar />
       <main className="admin-main">
         <div className="dashboard-header">
           <h1 className="admin-dashboard-title">Admin Dashboard</h1>

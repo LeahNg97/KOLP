@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import AdminSidebar from '../components/AdminSidebar';
 import './CourseManagement.css';
 
 export default function CourseManagement() {
@@ -120,7 +119,6 @@ export default function CourseManagement() {
 
   return (
     <div className="admin-layout">
-      <AdminSidebar />
       <main className="admin-main">
         <h1>Course Management</h1>
         <div className="course-controls">

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './CourseContentManagement.css';
 
 export default function CourseContentManagement() {
@@ -199,7 +198,6 @@ export default function CourseContentManagement() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="content-loading">
             <div className="loading-spinner"></div>
@@ -212,7 +210,6 @@ export default function CourseContentManagement() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="content-management">
           <div className="content-header">

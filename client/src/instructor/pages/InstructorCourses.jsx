@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getMyCourses, deleteCourse } from '../api/courseApi';
-import InstructorSidebar from '../components/InstructorSidebar';
 import InstructorCourseCard from '../components/InstructorCourseCard';
 import './InstructorCourses.css';
 
@@ -89,7 +88,6 @@ export default function InstructorCourses() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="courses-loading">
             <div className="loading-spinner"></div>
@@ -102,12 +100,11 @@ export default function InstructorCourses() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="instructor-courses">
           <div className="courses-header">
             <div className="header-content">
-              <h1>My Courses 📚</h1>
+              <h1>My Courses</h1>
               <p>Manage and organize all your courses in one place</p>
               <p className="status-note">💡 Course approval status is managed by administrators</p>
             </div>

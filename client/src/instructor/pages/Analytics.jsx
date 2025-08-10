@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './Analytics.css';
 import axios from 'axios';
 
@@ -72,7 +71,6 @@ export default function InstructorAnalytics() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="analytics-page">
           <h1>📈 Instructor Analytics</h1>

@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getStudentsByCourse, approveEnrollment, rejectEnrollment } from '../api/enrollmentApi';
 import { getCourseById } from '../api/courseApi';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './CourseStudents.css';
 
 export default function CourseStudents() {
@@ -203,7 +202,6 @@ export default function CourseStudents() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="students-loading">
             <div className="loading-spinner"></div>
@@ -216,7 +214,6 @@ export default function CourseStudents() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="course-students">
           <div className="students-header">

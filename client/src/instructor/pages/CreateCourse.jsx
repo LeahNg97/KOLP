@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './CreateCourse.css';
 
 export default function CreateCourse() {
@@ -85,7 +84,6 @@ export default function CreateCourse() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="create-course">
           <div className="create-course-header">
