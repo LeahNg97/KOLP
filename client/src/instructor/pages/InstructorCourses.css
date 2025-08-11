@@ -6,8 +6,8 @@
 
 .instructor-main {
   flex: 1;
-  margin-left: 250px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin-left: 0;
+  background: white;
 }
 
 /* Instructor Courses Page Styles */

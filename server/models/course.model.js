@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 const courseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
+  price: { 
+    type: Number, 
+    required: true, 
+    min: 0,
+    default: 0 
+  },
   instructorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -21,23 +27,32 @@ const courseSchema = new mongoose.Schema({
       description: { type: String }
     }
   ],
-  // Full course content (visible only to accepted students)
-  content: [
+  // Course sections containing lessons
+  sections: [
     {
-      type: {
-        type: String,
-        enum: ['video', 'pdf', 'slide', 'text'],
-        required: true
-      },
-      url: { type: String, required: true },
-      title: { type: String },
-      description: { type: String }
+      title: { type: String, required: true },
+      description: { type: String },
+      order: { type: Number, required: true },
+      lessons: [
+        {
+          title: { type: String, required: true },
+          description: { type: String },
+          type: {
+            type: String,
+            enum: ['video', 'pdf', 'slide', 'text'],
+            required: true
+          },
+          url: { type: String, required: true },
+          duration: { type: Number }, // in minutes
+          order: { type: Number, required: true }
+        }
+      ]
     }
   ],
-  imageIntroduction: { type: String },// Image URL for course introduction, vì là đường link
+  imageIntroduction: { type: String },
   status: { 
     type: String, 
-    enum: ['pending', 'active', 'inactive', 'draft'], // bắt buộc phải là 1 trong 4 trạng thái
+    enum: ['pending', 'active', 'inactive', 'draft'], 
     default: 'pending' 
   },
   adminNote: { type: String },

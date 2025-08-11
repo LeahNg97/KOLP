@@ -101,14 +101,12 @@ export default function Navbar() {
 
       <div className="navbar-user">
         <div className="user-info" onClick={handleProfileClick}>
-          <span className="user-avatar">👤</span>
           <div className="user-details">
             <span className="user-name">{user?.name}</span>
-            <span className="user-role">{user?.role}</span>
+            {/* <span className="user-role">{user?.role}</span> */}
           </div>
         </div>
         <button onClick={handleLogout} className="logout-button">
-          <span className="logout-icon">🚪</span>
           Log Out
         </button>
       </div>

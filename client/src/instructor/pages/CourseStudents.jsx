@@ -202,6 +202,7 @@ export default function CourseStudents() {
   if (loading) {
     return (
       <div className="instructor-layout">
+
         <main className="instructor-main">
           <div className="students-loading">
             <div className="loading-spinner"></div>
@@ -214,6 +215,7 @@ export default function CourseStudents() {
 
   return (
     <div className="instructor-layout">
+
       <main className="instructor-main">
         <div className="course-students">
           <div className="students-header">

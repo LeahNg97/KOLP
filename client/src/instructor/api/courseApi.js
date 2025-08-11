@@ -67,3 +67,14 @@ export const getCourseById = async (courseId) => {
   });
   return response.data;
 }; 
+
+//Get all student enrolled in instructor's course (Instructor only)
+export const getStudentsByCourse = async (token) => {
+  const response = await axios.get(`${API_BASE_URL}/enrollments/instructor-students`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+

@@ -29,21 +29,28 @@ exports.getCourseById = async (req, res) => {
 
 
 // POST, tạo khoá học
-exports.createCourse = async (req, res) => {// req là những cái từ database gửi lên, res là những cái gửi về client
-  const { title, description, content, imageIntroduction } = req.body;// req.body sẽ lên server
-  // Lấy thông tin khoá học từ body request, req.body là nơi chứa dữ liệu gửi lên từ client
+exports.createCourse = async (req, res) => {
+  console.log('Create course request received:', req.body);
+  console.log('User from token:', req.user);
+  
+  const { title, description, price, sections, imageIntroduction } = req.body;
 
-// lấy course tùy course model, tạo mới khoá học với các trường bắt buộc
-  const newCourse = await Course.create({
-    title,
-    description,
-    content,
-    imageIntroduction,
-    instructorId: req.user.id// lấy ID người tạo khoá học
-  });
+  try {
+    const newCourse = await Course.create({
+      title,
+      description,
+      price: price || 0,
+      sections: sections || [],
+      imageIntroduction,
+      instructorId: req.user.id
+    });
 
-
-  res.status(201).json(newCourse);// Trả về khoá học mới tạo với mã trạng thái 201 (Created), báo cho FE biết
+    console.log('Course created successfully:', newCourse);
+    res.status(201).json(newCourse);
+  } catch (error) {
+    console.error('Error creating course:', error);
+    res.status(500).json({ message: 'Error creating course: ' + error.message });
+  }
 };
 
 

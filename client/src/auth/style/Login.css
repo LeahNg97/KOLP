@@ -247,7 +247,7 @@
 }
 
 
-.loading-spinner {
+/* .loading-spinner {
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -262,7 +262,7 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
 
 
 .login-footer {

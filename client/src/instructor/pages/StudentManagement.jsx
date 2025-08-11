@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './StudentManagement.css';
+import { getMyCourses, getStudentsByCourse } from '../api/courseApi';
 
 export default function StudentManagement() {
   const [students, setStudents] = useState([]);
@@ -56,10 +57,8 @@ export default function StudentManagement() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/enrollments/instructor-students', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setStudents(response.data);
+      const response = await getStudentsByCourse(token);
+      setStudents(response);
       setError('');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch students');
@@ -71,10 +70,8 @@ export default function StudentManagement() {
   const fetchCourses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/courses/my-courses', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCourses(response.data);
+      const response = await getMyCourses(token);
+      setCourses(response);
     } catch (err) {
       console.error('Failed to fetch courses:', err);
     }
@@ -141,6 +138,7 @@ export default function StudentManagement() {
   if (loading) {
     return (
       <div className="instructor-layout">
+
         <main className="instructor-main">
           <div className="students-loading">
             <div className="loading-spinner"></div>
@@ -153,6 +151,7 @@ export default function StudentManagement() {
 
   return (
     <div className="instructor-layout">
+
       <main className="instructor-main">
         <div className="student-management">
           <div className="students-header">

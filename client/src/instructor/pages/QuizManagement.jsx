@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 import './QuizManagement.css';
+import { getCourseById } from '../api/courseApi';
+import { getQuizByCourseId, getQuizResultsByCourseId } from '../api/quizApi';
 
 export default function QuizManagement() {
   const { courseId } = useParams();
@@ -45,17 +48,13 @@ export default function QuizManagement() {
       const token = localStorage.getItem('token');
       
       // Fetch course details
-      const courseRes = await axios.get(`http://localhost:8080/api/courses/${courseId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCourse(courseRes.data);
+      const courseRes = await getCourseById(token, courseId);
+      setCourse(courseRes);
 
       // Fetch existing quiz if any
       try {
-        const quizRes = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}/instructor`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setQuiz(quizRes.data);
+        const quizRes = await getQuizByCourseId(token, courseId);
+        setQuiz(quizRes);
           
         // Convert existing quiz sets to question sets format
         if (quizRes.data.quizSets && quizRes.data.quizSets.length > 0) {
@@ -76,10 +75,8 @@ export default function QuizManagement() {
 
       // Fetch quiz results
       try {
-        const resultsRes = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}/summary`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setSubmissions(resultsRes.data.submissions || []);
+        const resultsRes = await getQuizResultsByCourseId(token, courseId);
+        setSubmissions(resultsRes.submissions || []);
       } catch (err) {
         console.log('No submissions found');
       }
@@ -300,7 +297,7 @@ export default function QuizManagement() {
       
       if (quiz) {
         // Update existing quiz
-        await axios.put(`http://localhost:8080/api/quizzes/${quiz.quizId || quiz._id}`, {
+        await axios.put(`http://localhost:8008/api/quizzes/${quiz.quizId || quiz._id}`, {
           quizSets: quizSets
         }, {
           headers: { Authorization: `Bearer ${token}` }
