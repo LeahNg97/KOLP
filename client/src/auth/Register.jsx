@@ -132,7 +132,7 @@ export default function Register() {//khởi tạo component Register
               >
                 <option value="student">Student</option>
                 <option value="instructor">Instructor</option>
-                <option value="admin">Admin</option>
+                {/* <option value="admin">Admin</option> */}
               </select>
             </div>
           </div>

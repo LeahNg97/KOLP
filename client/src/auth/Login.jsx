@@ -145,7 +145,7 @@ export default function Login() {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email" className="form-label">Email</label>
+            <label htmlFor="email" className="form-label-login">Email</label>
             <input
               id="email"
               name="email"
@@ -162,7 +162,7 @@ export default function Login() {
           </div>
          
           <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
+            <label htmlFor="password" className="form-label-login">Password</label>
             <input
               id="password"
               name="password"

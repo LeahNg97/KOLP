@@ -245,9 +245,9 @@ export default function CourseContentManagement() {
       <div key={index} className="content-item">
         <div className="content-header">
           <div className="content-type-badge">
-            {item.type === 'video' && '🎥'}
-            {item.type === 'image' && '🖼️'}
-            {item.type === 'text' && '📝'}
+            {item.type === 'video'}
+            {item.type === 'image'}
+            {item.type === 'text'}
             {item.type}
           </div>
           <div className="content-actions">
@@ -263,27 +263,7 @@ export default function CourseContentManagement() {
 
         {item.title && <h4 className="content-title">{item.title}</h4>}
         {item.description && <p className="content-description">{item.description}</p>}
-        
-        <div className="content-preview">
-          {item.type === 'video' && (
-            <video controls className="content-video">
-              <source src={item.url} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
-          {item.type === 'image' && (
-            <img src={item.url} alt={item.title || 'Content'} className="content-image" />
-          )}
-          {item.type === 'text' && (
-            <div className="content-text">
-              <p>{item.description}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="content-url">
-          <strong>URL:</strong> {item.url}
-        </div>
+       
       </div>
     );
   };
@@ -301,7 +281,7 @@ export default function CourseContentManagement() {
             onClick={() => handleDeleteSection(sectionIndex)}
             title="Delete Section"
           >
-            🗑️ Delete Section
+            Delete Section
           </button>
         </div>
 
@@ -326,10 +306,10 @@ export default function CourseContentManagement() {
               
               <div className="lesson-details">
                 <div className="lesson-type-badge">
-                  {lesson.type === 'video' && '🎥'}
-                  {lesson.type === 'pdf' && '📄'}
-                  {lesson.type === 'slide' && '📊'}
-                  {lesson.type === 'text' && '📝'}
+                  {lesson.type === 'video' }
+                  {lesson.type === 'pdf' }
+                  {lesson.type === 'slide' }
+                  {lesson.type === 'text' }
                   {lesson.type}
                 </div>
                 {lesson.duration > 0 && (

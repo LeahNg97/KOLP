@@ -152,11 +152,11 @@ export default function CourseStudents() {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { text: 'Pending', class: 'status-pending', icon: '⏳' },
-      approved: { text: 'Approved', class: 'status-approved', icon: '✅' }
+      pending: { text: 'Pending', class: 'status-pending' },
+      approved: { text: 'Approved', class: 'status-approved'}
     };
     
-    const config = statusConfig[status] || { text: status, class: 'status-default', icon: '❓' };
+    const config = statusConfig[status] || { text: status, class: 'status-default' };
     return (
       <span className={`status-badge ${config.class}`}>
         {config.icon} {config.text}
@@ -226,7 +226,7 @@ export default function CourseStudents() {
               >
                 ← Back to Courses
               </button>
-              <h1>Course Students 👥</h1>
+              <h1>Manage Students</h1>
               {course && (
                 <p className="course-title">{course.title}</p>
               )}
