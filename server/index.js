@@ -9,6 +9,7 @@ const enrollmentRoutes = require('./routes/enrollment.routes');
 const quizRoutes = require('./routes/quiz.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const certRoutes = require('./routes/certificate.routes');
+const paymentRoutes = require('./routes/payment.routes');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -29,6 +30,8 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/certificates', certRoutes);
 
 app.use('/api/dashboard', dashboardRoutes);
+
+app.use('/api/payments', paymentRoutes);
 
 app.use('/api/users', userRoutes);
 const PORT = process.env.PORT || 8080;

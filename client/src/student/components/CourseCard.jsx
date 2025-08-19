@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PaymentModal from './PaymentModal';
 import './CourseCard.css';
+
 
 export default function CourseCard({ course, onClick, className = '', onEnrollmentSuccess }) {
   const navigate = useNavigate();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  
+ 
   // Use imageIntroduction if available
   const introImage = course.imageIntroduction;
 
+
   const handleLearnNow = (e) => {
     e.stopPropagation(); // Prevent triggering the card's onClick
-    
+   
     if (course.price === 0) {
       // Free course - navigate directly
       navigate(`/student/courses/${course._id}`);
     } else {
       // Paid course - show payment modal
+      setShowPaymentModal(true);
     }
   };
+
 
   const handlePaymentSuccess = (result) => {
     setIsEnrolled(true);
@@ -28,6 +34,7 @@ export default function CourseCard({ course, onClick, className = '', onEnrollme
     // Navigate to course after successful payment
     navigate(`/student/courses/${course._id}`);
   };
+
 
   const getButtonText = () => {
     if (isEnrolled) {
@@ -39,6 +46,7 @@ export default function CourseCard({ course, onClick, className = '', onEnrollme
     return `Enroll Now - $${course.price}`;
   };
 
+
   const getButtonClass = () => {
     if (isEnrolled) {
       return 'learn-now-btn enrolled';
@@ -48,6 +56,7 @@ export default function CourseCard({ course, onClick, className = '', onEnrollme
     }
     return 'learn-now-btn paid';
   };
+
 
   return (
     <>
@@ -68,13 +77,24 @@ export default function CourseCard({ course, onClick, className = '', onEnrollme
             <span className="price-paid">${course.price}</span>
           )}
         </div>
-        <button 
+        <button
           className={getButtonClass()}
           onClick={handleLearnNow}
         >
           {getButtonText()}
         </button>
       </div>
+
+
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        course={course}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
     </>
   );
-} 
+}
+
+
+
