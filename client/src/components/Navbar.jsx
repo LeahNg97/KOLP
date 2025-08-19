@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import UserProfile from './UserProfile';
+import NotificationBell from './NotificationBell';
 import './Navbar.css';
 
 
@@ -100,6 +101,9 @@ export default function Navbar() {
 
 
       <div className="navbar-user">
+        {(user?.role === 'student' || user?.role === 'instructor') && (
+          <NotificationBell userRole={user.role} />
+        )}
         <div className="user-info" onClick={handleProfileClick}>
           <div className="user-details">
             <span className="user-name">{user?.name}</span>
