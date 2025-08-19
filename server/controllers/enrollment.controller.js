@@ -1,4 +1,5 @@
 const Enrollment = require('../models/enrollment.model');
+const NotificationService = require('../services/notification.service');
 
 // Sinh viên đăng ký khóa học
 exports.enrollCourse = async (req, res) => {
@@ -17,6 +18,13 @@ exports.enrollCourse = async (req, res) => {
     status: 'pending'
   });
 
+  // Tạo thông báo cho instructor
+  try {
+    await NotificationService.notifyEnrollmentRequest(enrollment._id);
+  } catch (error) {
+    console.error('Error creating enrollment notification:', error);
+  }
+
   res.status(201).json(enrollment);
 };
 
@@ -29,6 +37,14 @@ exports.approveEnrollment = async (req, res) => {
     { new: true }
   );
   if (!enrollment) return res.status(404).json({ message: 'Không tìm thấy đăng ký' });
+  
+  // Tạo thông báo cho học sinh
+  try {
+    await NotificationService.notifyEnrollmentApproval(enrollmentId, true);
+  } catch (error) {
+    console.error('Error creating approval notification:', error);
+  }
+  
   res.json(enrollment);
 };
 

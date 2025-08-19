@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const submissionSchema = new mongoose.Schema({
   quizId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Quiz',// lấy từ bảng quiz từ quiz model
+    ref: 'Quiz',
     required: true
   },
   quizSetId: {

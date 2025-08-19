@@ -12,25 +12,207 @@ const {
 
 const { verifyToken, authorizeRole } = require('../middleware/auth.middleware');
 
-// Sinh viên đăng ký khóa học
+/**
+ * @swagger
+ * /api/enrollments:
+ *   post:
+ *     summary: Enroll in a course (Student only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - courseId
+ *             properties:
+ *               courseId:
+ *                 type: string
+ *                 description: Course ID to enroll in
+ *     responses:
+ *       201:
+ *         description: Enrollment created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Enrollment'
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Bad request
+ */
 router.post('/', verifyToken, authorizeRole('student'), enrollCourse);
 
-// Sinh viên xem khóa học của mình
+/**
+ * @swagger
+ * /api/enrollments/my-courses:
+ *   get:
+ *     summary: Get current user's enrolled courses (Student only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of enrolled courses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Enrollment'
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/my-courses', verifyToken, authorizeRole('student'), getMyEnrollments);
 
-// Instructor/Admin xem danh sách sinh viên trong khóa học
+/**
+ * @swagger
+ * /api/enrollments/by-course/{courseId}/students:
+ *   get:
+ *     summary: Get students enrolled in a specific course (Instructor/Admin only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Course ID
+ *     responses:
+ *       200:
+ *         description: List of enrolled students
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   studentId:
+ *                     type: string
+ *                   studentName:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                   enrolledAt:
+ *                     type: string
+ *                     format: date-time
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/by-course/:courseId/students', verifyToken, authorizeRole('admin', 'instructor'), getStudentsByCourse);
 
-// Instructor xem tất cả sinh viên đăng ký khóa học của mình
+/**
+ * @swagger
+ * /api/enrollments/instructor-students:
+ *   get:
+ *     summary: Get all students enrolled in instructor's courses (Instructor only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of students in instructor's courses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   studentId:
+ *                     type: string
+ *                   studentName:
+ *                     type: string
+ *                   courseId:
+ *                     type: string
+ *                   courseTitle:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/instructor-students', verifyToken, authorizeRole('instructor'), getInstructorStudents);
 
-// Instructor/Admin duyệt đăng ký
+/**
+ * @swagger
+ * /api/enrollments/{enrollmentId}/approve:
+ *   put:
+ *     summary: Approve enrollment (Instructor/Admin only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: enrollmentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Enrollment ID
+ *     responses:
+ *       200:
+ *         description: Enrollment approved successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Enrollment not found
+ */
 router.put('/:enrollmentId/approve', verifyToken, authorizeRole('admin', 'instructor'), approveEnrollment);
 
-// Instructor/Admin từ chối đăng ký
+/**
+ * @swagger
+ * /api/enrollments/{enrollmentId}/reject:
+ *   delete:
+ *     summary: Reject enrollment (Instructor/Admin only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: enrollmentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Enrollment ID
+ *     responses:
+ *       200:
+ *         description: Enrollment rejected successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Enrollment not found
+ */
 router.delete('/:enrollmentId/reject', verifyToken, authorizeRole('admin', 'instructor'), rejectEnrollment);
 
-// Student hủy đăng ký khóa học
+/**
+ * @swagger
+ * /api/enrollments/{enrollmentId}:
+ *   delete:
+ *     summary: Cancel enrollment (Student only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: enrollmentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Enrollment ID
+ *     responses:
+ *       200:
+ *         description: Enrollment cancelled successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Enrollment not found
+ */
 router.delete('/:enrollmentId', verifyToken, authorizeRole('student'), cancelEnrollment);
 
 module.exports = router;

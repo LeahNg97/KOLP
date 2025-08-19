@@ -6,4 +6,4 @@ const certificateSchema = new mongoose.Schema({
   issuedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.models.Certificate || mongoose.model('Certificate', certificateSchema)
+module.exports = mongoose.models.Certificate || mongoose.model('Certificate', certificateSchema);

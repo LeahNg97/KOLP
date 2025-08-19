@@ -1,19 +1,28 @@
 const Certificate = require('../models/certificate.model');
 
+// Get all certificates for admin view
+exports.getAllCertificates = async (req, res) => {
+  try {
+    const certificates = await Certificate.find()
+      .populate('studentId', 'name email')
+      .populate('courseId', 'title')
+      .sort({ issuedAt: -1 });
+    res.json(certificates);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error: ' + err.message });
+  }
+};
 
 exports.getMyCertificates = async (req, res) => {
   const certs = await Certificate.find({ studentId: req.user.id }).populate('courseId', 'title');
   res.json(certs);
 };
 
-// Issue certificate for a student, only for completed courses
 exports.issueCertificate = async (req, res) => {
   const { courseId, studentId } = req.body;
 
-
   const exists = await Certificate.findOne({ studentId, courseId });
   if (exists) return res.status(400).json({ message: 'Đã cấp chứng chỉ' });
-
 
   const cert = await Certificate.create({ studentId, courseId });
   res.status(201).json(cert);
@@ -60,4 +69,3 @@ exports.getCertificateById = async (req, res) => {
     res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };
-

@@ -1,16 +1,14 @@
 const Quiz = require('../models/quiz.model');
 const Submission = require('../models/submission.model');
 const Enrollment = require('../models/enrollment.model');
-
+const Course = require('../models/course.model');
 
 exports.submitQuiz = async (req, res) => {
     const { quizId, quizSetId, answers } = req.body;
     const quiz = await Quiz.findById(quizId);
     if (!quiz) return res.status(404).json({ message: 'Quiz không tồn tại' });
 
-
     let quizSet, correctAnswers, totalQuestions;
-
 
     // Handle both old format (questions) and new format (quizSets)
     if (quiz.quizSets && quiz.quizSets.length > 0) {
@@ -19,6 +17,61 @@ exports.submitQuiz = async (req, res) => {
         if (!quizSet) return res.status(404).json({ message: 'Quiz set không tồn tại' });
         correctAnswers = quizSet.questions.map(q => q.answer);
         totalQuestions = quizSet.questions.length;
+        // Ensure only answers for this quiz set are counted
+        const trimmedAnswers = answers.slice(0, totalQuestions);
+        let scoreSet = 0;
+        for (let i = 0; i < trimmedAnswers.length; i++) {
+            if (trimmedAnswers[i] === correctAnswers[i]) scoreSet++;
+        }
+        // Save submission
+        const submissionSet = await Submission.create({
+            quizId,
+            quizSetId,
+            studentId: req.user.id,
+            answers: trimmedAnswers,
+            score: scoreSet
+        });
+        // Calculate progress based on completed quiz sets
+        const enrollmentSet = await Enrollment.findOne({ 
+            studentId: req.user.id, 
+            courseId: quiz.courseId 
+        });
+        if (enrollmentSet) {
+            const percent = (scoreSet / totalQuestions) * 100;
+            const passed = percent >= 60;
+            if (!enrollmentSet.attemptedQuizSets.includes(quizSetId)) {
+                enrollmentSet.attemptedQuizSets.push(quizSetId);
+            }
+            if (passed) {
+                if (!enrollmentSet.completedQuizSets.includes(quizSetId)) {
+                    enrollmentSet.completedQuizSets.push(quizSetId);
+                }
+            }
+            let activeQuizSetsCount;
+            if (quiz.quizSets && quiz.quizSets.length > 0) {
+                activeQuizSetsCount = quiz.quizSets.filter(set => set.isActive !== false).length;
+            } else {
+                activeQuizSetsCount = 1;
+            }
+            const attemptedProgressPercentage = activeQuizSetsCount > 0 
+                ? Math.round((enrollmentSet.attemptedQuizSets.length / activeQuizSetsCount) * 100)
+                : 0;
+            const passedProgressPercentage = activeQuizSetsCount > 0 
+                ? Math.round((enrollmentSet.completedQuizSets.length / activeQuizSetsCount) * 100)
+                : 0;
+            const allQuizSetsAttempted = enrollmentSet.attemptedQuizSets.length === activeQuizSetsCount;
+            const courseCompleted = allQuizSetsAttempted && enrollmentSet.instructorApproved;
+            enrollmentSet.progress = attemptedProgressPercentage;
+            enrollmentSet.completed = courseCompleted;
+            await enrollmentSet.save();
+        }
+        res.status(201).json({
+            message: '✅ Nộp bài thành công',
+            score: scoreSet,
+            passed: (scoreSet / totalQuestions) * 100 >= 60,
+            quizSetId
+        });
+        return;
     } else if (quiz.questions && quiz.questions.length > 0) {
         // Old format - use quiz ID as quizSetId
         if (quizSetId !== quiz._id.toString()) {
@@ -26,156 +79,104 @@ exports.submitQuiz = async (req, res) => {
         }
         correctAnswers = quiz.questions.map(q => q.answer);
         totalQuestions = quiz.questions.length;
+        const trimmedAnswers = answers.slice(0, totalQuestions);
+        let scoreOld = 0;
+        for (let i = 0; i < trimmedAnswers.length; i++) {
+            if (trimmedAnswers[i] === correctAnswers[i]) scoreOld++;
+        }
+        const submissionOld = await Submission.create({
+            quizId,
+            quizSetId,
+            studentId: req.user.id,
+            answers: trimmedAnswers,
+            score: scoreOld
+        });
+        const enrollmentOld = await Enrollment.findOne({ 
+            studentId: req.user.id, 
+            courseId: quiz.courseId 
+        });
+        if (enrollmentOld) {
+            const percent = (scoreOld / totalQuestions) * 100;
+            const passed = percent >= 60;
+            if (!enrollmentOld.attemptedQuizSets.includes(quizSetId)) {
+                enrollmentOld.attemptedQuizSets.push(quizSetId);
+            }
+            if (passed) {
+                if (!enrollmentOld.completedQuizSets.includes(quizSetId)) {
+                    enrollmentOld.completedQuizSets.push(quizSetId);
+                }
+            }
+            let activeQuizSetsCount = 1;
+            const attemptedProgressPercentage = Math.round((enrollmentOld.attemptedQuizSets.length / activeQuizSetsCount) * 100);
+            const passedProgressPercentage = Math.round((enrollmentOld.completedQuizSets.length / activeQuizSetsCount) * 100);
+            const allQuizSetsAttempted = enrollmentOld.attemptedQuizSets.length === activeQuizSetsCount;
+            const courseCompleted = allQuizSetsAttempted && enrollmentOld.instructorApproved;
+            enrollmentOld.progress = attemptedProgressPercentage;
+            enrollmentOld.completed = courseCompleted;
+            await enrollmentOld.save();
+        }
+        res.status(201).json({
+            message: '✅ Nộp bài thành công',
+            score: scoreOld,
+            passed: (scoreOld / totalQuestions) * 100 >= 60,
+            quizSetId
+        });
+        return;
     } else {
         return res.status(404).json({ message: 'Quiz không có câu hỏi' });
     }
-
-
-    // ❌ Không cho nộp nhiều lần cho cùng một quiz set
-    const existing = await Submission.findOne({
-        quizId,
-        quizSetId,
-        studentId: req.user.id
-    });
-    if (existing) {
-        return res.status(400).json({ message: 'Bạn đã nộp bài cho quiz set này rồi' });
-    }
-
-
-    let score = 0;
-    for (let i = 0; i < answers.length; i++) {
-        if (answers[i] === correctAnswers[i]) score++;
-    }
-
-
-    const submission = await Submission.create({
-        quizId,
-        quizSetId,
-        studentId: req.user.id,
-        answers,
-        score
-    });
-
-
-    // Calculate progress based on completed quiz sets
-    const enrollment = await Enrollment.findOne({
-        studentId: req.user.id,
-        courseId: quiz.courseId
-    });
-
-
-    if (enrollment) {
-        const percent = (score / totalQuestions) * 100;
-        const passed = percent >= 60;
-
-
-        // Always add to attempted quiz sets if not already there
-        if (!enrollment.attemptedQuizSets.includes(quizSetId)) {
-            enrollment.attemptedQuizSets.push(quizSetId);
-        }
-
-
-        if (passed) {
-            // Add to completed quiz sets if not already there
-            if (!enrollment.completedQuizSets.includes(quizSetId)) {
-                enrollment.completedQuizSets.push(quizSetId);
-            }
-        }
-
-
-        // Calculate progress percentage based on active quiz sets
-        let activeQuizSetsCount;
-        if (quiz.quizSets && quiz.quizSets.length > 0) {
-            activeQuizSetsCount = quiz.quizSets.filter(set => set.isActive !== false).length;
-        } else {
-            // Old format - count as 1 quiz set
-            activeQuizSetsCount = 1;
-        }
-
-
-        // Progress based on attempted quizzes (shows completion of all quizzes)
-        const attemptedProgressPercentage = activeQuizSetsCount > 0
-            ? Math.round((enrollment.attemptedQuizSets.length / activeQuizSetsCount) * 100)
-            : 0;
-
-
-        // Passed progress based on passed quizzes (shows quality of performance)
-        const passedProgressPercentage = activeQuizSetsCount > 0
-            ? Math.round((enrollment.completedQuizSets.length / activeQuizSetsCount) * 100)
-            : 0;
-
-
-        // Course is completed when all active quiz sets are attempted AND instructor approves
-        const allQuizSetsAttempted = enrollment.attemptedQuizSets.length === activeQuizSetsCount;
-        const courseCompleted = allQuizSetsAttempted && enrollment.instructorApproved;
-
-
-        enrollment.progress = attemptedProgressPercentage; // Use attempted progress for main progress
-        enrollment.completed = courseCompleted;
-        await enrollment.save();
-    }
-
-
-    res.status(201).json({
-        message: '✅ Nộp bài thành công',
-        score,
-        passed: (score / totalQuestions) * 100 >= 60,
-        quizSetId
-    });
 };
-
 
 // Instructor tạo quiz
 exports.createQuiz = async (req, res) => {
     const { courseId, quizSets } = req.body;
-   
-    // Log the incoming data for debugging, in ra xem có lấy dữ liệu trên FE đúng k
+    
     console.log('Creating quiz with data:', { courseId, quizSets });
     console.log('QuizSets type:', typeof quizSets);
     console.log('QuizSets length:', quizSets?.length);
     console.log('QuizSets content:', JSON.stringify(quizSets, null, 2));
-   
-    // Validate input, kiếm tra dữ liệu có hợp lệ không
+    
+    // Validate input
     if (!courseId) {
         return res.status(400).json({ message: 'Course ID is required' });
     }
-   
+    
     if (!quizSets || !Array.isArray(quizSets) || quizSets.length === 0) {
         return res.status(400).json({ message: 'Quiz sets are required and must be an array' });
     }
-   
-    // Validate each quiz set, duyệt mảng quizSets
+    
+    // Validate each quiz set
     for (let i = 0; i < quizSets.length; i++) {
         const quizSet = quizSets[i];
         if (!quizSet.name || !quizSet.questions || !Array.isArray(quizSet.questions)) {
-            return res.status(400).json({
-                message: `Quiz set ${i + 1} must have name and questions array`
+            return res.status(400).json({ 
+                message: `Quiz set ${i + 1} must have name and questions array` 
             });
         }
-       
+        
         if (quizSet.questions.length === 0) {
-            return res.status(400).json({
-                message: `Quiz set ${i + 1} must have at least one question`
+            return res.status(400).json({ 
+                message: `Quiz set ${i + 1} must have at least one question` 
             });
         }
-       
+        
         // Validate each question
         for (let j = 0; j < quizSet.questions.length; j++) {
             const question = quizSet.questions[j];
             if (!question.text || !question.options || !Array.isArray(question.options) || question.options.length < 2) {
-                return res.status(400).json({
-                    message: `Question ${j + 1} in quiz set ${i + 1} must have text and at least 2 options`
+                return res.status(400).json({ 
+                    message: `Question ${j + 1} in quiz set ${i + 1} must have text and at least 2 options` 
                 });
             }
-           
+            
             if (!question.answer || !question.options.includes(question.answer)) {
-                return res.status(400).json({
-                    message: `Question ${j + 1} in quiz set ${i + 1} must have a valid answer from options`
+                return res.status(400).json({ 
+                    message: `Question ${j + 1} in quiz set ${i + 1} must have a valid answer from options` 
                 });
             }
         }
     }
-   
+    
     try {
         // Check if instructor owns this course
         const Course = require('../models/course.model');
@@ -184,11 +185,9 @@ exports.createQuiz = async (req, res) => {
             return res.status(403).json({ message: 'Bạn không có quyền tạo quiz cho khóa học này' });
         }
 
-
         console.log('Course found:', course.title);
         console.log('Instructor ID:', req.user.id);
         console.log('Course instructor ID:', course.instructorId.toString());
-
 
         const quiz = await Quiz.create({ courseId, quizSets });
         console.log('Quiz created successfully:', quiz._id);
@@ -200,14 +199,12 @@ exports.createQuiz = async (req, res) => {
     }
 };
 
-
 // Instructor cập nhật quiz
 exports.updateQuiz = async (req, res) => {
     const { quizId } = req.params;
     const { quizSets } = req.body;
     const quiz = await Quiz.findById(quizId);
     if (!quiz) return res.status(404).json({ message: 'Quiz không tồn tại' });
-
 
     // Check if instructor owns this course
     const Course = require('../models/course.model');
@@ -216,13 +213,11 @@ exports.updateQuiz = async (req, res) => {
         return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa quiz này' });
     }
 
-
     // Build a map of existing quiz sets by _id (as string)
     const existingSetsMap = {};
     quiz.quizSets.forEach(set => {
         if (set._id) existingSetsMap[set._id.toString()] = set;
     });
-
 
     // Build new quizSets array
     const newQuizSets = quizSets.map(set => {
@@ -239,42 +234,35 @@ exports.updateQuiz = async (req, res) => {
         }
     });
 
-
     quiz.quizSets = newQuizSets;
     await quiz.save();
     res.json(quiz);
 };
-
 
 // Student lấy quiz theo course
 exports.getQuizByCourse = async (req, res) => {
     const quiz = await Quiz.findOne({ courseId: req.params.courseId });
     if (!quiz) return res.status(404).json({ message: 'Chưa có quiz cho khoá học này' });
 
-
     console.log('Quiz found for course:', req.params.courseId);
     console.log('Quiz data:', JSON.stringify(quiz, null, 2));
 
-
     // Get student's enrollment to check completed quiz sets
-    const enrollment = await Enrollment.findOne({
-        studentId: req.user.id,
-        courseId: req.params.courseId
+    const enrollment = await Enrollment.findOne({ 
+        studentId: req.user.id, 
+        courseId: req.params.courseId 
     });
-   
+    
     console.log('Student enrollment:', enrollment);
     console.log('Enrollment status:', enrollment?.status);
 
-
     // Get all submissions for this student in this course
-    const submissions = await Submission.find({
-        quizId: quiz._id,
-        studentId: req.user.id
+    const submissions = await Submission.find({ 
+        quizId: quiz._id, 
+        studentId: req.user.id 
     });
 
-
     let quizSetsWithStatus = [];
-
 
     // Handle both old format (questions) and new format (quizSets)
     if (quiz.quizSets && quiz.quizSets.length > 0) {
@@ -282,13 +270,12 @@ exports.getQuizByCourse = async (req, res) => {
         quizSetsWithStatus = quiz.quizSets.map(quizSet => {
             const submission = submissions.find(sub => sub.quizSetId === quizSet._id.toString());
             const isCompleted = submission && (submission.score / quizSet.questions.length) * 100 >= 60;
-           
+            
             // Hide answers when sending to student
             const hiddenQuestions = quizSet.questions.map(q => ({
                 text: q.text,
                 options: q.options
             }));
-
 
             return {
                 quizSetId: quizSet._id,
@@ -310,13 +297,12 @@ exports.getQuizByCourse = async (req, res) => {
         // Old format - convert to quizSet format
         const submission = submissions.find(sub => !sub.quizSetId); // Old submissions don't have quizSetId
         const isCompleted = submission && (submission.score / quiz.questions.length) * 100 >= 60;
-       
+        
         // Hide answers when sending to student
         const hiddenQuestions = quiz.questions.map(q => ({
             text: q.text,
             options: q.options
         }));
-
 
         quizSetsWithStatus = [{
             quizSetId: quiz._id, // Use quiz ID as quizSetId for old format
@@ -335,9 +321,8 @@ exports.getQuizByCourse = async (req, res) => {
         }];
     }
 
-
-    const response = {
-        quizId: quiz._id,
+    const response = { 
+        quizId: quiz._id, 
         quizSets: quizSetsWithStatus,
         totalQuizSets: quizSetsWithStatus.filter(set => set.isActive !== false).length,
         attemptedQuizSets: enrollment?.attemptedQuizSets?.length || 0,
@@ -347,20 +332,16 @@ exports.getQuizByCourse = async (req, res) => {
         completed: enrollment?.completed || false
     };
 
-
     res.json(response);
 };
-
 
 // Instructor lấy quiz theo course (có đáp án)
 exports.getQuizByCourseForInstructor = async (req, res) => {
     const quiz = await Quiz.findOne({ courseId: req.params.courseId });
-    if (!quiz) return res.status(404).json({ message: 'Quiz for this course is not available' });
-
+    if (!quiz) return res.status(404).json({ message: 'Chưa có quiz cho khoá học này' });
 
     console.log('Instructor - Quiz found for course:', req.params.courseId);
     console.log('Instructor - Quiz data:', JSON.stringify(quiz, null, 2));
-
 
     // Check if instructor owns this course
     const Course = require('../models/course.model');
@@ -369,10 +350,8 @@ exports.getQuizByCourseForInstructor = async (req, res) => {
         return res.status(403).json({ message: 'Bạn không có quyền xem quiz này' });
     }
 
-
     let quizSets = [];
     let totalQuizSets = 0;
-
 
     // Handle both old format (questions) and new format (quizSets)
     if (quiz.quizSets && quiz.quizSets.length > 0) {
@@ -390,18 +369,15 @@ exports.getQuizByCourseForInstructor = async (req, res) => {
         totalQuizSets = 1;
     }
 
-
     // Return full quiz data with answers for instructor
-    const response = {
-        quizId: quiz._id,
+    const response = { 
+        quizId: quiz._id, 
         quizSets: quizSets,
         totalQuizSets: totalQuizSets
     };
 
-
     res.json(response);
 };
-
 
 // Instructor xem bài nộp theo quiz
 exports.getSubmissionsByQuiz = async (req, res) => {
@@ -411,7 +387,6 @@ exports.getSubmissionsByQuiz = async (req, res) => {
     res.json(submissions);
 };
 
-
 exports.getMySubmission = async (req, res) => {
     const { quizId } = req.params;
     const submission = await Submission.findOne({
@@ -419,26 +394,20 @@ exports.getMySubmission = async (req, res) => {
         studentId: req.user.id
     });
 
-
     if (!submission) return res.status(404).json({ message: 'Bạn chưa làm bài' });
-
 
     res.json(submission);
 };
 
-
 exports.getSummaryByCourse = async (req, res) => {
     const { courseId } = req.params;
-
 
     const quiz = await Quiz.findOne({ courseId });
     if (!quiz) return res.status(404).json({ message: 'Không có quiz' });
 
-
     const submissions = await Submission.find({ quizId: quiz._id })
         .populate('studentId', 'name email')
         .sort({ score: -1 });
-
 
     res.json({
         quizId: quiz._id,
@@ -447,11 +416,10 @@ exports.getSummaryByCourse = async (req, res) => {
     });
 };
 
-
 // Instructor approve course completion for a student
 exports.approveCourseCompletion = async (req, res) => {
     const { courseId, studentId } = req.params;
-   
+    
     try {
         // Check if instructor owns this course
         const Course = require('../models/course.model');
@@ -460,42 +428,44 @@ exports.approveCourseCompletion = async (req, res) => {
             return res.status(403).json({ message: 'Bạn không có quyền phê duyệt khóa học này' });
         }
 
-
         const enrollment = await Enrollment.findOne({ courseId, studentId });
         if (!enrollment) {
             return res.status(404).json({ message: 'Không tìm thấy đăng ký khóa học' });
         }
-
 
         // Check if student has attempted all active quiz sets
         const quiz = await Quiz.findOne({ courseId });
         if (quiz) {
             const activeQuizSets = quiz.quizSets.filter(set => set.isActive);
             const allQuizSetsAttempted = enrollment.attemptedQuizSets.length === activeQuizSets.length;
-           
+            
             if (!allQuizSetsAttempted) {
-                return res.status(400).json({
-                    message: 'Học viên chưa thực hiện tất cả các bài quiz'
+                return res.status(400).json({ 
+                    message: 'Học viên chưa thực hiện tất cả các bài quiz' 
                 });
             }
         }
-
 
         enrollment.instructorApproved = true;
         enrollment.completed = true;
         enrollment.graduatedAt = new Date();
         await enrollment.save();
 
+        // Automatically issue certificate when course is approved
+        const Certificate = require('../models/certificate.model');
+        const existingCertificate = await Certificate.findOne({ studentId, courseId });
+        if (!existingCertificate) {
+            await Certificate.create({ studentId, courseId });
+        }
 
-        res.json({
+        res.json({ 
             message: 'Phê duyệt hoàn thành khóa học thành công',
-            enrollment
+            enrollment 
         });
     } catch (err) {
         res.status(500).json({ message: 'Lỗi server: ' + err.message });
     }
 };
-
 
 // Instructor fetches a student's quiz progress in a course
 exports.getStudentQuizProgress = async (req, res) => {
@@ -504,13 +474,10 @@ exports.getStudentQuizProgress = async (req, res) => {
         const quiz = await Quiz.findOne({ courseId });
         if (!quiz) return res.status(404).json({ message: 'No quiz for this course.' });
 
-
         const enrollment = await Enrollment.findOne({ courseId, studentId });
         if (!enrollment) return res.status(404).json({ message: 'Student not enrolled.' });
 
-
         const submissions = await Submission.find({ quizId: quiz._id, studentId });
-
 
         let quizSetsWithStatus = [];
         if (quiz.quizSets && quiz.quizSets.length > 0) {
@@ -561,7 +528,6 @@ exports.getStudentQuizProgress = async (req, res) => {
             }];
         }
 
-
         // If student has graduated, always return completed = true and progress = 100%
         const graduated = !!enrollment?.graduatedAt;
         res.json({
@@ -579,23 +545,18 @@ exports.getStudentQuizProgress = async (req, res) => {
     }
 };
 
-// Instructor lấy toàn bộ quiz mình tạo
+// Lấy tất cả quiz của instructor hiện tại
 exports.getQuizzesByInstructor = async (req, res) => {
-    try {
-        // Get all courses owned by this instructor
-        const Course = require('../models/course.model');
-        const courses = await Course.find({ instructorId: req.user.id });
-        const courseIds = courses.map(course => course._id);
-
-        // Get all quizzes for these courses
-        const quizzes = await Quiz.find({ courseId: { $in: courseIds } })
-            .populate('courseId', 'title');
-
-        res.json(quizzes);
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi server: ' + err.message });
-    }
+  try {
+    // Tìm tất cả khoá học mà instructor này dạy
+    const courses = await Course.find({ instructorId: req.user.id });
+    const courseIds = courses.map(course => course._id);
+    // Tìm tất cả quiz thuộc các khoá học đó
+    const quizzes = await Quiz.find({ courseId: { $in: courseIds } });
+    res.json(quizzes);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch quizzes for instructor' });
+  }
 };
-
 
 

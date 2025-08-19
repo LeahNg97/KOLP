@@ -15,11 +15,10 @@ const quizSetSchema = new mongoose.Schema({
 const quizSchema = new mongoose.Schema({
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',// Reference to the Course model
+    ref: 'Course',
     required: true
   },
   quizSets: [quizSetSchema]
 }, { timestamps: true });
 
 module.exports = mongoose.models.Quiz || mongoose.model('Quiz', quizSchema);
-// Export the Quiz model, or use the existing one if it already exists: tên chính của model, định nghĩa chính của model đó
