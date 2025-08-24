@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import AdminSidebar from '../components/AdminSidebar';
 import './CertificateManagement.css';
 
 export default function CertificateManagement() {
@@ -66,6 +67,7 @@ export default function CertificateManagement() {
 
   return (
     <div className="admin-layout">
+      <AdminSidebar />
       <main className="admin-main">
         <div className="cert-header">
           <h1>Certificate Management</h1>

@@ -3,20 +3,17 @@ import { getNotificationIcon } from './NotificationService';
 import NotificationApi from '../api/NotificationApi';
 import './NotificationBell.css';
 
-
 export default function NotificationBell({ userRole = 'student' }) {
   const [notifications, setNotifications] = useState([]);
- 
+  
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
-
 
   useEffect(() => {
     const unread = notifications.filter(notif => !notif.isRead).length;
     setUnreadCount(unread);
   }, [notifications]);
-
 
   // Fetch notifications from API
   useEffect(() => {
@@ -33,10 +30,8 @@ export default function NotificationBell({ userRole = 'student' }) {
       }
     };
 
-
     fetchNotifications();
   }, []);
-
 
   // Fetch unread count
   useEffect(() => {
@@ -51,10 +46,8 @@ export default function NotificationBell({ userRole = 'student' }) {
       }
     };
 
-
     fetchUnreadCount();
   }, []);
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -63,24 +56,21 @@ export default function NotificationBell({ userRole = 'student' }) {
       }
     };
 
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
-
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-
   const markAsRead = async (id) => {
     try {
       await NotificationApi.markAsRead(id);
-      setNotifications(prev =>
-        prev.map(notif =>
+      setNotifications(prev => 
+        prev.map(notif => 
           notif._id === id ? { ...notif, isRead: true } : notif
         )
       );
@@ -89,11 +79,10 @@ export default function NotificationBell({ userRole = 'student' }) {
     }
   };
 
-
   const markAllAsRead = async () => {
     try {
       await NotificationApi.markAllAsRead();
-      setNotifications(prev =>
+      setNotifications(prev => 
         prev.map(notif => ({ ...notif, isRead: true }))
       );
       setUnreadCount(0);
@@ -104,15 +93,12 @@ export default function NotificationBell({ userRole = 'student' }) {
 
 
 
-
-
-
   return (
     <div className="notification-bell" ref={dropdownRef}>
-      <button
-        className="notification-button"
+      <button 
+        className="notification-button" 
         onClick={toggleDropdown}
-        aria-label="Notification"
+        aria-label="Thông báo"
       >
         <span className="bell-icon">🔔</span>
         {unreadCount > 0 && (
@@ -120,30 +106,29 @@ export default function NotificationBell({ userRole = 'student' }) {
         )}
       </button>
 
-
       {isOpen && (
         <div className="notification-dropdown">
           <div className="notification-header">
-            <h3>Notification</h3>
+            <h3>Thông báo</h3>
             {unreadCount > 0 && (
-              <button
+              <button 
                 className="mark-all-read-btn"
                 onClick={markAllAsRead}
               >
-                Mark all as read
+                Đánh dấu đã đọc
               </button>
             )}
           </div>
-         
+          
           <div className="notification-list">
             {notifications.length === 0 ? (
               <div className="no-notifications">
-                <span>No notifications</span>
+                <span>Không có thông báo nào</span>
               </div>
             ) : (
               notifications.map(notification => (
-                <div
-                  key={notification._id}
+                <div 
+                  key={notification._id} 
                   className={`notification-item ${!notification.isRead ? 'unread' : ''}`}
                   onClick={() => markAsRead(notification._id)}
                 >
@@ -164,15 +149,12 @@ export default function NotificationBell({ userRole = 'student' }) {
               ))
             )}
           </div>
-         
+          
           <div className="notification-footer">
-            <button className="view-all-btn">View all</button>
+            <button className="view-all-btn">Xem tất cả</button>
           </div>
         </div>
       )}
     </div>
   );
 }
-
-
-

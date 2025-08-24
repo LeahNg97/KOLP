@@ -5,81 +5,43 @@ import UserProfile from './UserProfile';
 import NotificationBell from './NotificationBell';
 import './Navbar.css';
 
-
 export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
-
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-
   const handleProfileClick = () => {
     setShowProfile(true);
   };
 
-
   if (!isAuthenticated()) {
     return null; // Don't show navbar for unauthenticated users
   }
-
 
   return (
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/" className="navbar-logo">
           <span className="logo-text">KOLP</span>
-          <span className="logo-subtitle">Online Learning Platform</span>
+          <span className="logo-subtitle">Learning Platform</span>
         </Link>
       </div>
-
 
       <div className="navbar-menu">
         {user?.role === 'admin' && (
           <>
-            <Link to="/admin" className="nav-link">
-
-              Admin Dashboard
-            </Link>
-            <Link to="/admin/users" className="nav-link">
-
-              Manage Users
-            </Link>
-            <Link to="/admin/courses" className="nav-link">
-
-              Manage Courses
-            </Link>
-            <Link to="/admin/certificates" className="nav-link">
-
-              Certificate Management
-            </Link>
-            <Link to="/admin/analytics" className="nav-link">
-
-              Quiz Results / Analytics
-            </Link>
-
           </>
         )}
-
 
         {user?.role === 'instructor' && (
           <>
-            <Link to="/instructor/courses" className="nav-link">
-              My Courses
-            </Link>
-            <Link to="/instructor/students" className="nav-link">
-              All Students
-            </Link>
-            <Link to="/instructor/analytics" className="nav-link">
-              Analytics
-            </Link>
           </>
         )}
-
 
         {user?.role === 'student' && (
           <>
@@ -99,29 +61,26 @@ export default function Navbar() {
         )}
       </div>
 
-
       <div className="navbar-user">
+
         {(user?.role === 'student' || user?.role === 'instructor') && (
           <NotificationBell userRole={user.role} />
         )}
+        
         <div className="user-info" onClick={handleProfileClick}>
+          <span className="user-avatar">👤</span>
           <div className="user-details">
             <span className="user-name">{user?.name}</span>
-            {/* <span className="user-role">{user?.role}</span> */}
+            <span className="user-role">{user?.role}</span>
           </div>
         </div>
         <button onClick={handleLogout} className="logout-button">
-          Log Out
+          <span className="logout-icon">🚪</span>
+          Đăng xuất
         </button>
       </div>
-
 
       <UserProfile isOpen={showProfile} onClose={() => setShowProfile(false)} />
     </nav>
   );
 }
-
-
-
-
-

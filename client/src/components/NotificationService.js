@@ -1,18 +1,16 @@
 // NotificationService.js - Service để quản lý thông báo
 
-
 export const getDefaultNotifications = (userRole) => {
   const baseNotifications = [
     {
       id: 1,
-      title: 'WELCOME!',
+      title: 'Chào mừng bạn!',
       message: 'Chào mừng bạn đến với nền tảng học tập KOLP',
       time: 'Vừa xong',
       isRead: true,
       type: 'welcome'
     }
   ];
-
 
   if (userRole === 'student') {
     return [
@@ -52,7 +50,6 @@ export const getDefaultNotifications = (userRole) => {
     ];
   }
 
-
   if (userRole === 'instructor') {
     return [
       ...baseNotifications,
@@ -91,10 +88,8 @@ export const getDefaultNotifications = (userRole) => {
     ];
   }
 
-
   return baseNotifications;
 };
-
 
 export const getNotificationIcon = (type) => {
   switch (type) {
@@ -119,7 +114,6 @@ export const getNotificationIcon = (type) => {
   }
 };
 
-
 export const getNotificationColor = (type) => {
   switch (type) {
     case 'course':
@@ -142,8 +136,3 @@ export const getNotificationColor = (type) => {
       return '#868e96';
   }
 };
-
-
-
-
-

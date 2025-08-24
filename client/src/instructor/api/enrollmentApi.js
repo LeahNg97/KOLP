@@ -13,6 +13,17 @@ export const getStudentsByCourse = async (courseId) => {
   return response.data;
 };
 
+// Get all students enrolled in instructor's courses
+export const getInstructorStudents = async () => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`${API_BASE_URL}/enrollments/instructor-students`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
 // Approve student enrollment
 export const approveEnrollment = async (enrollmentId) => {
   const token = localStorage.getItem('token');

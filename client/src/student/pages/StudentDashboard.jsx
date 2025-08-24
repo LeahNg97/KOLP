@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { fetchActiveCourses } from '../api/courseApi';
 import './StudentDashboard.css';
 import CourseCard from '../components/CourseCard';
 import Footer from '../../components/Footer';
 
-
 const COURSES_PER_PAGE = 12;
-
 
 export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
@@ -17,34 +16,51 @@ export default function StudentDashboard() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-
+  // useEffect(() => {
+  //   const fetchCourses = async () => {
+  //     setLoading(true);
+  //     setError('');
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const res = await axios.get('http://localhost:8080/api/courses/active', {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
+  //       setCourses(res.data);
+  //     } catch (err) {
+  //       setError(err.response?.data?.message || 'Failed to load courses.');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchCourses();
+  // }, []);
   useEffect(() => {
-    const fetchCourses = async () => {
+    const loadCourses = async () => {
       setLoading(true);
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:8080/api/courses/active', {// lấy những khóa học đang hoạt động
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setCourses(res.data);
+        
+       
+        
+        const data = await fetchActiveCourses(token);
+        setCourses(data);
       } catch (err) {
+        console.error('Error loading courses:', err);
         setError(err.response?.data?.message || 'Failed to load courses.');
       } finally {
         setLoading(false);
       }
     };
-    fetchCourses();
+    loadCourses();
   }, []);
-
 
   // Filter courses by search
   const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(search.toLowerCase())
   );
-
 
   // Pagination
   const totalPages = Math.ceil(filteredCourses.length / COURSES_PER_PAGE);
@@ -53,12 +69,6 @@ export default function StudentDashboard() {
     page * COURSES_PER_PAGE
   );
 
-
-  // Group courses into rows of 4
-  const rows = [];
-  for (let i = 0; i < paginatedCourses.length; i += 4) {
-    rows.push(paginatedCourses.slice(i, i + 4));
-  }
 
 
   return (
@@ -83,20 +93,12 @@ export default function StudentDashboard() {
       ) : (
         <>
           <div className="student-courses-grid">
-            {rows.map((row, idx) => (
-              <div className="student-courses-row" key={idx}>
-                {row.map(course => (
-                  <CourseCard
-                    key={course._id}
-                    course={course}
-                    onClick={() => navigate(`/student/courses/${course._id}`)}
-                  />
-                ))}
-                {/* Fill empty columns if needed for layout */}
-                {Array.from({ length: 4 - row.length }).map((_, i) => (
-                  <div className="student-course-card empty" key={`empty-${i}`}></div>
-                ))}
-              </div>
+            {paginatedCourses.map(course => (
+              <CourseCard
+                key={course._id}
+                course={course}
+                onClick={() => navigate(`/student/courses/${course._id}`)}
+              />
             ))}
           </div>
           {/* Pagination controls */}
@@ -133,5 +135,4 @@ export default function StudentDashboard() {
     </div>
   );
 }
- 
-
+  

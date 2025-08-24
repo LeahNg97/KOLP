@@ -1,0 +1,174 @@
+.certificate-detail-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #e8f5f0, #ffffff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0 0 0;
+}
+
+.certificate-detail-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #17c3b2;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #0f9b8a;
+}
+
+.certificate {
+  border: 8px solid #17c3b2;
+  padding: 40px;
+  max-width: 800px;
+  margin: auto;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.logo {
+  text-align: center;
+  font-size: 28px;
+  color: #17c3b2;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+}
+
+.logo-academy {
+  color: #000;
+}
+
+.title {
+  text-align: center;
+  font-size: 36px;
+  margin-top: 10px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  color: #333;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: #777;
+}
+
+.recipient {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #333;
+}
+
+.description {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 40px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.description strong {
+  color: #17c3b2;
+  font-weight: bold;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 60px;
+  align-items: center;
+}
+
+.footer .signature {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.footer .signature strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.medal {
+  text-align: center;
+  font-size: 40px;
+  color: #ffd700;
+}
+
+.background-icon {
+  position: absolute;
+  opacity: 0.05;
+  font-size: 120px;
+  top: 20px;
+  right: 40px;
+  transform: rotate(-15deg);
+}
+
+.cert-loading, .cert-error {
+  text-align: center;
+  color: #a0aec0;
+  font-size: 1.1rem;
+  margin: 32px 0;
+}
+
+@media (max-width: 768px) {
+  .certificate {
+    padding: 20px;
+    margin: 0 10px 32px 10px;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .subtitle {
+    font-size: 16px;
+  }
+  
+  .recipient {
+    font-size: 24px;
+  }
+  
+  .description {
+    font-size: 16px;
+  }
+  
+  .footer {
+    padding: 0 20px;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .footer .signature {
+    font-size: 12px;
+  }
+  
+  .footer .signature strong {
+    font-size: 14px;
+  }
+  
+  .medal {
+    font-size: 30px;
+  }
+} 

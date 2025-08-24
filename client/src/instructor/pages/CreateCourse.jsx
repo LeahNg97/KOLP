@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { createCourse } from '../api/courseApi';
+import InstructorSidebar from '../components/InstructorSidebar';
 import './CreateCourse.css';
 
 export default function CreateCourse() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
+    subtitle: '',
     description: '',
+    level: 'beginner',
+    priceType: 'free',
     price: 0,
-    imageIntroduction: '',
-    sections: []
+    salePrice: 0,
+    currency: 'AUD',
+    thumbnailUrl: '',
+    promoVideoUrl: '',
+    introductionAssets: [],
+    status: 'draft',
+    modules: []
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,166 +36,178 @@ export default function CreateCourse() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     console.log('Form field changed:', name, value);
+    
     setFormData(prev => {
+      let newValue = type === 'checkbox' ? checked : value;
+      
+      // Handle price type change
+      if (name === 'priceType') {
+        if (value === 'free') {
+          newValue = { ...prev, priceType: value, price: 0, salePrice: 0 };
+        } else {
+          newValue = { ...prev, priceType: value };
+        }
+      }
+      
       const newData = {
         ...prev,
-        [name]: value
+        [name]: newValue
       };
+      
+      // If price type is free, reset price fields
+      if (name === 'priceType' && value === 'free') {
+        newData.price = 0;
+        newData.salePrice = 0;
+      }
+      
       console.log('Updated form data:', newData);
       return newData;
     });
+    
     // Clear error when user starts typing
     if (error) setError('');
   };
 
-  const addSection = () => {
-    const newSection = {
+  const addModule = () => {
+    const newModule = {
       title: '',
-      description: '',
-      order: formData.sections.length + 1,
+      summary: '',
+      order: formData.modules.length + 1,
       lessons: []
     };
     setFormData(prev => ({
       ...prev,
-      sections: [...prev.sections, newSection]
+      modules: [...prev.modules, newModule]
     }));
   };
 
-  const updateSection = (index, field, value) => {
+  const updateModule = (index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      sections: prev.sections.map((section, i) => 
-        i === index ? { ...section, [field]: value } : section
+      modules: prev.modules.map((module, i) => 
+        i === index ? { ...module, [field]: value } : module
       )
     }));
   };
 
-  const removeSection = (index) => {
+  const removeModule = (index) => {
     setFormData(prev => ({
       ...prev,
-      sections: prev.sections.filter((_, i) => i !== index).map((section, i) => ({
-        ...section,
+      modules: prev.modules.filter((_, i) => i !== index).map((module, i) => ({
+        ...module,
         order: i + 1
       }))
     }));
   };
 
-  const addLesson = (sectionIndex) => {
+  const addLesson = (moduleIndex) => {
     const newLesson = {
       title: '',
       description: '',
-      type: 'video',
+      contentType: 'video',
       url: '',
-      duration: 0,
-      order: formData.sections[sectionIndex].lessons.length + 1
+      textContent: '',
+      durationSec: 0,
+      order: formData.modules[moduleIndex].lessons.length + 1,
+      isPreview: false
     };
     setFormData(prev => ({
       ...prev,
-      sections: prev.sections.map((section, i) => 
-        i === sectionIndex 
-          ? { ...section, lessons: [...section.lessons, newLesson] }
-          : section
+      modules: prev.modules.map((module, i) => 
+        i === moduleIndex 
+          ? { ...module, lessons: [...module.lessons, newLesson] }
+          : module
       )
     }));
   };
 
-  const updateLesson = (sectionIndex, lessonIndex, field, value) => {
+  const updateLesson = (moduleIndex, lessonIndex, field, value) => {
     setFormData(prev => ({
       ...prev,
-      sections: prev.sections.map((section, i) => 
-        i === sectionIndex 
+      modules: prev.modules.map((module, i) => 
+        i === moduleIndex 
           ? {
-              ...section,
-              lessons: section.lessons.map((lesson, j) => 
+              ...module,
+              lessons: module.lessons.map((lesson, j) => 
                 j === lessonIndex ? { ...lesson, [field]: value } : lesson
               )
             }
-          : section
+          : module
       )
     }));
   };
 
-  const removeLesson = (sectionIndex, lessonIndex) => {
+  const removeLesson = (moduleIndex, lessonIndex) => {
     setFormData(prev => ({
       ...prev,
-      sections: prev.sections.map((section, i) => 
-        i === sectionIndex 
+      modules: prev.modules.map((module, i) => 
+        i === moduleIndex 
           ? {
-              ...section,
-              lessons: section.lessons.filter((_, j) => j !== lessonIndex).map((lesson, j) => ({
+              ...module,
+              lessons: module.lessons.filter((_, j) => j !== lessonIndex).map((lesson, j) => ({
                 ...lesson,
                 order: j + 1
               }))
             }
-          : section
+          : module
       )
     }));
   };
 
   const validateForm = () => {
-    console.log('Validating form with data:', formData);
-    
     if (!formData.title.trim()) {
-      console.log('Title validation failed');
       setError('Course title is required');
       return false;
     }
+
     if (!formData.description.trim()) {
-      console.log('Description validation failed');
       setError('Course description is required');
       return false;
     }
-    if (formData.title.trim().length < 3) {
-      console.log('Title length validation failed');
-      setError('Course title must be at least 3 characters long');
-      return false;
-    }
-    if (formData.description.trim().length < 10) {
-      console.log('Description length validation failed');
-      setError('Course description must be at least 10 characters long');
-      return false;
-    }
-    if (formData.price < 0) {
-      console.log('Price validation failed');
-      setError('Course price cannot be negative');
-      return false;
-    }
 
-    // Validate sections
-    for (let i = 0; i < formData.sections.length; i++) {
-      const section = formData.sections[i];
-      if (!section.title.trim()) {
-        setError(`Section ${i + 1} title is required`);
+    if (formData.priceType === 'paid') {
+      if (formData.price <= 0) {
+        setError('Paid courses must have a price greater than 0');
         return false;
       }
       
-      // Validate lessons in each section
-      for (let j = 0; j < section.lessons.length; j++) {
-        const lesson = section.lessons[j];
+      if (formData.salePrice && formData.salePrice >= formData.price) {
+        setError('Sale price must be less than regular price');
+        return false;
+      }
+    }
+
+    // Validate modules
+    for (let i = 0; i < formData.modules.length; i++) {
+      const module = formData.modules[i];
+      if (!module.title.trim()) {
+        setError(`Module ${i + 1} title is required`);
+        return false;
+      }
+      
+      // Validate lessons in each module
+      for (let j = 0; j < module.lessons.length; j++) {
+        const lesson = module.lessons[j];
         if (!lesson.title.trim()) {
-          setError(`Lesson ${j + 1} in Section ${i + 1} title is required`);
+          setError(`Lesson ${j + 1} in Module ${i + 1} title is required`);
           return false;
         }
-        if (!lesson.url.trim()) {
-          setError(`Lesson ${j + 1} in Section ${i + 1} URL is required`);
+        if (!lesson.url.trim() && !lesson.textContent.trim()) {
+          setError(`Lesson ${j + 1} in Module ${i + 1} URL or text content is required`);
           return false;
         }
       }
     }
 
-    console.log('Form validation passed');
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log('Form submitted with data:', formData);
-    
     if (!validateForm()) {
-      console.log('Form validation failed');
       return;
     }
 
@@ -195,46 +216,23 @@ export default function CreateCourse() {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
-      console.log('Token:', token ? 'Token exists' : 'No token found');
+      console.log('Submitting course data:', formData);
+      const result = await createCourse(formData);
+      console.log('Course created successfully:', result);
       
-      const requestData = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        price: formData.price,
-        imageIntroduction: formData.imageIntroduction.trim() || undefined,
-        sections: formData.sections.map(section => ({
-          ...section,
-          title: section.title.trim(),
-          description: section.description.trim(),
-          lessons: section.lessons.map(lesson => ({
-            ...lesson,
-            title: lesson.title.trim(),
-            description: lesson.description.trim(),
-            url: lesson.url.trim()
-          }))
-        }))
-      };
+      const statusMessage = formData.status === 'pending' 
+        ? 'Course submitted for review successfully! Admin will review and approve your course.'
+        : 'Course saved as draft successfully! You can edit and submit for review later.';
       
-      console.log('Sending request with data:', requestData);
-      
-      const response = await axios.post('http://localhost:8080/api/courses', requestData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      console.log('Response received:', response.data);
-      setSuccess('Course created successfully! Redirecting to course management...');
-      
-      // Redirect to the new course's content management page after 2 seconds
+      setSuccess(statusMessage);
       setTimeout(() => {
-        navigate(`/instructor/courses/${response.data._id}/content`);
-      }, 2000);
-
+        navigate('/instructor/courses');
+      }, 3000);
+      
     } catch (err) {
-      console.error('Create course error:', err);
-      console.error('Error response:', err.response);
-      console.error('Error message:', err.message);
-      setError(err.response?.data?.message || 'Failed to create course. Please try again.');
+      console.error('Error creating course:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to create course. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -246,6 +244,7 @@ export default function CreateCourse() {
 
   return (
     <div className="instructor-layout">
+      <InstructorSidebar />
       <main className="instructor-main">
         <div className="create-course">
           <div className="create-course-header">
@@ -297,7 +296,20 @@ export default function CreateCourse() {
                     required
                     disabled={loading}
                   />
-                  <small>Choose a clear, descriptive title for your course</small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="subtitle">Course Subtitle</label>
+                  <input
+                    type="text"
+                    id="subtitle"
+                    name="subtitle"
+                    value={formData.subtitle}
+                    onChange={handleChange}
+                    placeholder="Enter course subtitle"
+                    className="form-input"
+                    disabled={loading}
+                  />
                 </div>
 
                 <div className="form-group">
@@ -309,252 +321,342 @@ export default function CreateCourse() {
                     onChange={handleChange}
                     placeholder="Describe what students will learn in this course"
                     className="form-textarea"
-                    rows="5"
+                    rows="4"
                     required
                     disabled={loading}
                   />
-                  <small>Provide a detailed description of the course content and learning objectives</small>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="level">Course Level</label>
+                    <select
+                      id="level"
+                      name="level"
+                      value={formData.level}
+                      onChange={handleChange}
+                      className="form-select"
+                      disabled={loading}
+                    >
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="priceType">Price Type</label>
+                    <select
+                      id="priceType"
+                      name="priceType"
+                      value={formData.priceType}
+                      onChange={handleChange}
+                      className="form-select"
+                      disabled={loading}
+                    >
+                      <option value="free">Free</option>
+                      <option value="paid">Paid</option>
+                    </select>
+                  </div>
+
+                  {formData.priceType === 'paid' && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="price">Course Price (AUD) *</label>
+                        <input
+                          type="number"
+                          id="price"
+                          name="price"
+                          value={formData.price}
+                          onChange={handleChange}
+                          placeholder="0"
+                          className="form-input"
+                          min="0.01"
+                          step="0.01"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="salePrice">Sale Price (AUD) - Optional</label>
+                        <input
+                          type="number"
+                          id="salePrice"
+                          name="salePrice"
+                          value={formData.salePrice}
+                          onChange={handleChange}
+                          placeholder="0"
+                          className="form-input"
+                          min="0"
+                          step="0.01"
+                          disabled={loading}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="form-group">
+                    <label htmlFor="currency">Currency</label>
+                    <select
+                      id="currency"
+                      name="currency"
+                      value={formData.currency}
+                      onChange={handleChange}
+                      className="form-select"
+                      disabled={loading}
+                    >
+                      <option value="AUD">AUD</option>
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="price">Course Price (Optional)</label>
-                  <input
-                    type="number"
-                    id="price"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="Enter course price (e.g., 100)"
-                    className="form-input"
-                    disabled={loading}
-                  />
-                  <small>Set a price for your course if you want to monetize it.</small>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="imageIntroduction">Course Introduction Image (Optional)</label>
+                  <label htmlFor="thumbnailUrl">Course Thumbnail URL</label>
                   <input
                     type="url"
-                    id="imageIntroduction"
-                    name="imageIntroduction"
-                    value={formData.imageIntroduction}
+                    id="thumbnailUrl"
+                    name="thumbnailUrl"
+                    value={formData.thumbnailUrl}
                     onChange={handleChange}
-                    placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                    placeholder="https://example.com/image.jpg"
                     className="form-input"
                     disabled={loading}
                   />
-                  <small>Add an image URL to represent your course. This will be shown to students.</small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="promoVideoUrl">Course Promo Video URL</label>
+                  <input
+                    type="url"
+                    id="promoVideoUrl"
+                    name="promoVideoUrl"
+                    value={formData.promoVideoUrl}
+                    onChange={handleChange}
+                    placeholder="https://example.com/video.mp4"
+                    className="form-input"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="status">Course Status</label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="form-select"
+                    disabled={loading}
+                  >
+                    <option value="draft">Draft - Save as draft for later editing</option>
+                    <option value="pending">Submit for Review - Ready for admin approval</option>
+                  </select>
+                  <small className="form-help-text">
+                    Choose "Draft" to save your work, or "Submit for Review" when ready for admin approval.
+                  </small>
                 </div>
               </div>
 
               <div className="form-section">
-                <h3>Course Sections</h3>
-                <p>Organize your course content into sections. Each section can contain multiple lessons.</p>
-                
-                {formData.sections.map((section, sectionIndex) => (
-                  <div key={sectionIndex} className="section-container">
+                <div className="section-header">
+                  <h3>Course Content</h3>
+                  <button
+                    type="button"
+                    onClick={addModule}
+                    className="add-section-btn"
+                    disabled={loading}
+                  >
+                    + Add Module
+                  </button>
+                </div>
+
+                {formData.modules.length === 0 && (
+                  <div className="no-sections">
+                    <p>No modules added yet. Click "Add Module" to start organizing your course content.</p>
+                  </div>
+                )}
+
+                {formData.modules.map((module, moduleIndex) => (
+                  <div key={moduleIndex} className="section-container">
                     <div className="section-header">
-                      <h4>Section {section.order}</h4>
+                      <h4>Module {module.order}</h4>
                       <button
                         type="button"
+                        onClick={() => removeModule(moduleIndex)}
                         className="remove-section-btn"
-                        onClick={() => removeSection(sectionIndex)}
                         disabled={loading}
                       >
-                        Remove Section
+                        Remove Module
                       </button>
                     </div>
-                    
+
                     <div className="form-group">
-                      <label>Section Title *</label>
+                      <label>Module Title *</label>
                       <input
                         type="text"
-                        value={section.title}
-                        onChange={(e) => updateSection(sectionIndex, 'title', e.target.value)}
-                        placeholder="Enter section title"
+                        value={module.title}
+                        onChange={(e) => updateModule(moduleIndex, 'title', e.target.value)}
+                        placeholder="Enter module title"
                         className="form-input"
                         required
                         disabled={loading}
                       />
                     </div>
-                    
+
                     <div className="form-group">
-                      <label>Section Description</label>
+                      <label>Module Summary</label>
                       <textarea
-                        value={section.description}
-                        onChange={(e) => updateSection(sectionIndex, 'description', e.target.value)}
-                        placeholder="Describe what this section covers"
+                        value={module.summary}
+                        onChange={(e) => updateModule(moduleIndex, 'summary', e.target.value)}
+                        placeholder="Describe what this module covers"
                         className="form-textarea"
-                        rows="3"
+                        rows="2"
                         disabled={loading}
                       />
                     </div>
-                    
+
                     <div className="lessons-container">
-                      <h5>Lessons in this Section</h5>
-                      {section.lessons.map((lesson, lessonIndex) => (
+                      <div className="lessons-header">
+                        <h5>Lessons in this Module</h5>
+                        <button
+                          type="button"
+                          onClick={() => addLesson(moduleIndex)}
+                          className="add-lesson-btn"
+                          disabled={loading}
+                        >
+                          + Add Lesson
+                        </button>
+                      </div>
+
+                      {module.lessons.map((lesson, lessonIndex) => (
                         <div key={lessonIndex} className="lesson-container">
                           <div className="lesson-header">
                             <h6>Lesson {lesson.order}</h6>
                             <button
                               type="button"
+                              onClick={() => removeLesson(moduleIndex, lessonIndex)}
                               className="remove-lesson-btn"
-                              onClick={() => removeLesson(sectionIndex, lessonIndex)}
                               disabled={loading}
                             >
-                              Remove Lesson
+                              Remove
                             </button>
                           </div>
-                          
-                          <div className="lesson-fields">
+
+                          <div className="form-row">
                             <div className="form-group">
                               <label>Lesson Title *</label>
                               <input
                                 type="text"
                                 value={lesson.title}
-                                onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'title', e.target.value)}
+                                onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'title', e.target.value)}
                                 placeholder="Enter lesson title"
                                 className="form-input"
                                 required
                                 disabled={loading}
                               />
                             </div>
-                            
+
                             <div className="form-group">
-                              <label>Lesson Description</label>
+                              <label>Lesson Type</label>
+                              <select
+                                value={lesson.contentType}
+                                onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'contentType', e.target.value)}
+                                className="form-select"
+                                disabled={loading}
+                              >
+                                <option value="video">Video</option>
+                                <option value="pdf">PDF</option>
+                                <option value="slide">Slide</option>
+                                <option value="text">Text</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="form-group">
+                            <label>Lesson Description</label>
+                            <textarea
+                              value={lesson.description}
+                              onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'description', e.target.value)}
+                              placeholder="Describe what this lesson covers"
+                              className="form-textarea"
+                              rows="2"
+                              disabled={loading}
+                            />
+                          </div>
+
+                          <div className="form-row">
+                            <div className="form-group">
+                              <label>Content URL</label>
+                              <input
+                                type="url"
+                                value={lesson.url}
+                                onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'url', e.target.value)}
+                                placeholder="https://example.com/lesson-content"
+                                className="form-input"
+                                disabled={loading}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label>Text Content</label>
                               <textarea
-                                value={lesson.description}
-                                onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'description', e.target.value)}
-                                placeholder="Describe this lesson"
+                                value={lesson.textContent}
+                                onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'textContent', e.target.value)}
+                                placeholder="Enter text content for this lesson"
                                 className="form-textarea"
                                 rows="2"
                                 disabled={loading}
                               />
                             </div>
-                            
-                            <div className="lesson-type-duration">
-                              <div className="form-group">
-                                <label>Content Type *</label>
-                                <select
-                                  value={lesson.type}
-                                  onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'type', e.target.value)}
-                                  className="form-select"
-                                  disabled={loading}
-                                >
-                                  <option value="video">Video</option>
-                                  <option value="pdf">PDF</option>
-                                  <option value="slide">Slide</option>
-                                  <option value="text">Text</option>
-                                </select>
-                              </div>
-                              
-                              <div className="form-group">
-                                <label>Duration (minutes)</label>
-                                <input
-                                  type="number"
-                                  value={lesson.duration}
-                                  onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'duration', parseInt(e.target.value) || 0)}
-                                  placeholder="0"
-                                  className="form-input"
-                                  min="0"
-                                  disabled={loading}
-                                />
-                              </div>
-                            </div>
-                            
+
                             <div className="form-group">
-                              <label>Content URL *</label>
+                              <label>Duration (seconds)</label>
                               <input
-                                type="url"
-                                value={lesson.url}
-                                onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'url', e.target.value)}
-                                placeholder="Enter content URL"
+                                type="number"
+                                value={lesson.durationSec}
+                                onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'durationSec', parseInt(e.target.value) || 0)}
+                                placeholder="0"
                                 className="form-input"
-                                required
+                                min="0"
                                 disabled={loading}
                               />
                             </div>
                           </div>
+
+                          <div className="form-group">
+                            <label>Preview Lesson</label>
+                            <input
+                              type="checkbox"
+                              checked={lesson.isPreview}
+                              onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'isPreview', e.target.checked)}
+                              disabled={loading}
+                            />
+                          </div>
                         </div>
                       ))}
-                      
-                      <button
-                        type="button"
-                        className="add-lesson-btn"
-                        onClick={() => addLesson(sectionIndex)}
-                        disabled={loading}
-                      >
-                        + Add Lesson to Section {section.order}
-                      </button>
                     </div>
                   </div>
                 ))}
-                
-                <button
-                  type="button"
-                  className="add-section-btn"
-                  onClick={addSection}
-                  disabled={loading}
-                >
-                  + Add New Section
-                </button>
-              </div>
-
-              <div className="form-section">
-                <h3>Course Setup Information</h3>
-                <div className="info-cards">
-                  <div className="info-card">
-                    <div className="info-icon">📝</div>
-                    <div className="info-content">
-                      <h4>Content Organization</h4>
-                      <p>Organize your course into logical sections. Each section can contain multiple lessons of different types.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="info-card">
-                    <div className="info-icon">⏳</div>
-                    <div className="info-content">
-                      <h4>Approval Process</h4>
-                      <p>New courses require admin approval before students can enroll. This usually takes 1-2 business days.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="info-card">
-                    <div className="info-icon">🎯</div>
-                    <div className="info-content">
-                      <h4>Content Types</h4>
-                      <p>Support for video, PDF, slides, and text content. You can also add introduction content visible to all students.</p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               <div className="form-actions">
                 <button
                   type="button"
-                  className="cancel-btn"
                   onClick={handleCancel}
+                  className="cancel-btn"
                   disabled={loading}
                 >
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  className="create-btn"
+                  type="submit"
+                  className="submit-btn"
                   disabled={loading}
-                  onClick={() => {
-                    console.log('Create Course button clicked');
-                    handleSubmit({ preventDefault: () => {} });
-                  }}
                 >
-                  {loading ? (
-                    <>
-                      <span className="loading-spinner"></span>
-                      Creating Course...
-                    </>
-                  ) : (
-                    'Create Course'
-                  )}
+                  {loading ? 'Creating Course...' : 'Create Course'}
                 </button>
               </div>
             </form>

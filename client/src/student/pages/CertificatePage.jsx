@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { getMyCertificates } from '../api/certificateApi';
 import Footer from '../../components/Footer';
-// import './CertificatePage.css'; 
+import './CertificatePage.css';
 import { Link } from 'react-router-dom';
-
 
 export default function CertificatePage() {
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -26,7 +24,6 @@ export default function CertificatePage() {
     };
     fetchCertificates();
   }, []);
-
 
   return (
     <div className="student-course-page">
@@ -68,7 +65,4 @@ export default function CertificatePage() {
       <Footer />
     </div>
   );
-}
-
-
-
+} 

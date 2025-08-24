@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Footer from '../../components/Footer';
-import './CetificateDetail.css'; 
-
+import './CertificateDetail.css';
+import { getCertificateById } from '../api/certificateApi';
 
 export default function CertificateDetail() {
   const { certificateId } = useParams();
@@ -12,17 +12,14 @@ export default function CertificateDetail() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const fetchCertificate = async () => {
       setLoading(true);
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`http://localhost:8080/api/certificates/${certificateId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCertificate(res.data);
+        const res = await getCertificateById(token, certificateId);
+        setCertificate(res);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load certificate.');
       } finally {
@@ -31,7 +28,6 @@ export default function CertificateDetail() {
     };
     fetchCertificate();
   }, [certificateId]);
-
 
   return (
     <div className="certificate-detail-page">
@@ -42,27 +38,32 @@ export default function CertificateDetail() {
         ) : error ? (
           <div className="cert-error">{error}</div>
         ) : certificate ? (
-          <div className="certificate-card">
-            <div className="certificate-header">
-              <h1>Certificate of Completion</h1>
-              <span className="certificate-icon">📜</span>
+          <div className="certificate">
+            <div className="background-icon">📜</div>
+            <div className="logo">KOLP <span className="logo-academy">Lerning Platform</span></div>
+            <div className="title">COMPLETION</div>
+            <div className="subtitle">CERTIFICATE</div>
+            <div className="subtitle">THIS CERTIFICATE IS PRESENTED TO</div>
+
+            <div className="recipient">
+              {certificate.studentId?.name || certificate.studentId?.email}
             </div>
-            <div className="certificate-body">
-              <div className="cert-row">
-                <span className="cert-label">Student:</span>
-                <span className="cert-value">{certificate.studentId?.name || certificate.studentId?.email}</span>
-              </div>
-              <div className="cert-row">
-                <span className="cert-label">Course:</span>
-                <span className="cert-value">{certificate.courseId?.title}</span>
-              </div>
-              <div className="cert-row">
-                <span className="cert-label">Issued At:</span>
-                <span className="cert-value">{certificate.issuedAt ? new Date(certificate.issuedAt).toLocaleString() : 'N/A'}</span>
-              </div>
+
+            <div className="description">
+              Who has successfully completed the<br/>
+              <strong>{certificate.courseId?.title}</strong>
             </div>
-            <div className="certificate-footer">
-              <span className="footer-text">Congratulations on your achievement!</span>
+
+            <div className="footer">
+              <div className="signature">
+                <strong>SKILL ACADEMY</strong>
+                Director
+              </div>
+              <div className="medal">🏅</div>
+              <div className="signature">
+                <strong>DATE OF ISSUE</strong>
+                {certificate.issuedAt ? new Date(certificate.issuedAt).toLocaleDateString() : 'N/A'}
+              </div>
             </div>
           </div>
         ) : null}
@@ -70,7 +71,4 @@ export default function CertificateDetail() {
       <Footer />
     </div>
   );
-}
-
-
-
+} 

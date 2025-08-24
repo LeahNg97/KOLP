@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getStudentsByCourse, approveEnrollment, rejectEnrollment } from '../api/enrollmentApi';
 import { getCourseById } from '../api/courseApi';
+import InstructorSidebar from '../components/InstructorSidebar';
 import './CourseStudents.css';
 
 export default function CourseStudents() {
@@ -92,7 +93,9 @@ export default function CourseStudents() {
     try {
       setProcessingId(studentId);
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:8080/api/quizzes/course/${courseId}/approve/${studentId}`, {}, {
+      
+      // Update enrollment to mark as instructor approved
+      await axios.patch(`http://localhost:8080/api/enrollments/${courseId}/approve-completion/${studentId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -139,10 +142,33 @@ export default function CourseStudents() {
     setProgressLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}/student/${student.studentId._id}`, {
+      
+      // Get lesson progress
+      const lessonProgressRes = await axios.get(`http://localhost:8080/api/lesson-progress/course/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setProgressDetails(res.data);
+      
+      // Get quiz progress (if available)
+      let quizProgress = null;
+      try {
+        const quizRes = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}/student/${student.studentId._id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        quizProgress = quizRes.data;
+      } catch (quizErr) {
+        console.log('No quiz progress available');
+      }
+      
+      // Combine lesson and quiz progress
+      const combinedProgress = {
+        lessonProgress: lessonProgressRes.data,
+        quizProgress: quizProgress,
+        totalLessons: lessonProgressRes.data.length,
+        completedLessons: lessonProgressRes.data.filter(p => p.completed).length,
+        progress: student.progress || 0
+      };
+      
+      setProgressDetails(combinedProgress);
     } catch (err) {
       setProgressDetails({ error: err.response?.data?.message || 'Failed to fetch progress.' });
     } finally {
@@ -152,11 +178,11 @@ export default function CourseStudents() {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { text: 'Pending', class: 'status-pending' },
-      approved: { text: 'Approved', class: 'status-approved'}
+      pending: { text: 'Pending', class: 'status-pending', icon: '⏳' },
+      approved: { text: 'Approved', class: 'status-approved', icon: '✅' }
     };
     
-    const config = statusConfig[status] || { text: status, class: 'status-default' };
+    const config = statusConfig[status] || { text: status, class: 'status-default', icon: '❓' };
     return (
       <span className={`status-badge ${config.class}`}>
         {config.icon} {config.text}
@@ -202,7 +228,7 @@ export default function CourseStudents() {
   if (loading) {
     return (
       <div className="instructor-layout">
-
+        <InstructorSidebar />
         <main className="instructor-main">
           <div className="students-loading">
             <div className="loading-spinner"></div>
@@ -215,7 +241,7 @@ export default function CourseStudents() {
 
   return (
     <div className="instructor-layout">
-
+      <InstructorSidebar />
       <main className="instructor-main">
         <div className="course-students">
           <div className="students-header">
@@ -226,7 +252,7 @@ export default function CourseStudents() {
               >
                 ← Back to Courses
               </button>
-              <h1>Manage Students</h1>
+              <h1>Course Students 👥</h1>
               {course && (
                 <p className="course-title">{course.title}</p>
               )}
@@ -449,7 +475,7 @@ export default function CourseStudents() {
                             <div className="completion-approval-section">
                               <div className="completion-notice">
                                 <span className="notice-icon">🎯</span>
-                                <span className="notice-text">Student has attempted all quizzes</span>
+                                <span className="notice-text">Student has completed all lessons (100% progress)</span>
                               </div>
                               <button
                                 className="action-btn approve-completion-btn"
@@ -500,17 +526,50 @@ export default function CourseStudents() {
               ) : progressDetails ? (
                 <>
                   <div><strong>Status:</strong> {progressStudent.status}</div>
-                  <div><strong>Progress:</strong> {progressStudent.progress || 0}%</div>
-                  <div><strong>Quiz Sets Attempted:</strong> {progressStudent.attemptedQuizSets?.length || 0}</div>
-                  <div><strong>Quiz Sets Passed:</strong> {progressStudent.completedQuizSets?.length || 0}</div>
-                  <div><strong>Quiz Details:</strong></div>
-                  <ul>
-                    {progressDetails.quizSets?.map((set, idx) => (
-                      <li key={set.quizSetId || idx}>
-                        <strong>{set.name}:</strong> {set.submission ? `${set.submission.score}/${set.submission.totalQuestions} (${set.submission.percentage}%) - ${set.submission.passed ? '✅ Passed' : '❌ Failed'}` : 'Not attempted'}
-                      </li>
-                    ))}
-                  </ul>
+                  <div><strong>Overall Progress:</strong> {progressDetails.progress || 0}%</div>
+                  
+                  {/* Lesson Progress */}
+                  <div className="progress-section">
+                    <h4>📚 Lesson Progress</h4>
+                    <div><strong>Total Lessons:</strong> {progressDetails.totalLessons || 0}</div>
+                    <div><strong>Completed Lessons:</strong> {progressDetails.completedLessons || 0}</div>
+                    <div><strong>Lesson Completion Rate:</strong> {progressDetails.totalLessons > 0 ? Math.round((progressDetails.completedLessons / progressDetails.totalLessons) * 100) : 0}%</div>
+                  </div>
+                  
+                  {/* Quiz Progress (if available) */}
+                  {progressDetails.quizProgress && (
+                    <div className="progress-section">
+                      <h4>🧠 Quiz Progress</h4>
+                      <div><strong>Quiz Sets Attempted:</strong> {progressStudent.attemptedQuizSets?.length || 0}</div>
+                      <div><strong>Quiz Sets Passed:</strong> {progressStudent.completedQuizSets?.length || 0}</div>
+                      <div><strong>Quiz Details:</strong></div>
+                      <ul>
+                        {progressDetails.quizProgress.quizSets?.map((set, idx) => (
+                          <li key={set.quizSetId || idx}>
+                            <strong>{set.name}:</strong> {set.submission ? `${set.submission.score}/${set.submission.totalQuestions} (${set.submission.percentage}%) - ${set.submission.passed ? '✅ Passed' : '❌ Failed'}` : 'Not attempted'}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Lesson Details */}
+                  {progressDetails.lessonProgress && progressDetails.lessonProgress.length > 0 && (
+                    <div className="progress-section">
+                      <h4>📖 Lesson Details</h4>
+                      <div className="lesson-progress-list">
+                        {progressDetails.lessonProgress.map((lesson, idx) => (
+                          <div key={lesson._id || idx} className={`lesson-progress-item ${lesson.completed ? 'completed' : 'incomplete'}`}>
+                            <span className="lesson-status">{lesson.completed ? '✅' : '⏳'}</span>
+                            <span className="lesson-title">{lesson.lessonTitle || `Lesson ${idx + 1}`}</span>
+                            <span className="lesson-completion-date">
+                              {lesson.completed ? new Date(lesson.completedAt).toLocaleDateString() : 'Not completed'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : null}
             </div>

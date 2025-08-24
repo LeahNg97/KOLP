@@ -4,7 +4,6 @@ import { getMyEnrollments, cancelEnrollment } from '../api/enrollmentApi';
 import './StudentCourse.css';
 import Footer from '../../components/Footer';
 
-
 export default function StudentCourse() {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,11 +11,9 @@ export default function StudentCourse() {
   const [filter, setFilter] = useState('all'); // all, pending, approved
   const navigate = useNavigate();
 
-
   useEffect(() => {
     fetchEnrollments();
   }, []);
-
 
   const fetchEnrollments = async () => {
     setLoading(true);
@@ -31,7 +28,6 @@ export default function StudentCourse() {
     }
   };
 
-
   const handleCancelEnrollment = async (enrollmentId) => {
     if (window.confirm('Are you sure you want to cancel this enrollment?')) {
       try {
@@ -43,33 +39,28 @@ export default function StudentCourse() {
     }
   };
 
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       pending: { text: 'Pending', class: 'status-pending' },
       approved: { text: 'Approved', class: 'status-approved' }
     };
-   
+    
     const config = statusConfig[status] || { text: status, class: 'status-default' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
-
 
   const filteredEnrollments = enrollments.filter(enrollment => {
     if (filter === 'all') return true;
     return enrollment.status === filter;
   });
 
-
   const validEnrollments = filteredEnrollments.filter(e => e.courseId);
-
 
   const getProgressColor = (progress) => {
     if (progress >= 80) return '#28a745';
     if (progress >= 50) return '#ffc107';
     return '#dc3545';
   };
-
 
   return (
     <div className="student-course-page">
@@ -97,7 +88,6 @@ export default function StudentCourse() {
         </div>
       </div>
 
-
       {loading ? (
         <div className="student-course-loading">Loading your enrolled courses...</div>
       ) : error ? (
@@ -105,7 +95,7 @@ export default function StudentCourse() {
       ) : filteredEnrollments.length === 0 ? (
         <div className="student-course-empty">
           <p>You haven't enrolled in any courses yet.</p>
-          <button
+          <button 
             className="browse-courses-btn"
             onClick={() => navigate('/student')}
           >
@@ -133,9 +123,9 @@ export default function StudentCourse() {
                       <span className="progress-percentage">{enrollment.progress}%</span>
                     </div>
                     <div className="progress-bar">
-                      <div
+                      <div 
                         className="progress-fill"
-                        style={{
+                        style={{ 
                           width: `${enrollment.progress}%`,
                           backgroundColor: getProgressColor(enrollment.progress)
                         }}
@@ -165,9 +155,9 @@ export default function StudentCourse() {
                   {enrollment.status === 'approved' && (
                     <button
                       className="action-btn primary"
-                      onClick={() => navigate(`/student/courses/${enrollment.courseId._id}`)}
+                      onClick={() => navigate(`/student/courses/${enrollment.courseId._id}/learn`)}
                     >
-                      Learning
+                      Start Learning
                     </button>
                   )}
                   {enrollment.status === 'pending' && (
@@ -188,6 +178,3 @@ export default function StudentCourse() {
     </div>
   );
 }
-
-
-

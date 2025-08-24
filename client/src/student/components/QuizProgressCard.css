@@ -1,0 +1,383 @@
+.quiz-progress-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.quiz-progress-card.error {
+  background: #fff5f5;
+  border-color: #fed7d7;
+}
+
+/* Quiz Header */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quiz-header h3 {
+  font-size: 1.25rem;
+  color: #2d3748;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+.quiz-status {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.status-badge.passed {
+  background: #f0fff4;
+  color: #38a169;
+}
+
+.status-badge.failed {
+  background: #fff5f5;
+  color: #e53e3e;
+}
+
+.status-badge.in-progress {
+  background: #fffaf0;
+  color: #dd6b20;
+}
+
+.status-badge.not-started {
+  background: #f7fafc;
+  color: #718096;
+}
+
+/* Quiz Info */
+.quiz-info {
+  margin-bottom: 1.5rem;
+}
+
+.quiz-info h4 {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+}
+
+.quiz-info p {
+  color: #718096;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.quiz-details {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.quiz-details span {
+  background: #f7fafc;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* Progress Section */
+.progress-section {
+  margin-bottom: 1.5rem;
+}
+
+.progress-section > div {
+  margin-bottom: 1rem;
+}
+
+.progress-section label {
+  display: block;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progress-fill.lesson-fill {
+  background: linear-gradient(90deg, #4299e1, #3182ce);
+}
+
+.progress-fill.quiz-fill {
+  background: linear-gradient(90deg, #48bb78, #38a169);
+}
+
+.progress-fill.total-fill {
+  background: linear-gradient(90deg, #805ad5, #6b46c1);
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+/* Quiz Actions */
+.quiz-actions {
+  margin-bottom: 1.5rem;
+}
+
+.quiz-locked {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 2px dashed #cbd5e0;
+}
+
+.lock-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-locked p {
+  color: #4a5568;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.lesson-count {
+  color: #718096;
+  font-size: 0.875rem;
+}
+
+.start-quiz-btn, .continue-quiz-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-quiz-btn:hover, .continue-quiz-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(72, 187, 120, 0.2);
+}
+
+.continue-quiz-btn {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+}
+
+.continue-quiz-btn:hover {
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.2);
+}
+
+.quiz-completed {
+  text-align: center;
+  padding: 1rem;
+  background: #f0fff4;
+  border-radius: 8px;
+  border: 1px solid #c6f6d5;
+}
+
+.score-display {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.score {
+  color: #38a169;
+}
+
+.separator {
+  color: #718096;
+  margin: 0 0.25rem;
+}
+
+.total {
+  color: #2d3748;
+}
+
+.percentage {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.view-results-btn, .retake-quiz-btn {
+  padding: 0.75rem 1.5rem;
+  margin: 0 0.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-results-btn {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+  color: white;
+}
+
+.view-results-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.2);
+}
+
+.retake-quiz-btn {
+  background: linear-gradient(135deg, #805ad5, #6b46c1);
+  color: white;
+}
+
+.retake-quiz-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(128, 90, 213, 0.2);
+}
+
+/* Quiz Summary */
+.quiz-summary {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-item .label {
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.875rem;
+}
+
+.summary-item .value {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.875rem;
+}
+
+/* Loading and Error States */
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #4299e1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.quiz-progress-card.error .error-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-progress-card.error p {
+  color: #e53e3e;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.retry-btn {
+  padding: 0.5rem 1rem;
+  background: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3182ce;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .quiz-progress-card {
+    padding: 1rem;
+  }
+  
+  .quiz-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .quiz-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .quiz-details span {
+    text-align: center;
+  }
+  
+  .quiz-completed {
+    padding: 0.75rem;
+  }
+  
+  .view-results-btn, .retake-quiz-btn {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}

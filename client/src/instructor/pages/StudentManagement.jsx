@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import InstructorSidebar from '../components/InstructorSidebar';
 import './StudentManagement.css';
-import { getMyCourses, getStudentsByCourse } from '../api/courseApi';
+import { getMyCourses } from '../api/courseApi';
+import { getInstructorStudents } from '../api/enrollmentApi';
 
 export default function StudentManagement() {
   const [students, setStudents] = useState([]);
@@ -56,8 +58,7 @@ export default function StudentManagement() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await getStudentsByCourse(token);
+      const response = await getInstructorStudents();
       setStudents(response);
       setError('');
     } catch (err) {
@@ -138,7 +139,7 @@ export default function StudentManagement() {
   if (loading) {
     return (
       <div className="instructor-layout">
-
+        <InstructorSidebar />
         <main className="instructor-main">
           <div className="students-loading">
             <div className="loading-spinner"></div>
@@ -151,7 +152,7 @@ export default function StudentManagement() {
 
   return (
     <div className="instructor-layout">
-
+      <InstructorSidebar />
       <main className="instructor-main">
         <div className="student-management">
           <div className="students-header">

@@ -7,7 +7,9 @@ export default function InstructorCourseCard({
   onViewStudents, 
   onManageContent, 
   onManageQuiz,
-  deletingId 
+  onStatusUpdate,
+  deletingId,
+  updatingStatus
 }) {
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
@@ -15,71 +17,128 @@ export default function InstructorCourseCard({
     }
   };
 
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'active': return 'status-active';
+      case 'pending': return 'status-pending';
+      case 'inactive': return 'status-inactive';
+      case 'draft': return 'status-draft';
+      default: return 'status-unknown';
+    }
+  };
+
+  const getStatusBadgeText = (status) => {
+    switch (status) {
+      case 'active': return 'Active';
+      case 'pending': return 'Pending Review';
+      case 'inactive': return 'Inactive';
+      case 'draft': return 'Draft';
+      default: return 'Unknown';
+    }
+  };
+
+  const getLevelBadgeClass = (level) => {
+    switch (level) {
+      case 'beginner': return 'level-beginner';
+      case 'intermediate': return 'level-intermediate';
+      case 'advanced': return 'level-advanced';
+      default: return 'level-unknown';
+    }
+  };
+
   return (
-    <div className="instructor-course-card">
-      <div className="course-header">
-        <div className="course-status">
-          <span className={`status-badge ${course.status || 'active'}`}>
-            {course.status || 'active'}
-          </span>
+    <div className="course-card">
+      <div className="course-image">
+        {course.thumbnailUrl ? (
+          <img src={course.thumbnailUrl} alt={course.title} />
+        ) : (
+          <div className="course-image-placeholder">
+            <span>No Image</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="course-content">
+        <div className="course-header">
+          <h3>{course.title}</h3>
+          <div className="course-badges">
+            <span className={`status-badge ${getStatusBadgeClass(course.status)}`}>
+              {getStatusBadgeText(course.status)}
+            </span>
+            <span className={`level-badge ${getLevelBadgeClass(course.level)}`}>
+              {course.level}
+            </span>
+            {course.priceType === 'free' ? (
+              <span className="price-badge free">Free</span>
+            ) : (
+              <span className="price-badge paid">
+                {course.currency || 'AUD'}${course.salePrice || course.price}
+              </span>
+            )}
+          </div>
         </div>
+        
+        {course.subtitle && <p className="course-subtitle">{course.subtitle}</p>}
+        
+        <div className="course-stats">
+          <span>📚 {course.stats?.totalLessons || 0} lessons</span>
+          <span>⏱ {Math.floor((course.stats?.totalDurationSec || 0) / 60)} min</span>
+          <span>👥 {course.stats?.studentCount || 0} students</span>
+        </div>
+        
         <div className="course-actions">
-          <button
-            className="action-btn delete-btn"
-            onClick={handleDelete}
-            disabled={deletingId === course._id}
-            title="Delete Course"
+          <button 
+            onClick={() => {
+              console.log('Manage Content clicked for course:', course._id);
+              onManageContent(course._id);
+            }}
+            className="action-btn primary"
           >
-            {deletingId === course._id ? '🗑️...' : '🗑️'}
+            Manage Content
+          </button>
+          
+          {course.status === 'draft' && (
+            <button 
+              onClick={() => onStatusUpdate(course._id, 'pending')}
+              className="action-btn secondary"
+              disabled={updatingStatus === course._id}
+            >
+              {updatingStatus === course._id ? 'Updating...' : 'Submit for Review'}
+            </button>
+          )}
+          
+          {course.status === 'pending' && (
+            <button 
+              onClick={() => onStatusUpdate(course._id, 'draft')}
+              className="action-btn secondary"
+              disabled={updatingStatus === course._id}
+            >
+              {updatingStatus === course._id ? 'Updating...' : 'Mark as Draft'}
+            </button>
+          )}
+          
+          <button 
+            onClick={() => onViewStudents(course._id)}
+            className="action-btn secondary"
+          >
+          View Students
+          </button>
+          
+          <button 
+            onClick={() => onManageQuiz(course._id)}
+            className="action-btn secondary"
+          >
+          Quiz
+          </button>
+          
+          <button 
+            onClick={handleDelete}
+            className="action-btn danger"
+            disabled={deletingId === course._id}
+          >
+            {deletingId === course._id ? 'Deleting...' : 'Delete'}
           </button>
         </div>
-      </div>
-      
-      <h3 className="course-title">{course.title}</h3>
-      <p className="course-description">
-        {course.description || 'No description available'}
-      </p>
-      
-      <div className="course-meta">
-        <div className="meta-item">
-          <span className="meta-label">Created:</span>
-          <span className="meta-value">
-            {new Date(course.createdAt).toLocaleDateString()}
-          </span>
-        </div>
-        <div className="meta-item">
-          <span className="meta-label">Content:</span>
-          <span className="meta-value">
-            {course.content?.length || 0} items
-          </span>
-        </div>
-        <div className="meta-item">
-          <span className="meta-label">Students:</span>
-          <span className="meta-value">
-            {course.studentCount || 0} enrolled
-          </span>
-        </div>
-      </div>
-
-      <div className="course-footer">
-        <button
-          className="view-students-btn"
-          onClick={() => onViewStudents(course._id)}
-        >
-          👥 View Students
-        </button>
-        <button 
-          className="manage-content-btn"
-          onClick={() => onManageContent(course._id)}
-        >
-          📝 Manage Content
-        </button>
-        <button 
-          className="manage-quiz-btn"
-          onClick={() => onManageQuiz(course._id)}
-        >
-          🧠 Manage Quiz
-        </button>
       </div>
     </div>
   );

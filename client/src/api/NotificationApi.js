@@ -1,7 +1,6 @@
-
+// NotificationApi.js - API service cho notification
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-
 
 class NotificationApi {
   static async getNotifications(page = 1, limit = 20) {
@@ -15,11 +14,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to fetch notifications');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -27,7 +24,6 @@ class NotificationApi {
       throw error;
     }
   }
-
 
   static async getUnreadCount() {
     try {
@@ -40,11 +36,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to fetch unread count');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -52,7 +46,6 @@ class NotificationApi {
       throw error;
     }
   }
-
 
   static async markAsRead(notificationId) {
     try {
@@ -65,11 +58,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to mark notification as read');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -77,7 +68,6 @@ class NotificationApi {
       throw error;
     }
   }
-
 
   static async markAllAsRead() {
     try {
@@ -90,11 +80,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to mark all notifications as read');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -102,7 +90,6 @@ class NotificationApi {
       throw error;
     }
   }
-
 
   static async deleteNotification(notificationId) {
     try {
@@ -115,11 +102,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to delete notification');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -127,7 +112,6 @@ class NotificationApi {
       throw error;
     }
   }
-
 
   static async getNotificationsByType(type, page = 1, limit = 20) {
     try {
@@ -140,11 +124,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to fetch notifications by type');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -152,7 +134,6 @@ class NotificationApi {
       throw error;
     }
   }
-
 
   static async getNotificationsByPriority(priority, page = 1, limit = 20) {
     try {
@@ -165,11 +146,9 @@ class NotificationApi {
         }
       });
 
-
       if (!response.ok) {
         throw new Error('Failed to fetch notifications by priority');
       }
-
 
       return await response.json();
     } catch (error) {
@@ -179,8 +158,4 @@ class NotificationApi {
   }
 }
 
-
 export default NotificationApi;
-
-
-

@@ -49,7 +49,7 @@ app.use('/api/lesson-progress', lessonProgressRoutes);
 app.use('/api/quiz-progress', quizProgressRoutes);
 
 app.use('/api/users', userRoutes);
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 connectDB().then(() => {
   app.listen(PORT, () => {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import AdminSidebar from '../components/AdminSidebar';
 import './QuizResultsAnalytics.css';
 
 export default function QuizResultsAnalytics() {
@@ -32,6 +33,7 @@ export default function QuizResultsAnalytics() {
 
   return (
     <div className="admin-layout">
+      <AdminSidebar />
       <main className="admin-main">
         <h1>Quiz Results / Analytics</h1>
         <div className="quiz-analytics-bar">

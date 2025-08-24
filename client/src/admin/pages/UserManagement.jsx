@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import AdminSidebar from '../components/AdminSidebar';
 import './UserManagement.css';
 
 export default function UserManagement() {
@@ -45,6 +46,7 @@ export default function UserManagement() {
 
   return (
     <div className="admin-layout">
+      <AdminSidebar />
       <main className="admin-main">
         <h1>User Management</h1>
         {loading ? (

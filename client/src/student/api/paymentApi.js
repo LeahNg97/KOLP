@@ -26,12 +26,16 @@ api.interceptors.request.use((config) => {
 
 export const paymentApi = {
   // Create payment and enroll in course
-  createPayment: async (courseId, paymentMethod, amount) => {
+  createPayment: async (courseId, paymentMethod, amount, courseData = {}) => {
     try {
       const response = await api.post('/payments/create', {
         courseId,
         paymentMethod,
-        amount
+        amount,
+        currency: courseData.currency || 'AUD',
+        originalPrice: courseData.price,
+        salePrice: courseData.salePrice,
+        priceType: courseData.priceType
       });
       return response.data;
     } catch (error) {

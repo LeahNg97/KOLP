@@ -1,539 +1,481 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './CourseDetail.css';
 import Footer from '../../components/Footer';
-
-
-// Quiz Results Component
-function QuizResults({ submission, onClose }) {
-  return (
-    <div className="quiz-modal-overlay">
-      <div className="quiz-modal">
-        <div className="quiz-result">
-          <h2>Quiz Results 📊</h2>
-          <div className="result-details">
-            <p><strong>Score:</strong> {submission.score}/{submission.totalQuestions}</p>
-            <p><strong>Percentage:</strong> {submission.percentage}%</p>
-            <p><strong>Status:</strong> {submission.passed ? '✅ Passed' : '❌ Failed'}</p>
-            <p><strong>Submitted:</strong> {new Date(submission.submittedAt).toLocaleDateString()}</p>
-          </div>
-          <button className="quiz-close-btn" onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-// Quiz Modal Component
-function QuizModal({ quizSet, onClose, onComplete }) {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState(null);
-
-
-  const handleAnswerSelect = (answer) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = answer;
-    setAnswers(newAnswers);
-  };
-
-
-  const handleSubmit = async () => {
-    if (answers.length !== quizSet.questions.length) {
-      alert('Please answer all questions before submitting.');
-      return;
-    }
-
-
-    setSubmitting(true);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8080/api/quizzes/submit', {
-        quizId: quizSet.quizId,
-        quizSetId: quizSet.quizSetId,
-        answers
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-
-      setResult(response.data);
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to submit quiz');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-
-  const handleNext = () => {
-    if (currentQuestion < quizSet.questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    }
-  };
-
-
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
-  };
-
-
-  if (result) {
-    return (
-      <div className="quiz-modal-overlay">
-        <div className="quiz-modal">
-          <div className="quiz-result">
-            <h2>Quiz Complete! 🎉</h2>
-            <div className="result-details">
-              <p><strong>Score:</strong> {result.score}/{quizSet.questions.length}</p>
-              <p><strong>Percentage:</strong> {Math.round((result.score / quizSet.questions.length) * 100)}%</p>
-              <p><strong>Status:</strong> {result.passed ? '✅ Passed' : '❌ Failed'}</p>
-            </div>
-            <button className="quiz-close-btn" onClick={onComplete}>
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-
-  return (
-    <div className="quiz-modal-overlay">
-      <div className="quiz-modal">
-        <div className="quiz-header">
-          <h2>Quiz</h2>
-          <button className="quiz-close-btn" onClick={onClose}>✕</button>
-        </div>
-       
-        <div className="quiz-progress">
-          Question {currentQuestion + 1} of {quizSet.questions.length}
-        </div>
-
-
-        <div className="quiz-question">
-          <h3>{quizSet.questions[currentQuestion].text}</h3>
-          <div className="quiz-options">
-            {quizSet.questions[currentQuestion].options.map((option, index) => (
-              <label key={index} className="quiz-option">
-                <input
-                  type="radio"
-                  name={`question-${currentQuestion}`}
-                  value={option}
-                  checked={answers[currentQuestion] === option}
-                  onChange={() => handleAnswerSelect(option)}
-                />
-                <span>{option}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-
-        <div className="quiz-navigation">
-          <button
-            className="quiz-nav-btn"
-            onClick={handlePrevious}
-            disabled={currentQuestion === 0}
-          >
-            Previous
-          </button>
-         
-          {currentQuestion === quizSet.questions.length - 1 ? (
-            <button
-              className="quiz-submit-btn"
-              onClick={handleSubmit}
-              disabled={submitting || answers.length !== quizSet.questions.length}
-            >
-              {submitting ? 'Submitting...' : 'Submit Quiz'}
-            </button>
-          ) : (
-            <button
-              className="quiz-nav-btn"
-              onClick={handleNext}
-              disabled={!answers[currentQuestion]}
-            >
-              Next
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
+import { getCourseByID, getCourseSyllabus } from '../api/courseApi';
+import { createEnrollment, getEnrollmentByCourseId, cancelEnrollment } from '../api/enrollmentApi';
+import PaymentModal from '../components/PaymentModal';
+import QuizProgressCard from '../components/QuizProgressCard';
 
 export default function CourseDetail() {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
+  const [syllabus, setSyllabus] = useState(null);
   const [enrollment, setEnrollment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [registering, setRegistering] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
-  const [quizData, setQuizData] = useState(null);
-  const [quizLoading, setQuizLoading] = useState(false);
-  const [selectedQuizSet, setSelectedQuizSet] = useState(null);
-  const [showQuizModal, setShowQuizModal] = useState(false);
-  const [showResultsModal, setShowResultsModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
+  useEffect(() => {
+    fetchCourseData();
+  }, [courseId]);
 
-  const fetchCourseAndEnrollment = async () => {
-    setLoading(true);
-    setError('');
+  const fetchCourseData = async () => {
     try {
+      setLoading(true);
+      setError('');
       const token = localStorage.getItem('token');
-      // Fetch course
-      const courseRes = await axios.get(`http://localhost:8080/api/courses/${courseId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCourse(courseRes.data);
-     
-      // Fetch my enrollments
-      const enrollRes = await axios.get('http://localhost:8080/api/enrollments/my-courses', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const found = enrollRes.data.find(e => e.courseId?._id === courseId);
-      setEnrollment(found || null);
-
-
-      // If student is accepted, fetch quizzes
-      if (found && found.status === 'approved') {
-        fetchQuizzes();
+      
+      if (!token) {
+        setError('Please login to view course details');
+        setLoading(false);
+        return;
       }
+      
+      console.log('Fetching course data for courseId:', courseId);
+      
+      // Fetch course details
+      const courseData = await getCourseByID(token, courseId);
+      console.log('Course data fetched:', courseData);
+      setCourse(courseData);
+      
+      // Fetch course syllabus
+      try {
+        console.log('Fetching course syllabus...');
+        const syllabusData = await getCourseSyllabus(token, courseId);
+        console.log('Syllabus data fetched:', syllabusData);
+        console.log('Syllabus data type:', typeof syllabusData);
+        console.log('Syllabus data keys:', Object.keys(syllabusData || {}));
+        console.log('Syllabus.data:', syllabusData?.data);
+        console.log('Syllabus.data length:', syllabusData?.data?.length);
+        if (syllabusData?.data?.length > 0) {
+          console.log('First module:', syllabusData.data[0]);
+          console.log('First module title:', syllabusData.data[0]?.module?.title);
+        }
+        setSyllabus(syllabusData);
+      } catch (err) {
+        console.log('Failed to fetch syllabus:', err.message);
+        console.log('Syllabus error details:', err);
+        setSyllabus(null);
+      }
+      
+      // Fetch enrollment status
+      try {
+        console.log('Checking enrollment status...');
+        const enrollmentData = await getEnrollmentByCourseId(token, courseId);
+        console.log('Enrollment status:', enrollmentData);
+        setEnrollment(enrollmentData);
+      } catch (err) {
+        console.log('User not enrolled or enrollment check failed:', err.message);
+        // User not enrolled, that's okay
+        setEnrollment(null);
+      }
+      
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load course.');
+      console.error('Failed to load course data:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to load course data';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-
-  useEffect(() => {
-    fetchCourseAndEnrollment();
-  }, [courseId]);
-
-
-  const fetchQuizzes = async () => {
-    setQuizLoading(true);
+  const handleEnroll = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem('token');
-      console.log('Fetching quizzes for course:', courseId);
-      const response = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      console.log('Quiz data received:', response.data);
-      setQuizData(response.data);
+      
+      if (!token) {
+        alert('Please login to enroll in this course');
+        return;
+      }
+
+      // Check if course is free or paid
+      const isFree = course.priceType === 'free' || Number(course.price || 0) === 0;
+      
+      if (!isFree) {
+        // For paid courses, redirect to payment or show payment modal
+        alert(`This is a paid course (${course.currency || 'AUD'}${course.price}). Please complete payment before enrollment.`);
+        // TODO: Redirect to payment page or open payment modal
+        // navigate(`/student/payment/${courseId}`);
+        setLoading(false);
+        return;
+      }
+      
+      // Only allow direct enrollment for free courses
+      const enrollmentData = await createEnrollment(token, courseId);
+      console.log('Enrollment successful:', enrollmentData);
+      
+      // Update enrollment state
+      setEnrollment(enrollmentData);
+      
+      // Show success message
+      alert('Enrollment submitted successfully! Please wait for instructor approval to access course content.');
+      
     } catch (err) {
-      console.error('Failed to fetch quizzes:', err);
-      console.error('Error details:', err.response?.data);
+      console.error('Enrollment error:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to enroll in course. Please try again.';
+      alert(errorMessage);
     } finally {
-      setQuizLoading(false);
+      setLoading(false);
     }
   };
 
-
-  const handleStartQuiz = (quizSet) => {
-    setSelectedQuizSet({
-      ...quizSet,
-      quizId: quizData.quizId
-    });
-    setShowQuizModal(true);
-  };
-
-
-  const handleViewResults = (quizSet) => {
-    setSelectedQuizSet(quizSet);
-    setShowResultsModal(true);
-  };
-
-
-  const handleQuizComplete = () => {
-    setShowQuizModal(false);
-    setSelectedQuizSet(null);
-    // Refresh enrollment to get updated progress
-    fetchCourseAndEnrollment();
-  };
-
-
-  const handleCloseResults = () => {
-    setShowResultsModal(false);
-    setSelectedQuizSet(null);
-  };
-
-
-  const handleRegister = async () => {
-    setRegistering(true);
-    setError('');
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:8080/api/enrollments', { courseId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      // Refetch enrollment status
-      const enrollRes = await axios.get('http://localhost:8080/api/enrollments/my-courses', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const found = enrollRes.data.find(e => e.courseId?._id === courseId);
-      setEnrollment(found || null);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to register.');
-    } finally {
-      setRegistering(false);
+  const handleCancelEnrollment = async () => {
+    if (!window.confirm('Are you sure you want to cancel your enrollment? This action cannot be undone.')) {
+      return;
     }
-  };
-
-
-  const handleCancelRegistration = async () => {
-    setCancelling(true);
-    setError('');
+    
     try {
+      setLoading(true);
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8080/api/enrollments/${enrollment._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      
+      if (!token) {
+        alert('Please login to manage your enrollment');
+        return;
+      }
+      
+      // We need to get the enrollment ID first
+      if (!enrollment || !enrollment._id) {
+        alert('Enrollment information not found. Please refresh the page and try again.');
+        return;
+      }
+      
+      await cancelEnrollment(enrollment._id);
+      console.log('Enrollment cancelled successfully');
+      
+      // Update enrollment state
       setEnrollment(null);
+      
+      // Show success message
+      alert('Enrollment cancelled successfully');
+      
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to cancel registration.');
+      console.error('Cancel enrollment error:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to cancel enrollment. Please try again.';
+      alert(errorMessage);
     } finally {
-      setCancelling(false);
+      setLoading(false);
     }
   };
 
-
-  const renderContentItem = (item, index) => {
-    switch (item.type) {
-      case 'video':
-        return (
-          <video controls className="course-detail-video">
-            <source src={item.url} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        );
-      case 'image':
-        return (
-          <img src={item.url} alt={item.title || `Course content ${index + 1}`} className="course-detail-image" />
-        );
-      case 'pdf':
-        return (
-          <a href={item.url} target="_blank" rel="noopener noreferrer" className="course-detail-pdf">
-            📄 {item.title || 'View PDF'}
-          </a>
-        );
-      case 'text':
-        return (
-          <div className="course-detail-text">
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-          </div>
-        );
-      default:
-        return null;
+  const handlePaymentSuccess = async (paymentResult) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to complete enrollment');
+        return;
+      }
+      
+      // After successful payment, create enrollment
+      const enrollmentData = await createEnrollment(token, courseId);
+      console.log('Enrollment successful after payment:', enrollmentData);
+      
+      // Update enrollment state
+      setEnrollment(enrollmentData);
+      
+      // Show success message
+      alert('Payment successful! You are now enrolled in the course.');
+      
+    } catch (err) {
+      console.error('Enrollment after payment error:', err);
+      const errorMessage = err.response?.data?.message || 'Payment successful but enrollment failed. Please contact support.';
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
-
-
-  const isAccepted = enrollment && enrollment.status === 'approved';
-  const isPending = enrollment && enrollment.status === 'pending';
-
 
   return (
-    <div className="course-detail-page">
+    <>
       {loading ? (
-        <div className="course-detail-loading">Loading course...</div>
-      ) : error ? (
-        <div className="course-detail-error">{error}</div>
-      ) : course ? (
-        <div className="course-detail-content">
-          <h1 className="course-detail-title">{course.title}</h1>
-          <div className="course-detail-desc">{course.description}</div>
-          <div className="course-detail-instructor">
-            <b>Instructor:</b> {course.instructorId?.name || 'Unknown'}
-          </div>
-
-
-          {/* Show different content based on enrollment status */}
-          {!enrollment ? (
-            // Not enrolled - Show introduction content
-            <div className="course-detail-intro-section">
-              <div className="intro-header">
-                <h2>Course Introduction</h2>
-                <p>Register to access the full course content and quizzes</p>
-              </div>
-             
-              {course.introductionContent && course.introductionContent.length > 0 ? (
-                <div className="intro-content">
-                  {course.introductionContent.map((item, idx) => (
-                    <div key={idx} className="intro-item">
-                      {renderContentItem(item, idx)}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="intro-placeholder">
-                  <p>No introduction content available.</p>
-                </div>
-              )}
-
-
-              <div className="enrollment-section">
-                <button className="course-detail-register-btn" onClick={handleRegister} disabled={registering}>
-                  {registering ? 'Registering...' : 'Register for this Course'}
-                </button>
-              </div>
-            </div>
-          ) : isPending ? (// Enrolled but pending approval
-            // Pending approval - Show introduction with pending message
-            <div className="course-detail-pending-section">
-              <div className="pending-message">
-                <h2>⏳ Registration Pending</h2>
-                <p>Your registration is waiting for instructor approval. You can view the course introduction while waiting.</p>
-              </div>
-
-
-              {course.introductionContent && course.introductionContent.length > 0 && (
-                <div className="intro-content">
-                  {course.introductionContent.map((item, idx) => (
-                    <div key={idx} className="intro-item">
-                      {renderContentItem(item, idx)}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-
-              <div className="pending-actions">
-                <button
-                  className="course-detail-cancel-btn"
-                  onClick={handleCancelRegistration}
-                  disabled={cancelling}
-                >
-                  {cancelling ? "Cancelling..." : "Cancel Registration"}
-                </button>
-              </div>
-            </div>
-          ) : isAccepted ? (
-            // Accepted - Show full course content and quizzes
-            <div className="course-detail-full-section">
-              <div className="progress-section">
-                <h2>Course Progress</h2>
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${quizData?.progress || enrollment.progress || 0}%` }}
-                  ></div>
-                </div>
-                <span className="progress-text">
-                  {quizData?.completedQuizSets || 0} of {quizData?.totalQuizSets || 0} Quiz Sets Completed
-                  ({quizData?.progress || enrollment.progress || 0}%)
-                </span>
-                {quizData?.instructorApproved && (
-                  <div className="completion-status">
-                    <span className="completion-badge">✅ Course Approved by Instructor</span>
-                  </div>
-                )}
-              </div>
-
-
-              {/* Full Course Content */}
-              <div className="full-content-section">
-                <h2>Course Content</h2>
-                {course.content && course.content.length > 0 ? (
-                  <div className="course-detail-media-list">
-                    {course.content.map((item, idx) => (
-                      <div key={idx} className="course-detail-media">
-                        {renderContentItem(item, idx)}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="course-detail-no-content">No course content available.</div>
-                )}
-              </div>
-
-
-              {/* Quizzes Section */}
-              <div className="quizzes-section">
-                <h2>Course Quiz Sets</h2>
-                {console.log('Quiz data in render:', quizData)}
-                {console.log('Quiz loading:', quizLoading)}
-                {quizLoading ? (
-                  <div className="quiz-loading">Loading quiz sets...</div>
-                ) : quizData?.quizSets && quizData.quizSets.length > 0 ? (
-                  <div className="quizzes-list">
-                    {quizData.quizSets.filter(set => set.isActive).map((quizSet, idx) => (
-                      <div key={quizSet.quizSetId || idx} className="quiz-item">
-                        <h3>{quizSet.name}</h3>
-                        <p>{quizSet.questions?.length || 0} questions</p>
-                        {quizSet.hasSubmitted ? (
-                          <div className="quiz-completed">
-                            <div className="quiz-status">
-                              <span className={`status-badge ${quizSet.submission.passed ? 'passed' : 'failed'}`}>
-                                {quizSet.submission.passed ? '✅ Passed' : '❌ Failed'}
-                              </span>
-                              <span className="quiz-score">
-                                Score: {quizSet.submission.score}/{quizSet.submission.totalQuestions} ({quizSet.submission.percentage}%)
-                              </span>
-                            </div>
-                            <button
-                              className="quiz-view-results-btn"
-                              onClick={() => handleViewResults(quizSet)}
-                            >
-                              View Results
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            className="quiz-start-btn"
-                            onClick={() => handleStartQuiz(quizSet)}
-                          >
-                            Start Quiz Set
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-quizzes">
-                    <p>No quiz sets available for this course yet.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : null}
+        <div className="cd-loading">
+          <div className="cd-spinner"></div>
+          <p>Loading course details...</p>
         </div>
-      ) : null}
+      ) : error ? (
+        <div className="cd-error">
+          <h2>Error</h2>
+          <p>{error}</p>
+        </div>
+      ) : !course ? (
+        <div className="cd-error">
+          <h2>Course Not Found</h2>
+          <p>The course you're looking for doesn't exist.</p>
+        </div>
+      ) : (
+        <div className="cd-page">
+          {/* HERO */}
+          <header className="cd-hero">
+            <div className="cd-hero-grid">
+              <figure className="cd-hero-media">
+                {/* Ưu tiên image trong introductionAssets, sau đó đến thumbnailUrl */}
+                {course.introductionAssets?.find(a => a.kind === 'image') ? (
+                  <img
+                    src={course.introductionAssets.find(a => a.kind === 'image')?.url}
+                    alt={course.title}
+                    className="cd-hero-img"
+                  />
+                ) : course.thumbnailUrl ? (
+                  <img src={course.thumbnailUrl} alt={course.title} className="cd-hero-img" />
+                ) : (
+                  <div className="cd-hero-placeholder">
+                    <span>Course Preview</span>
+                  </div>
+                )}
+                {/* Nếu có video preview */}
+                {course.introductionAssets?.find(a => a.kind === 'video') && (
+                  <div className="cd-hero-video">
+                    <video controls className="cd-video">
+                      <source
+                        src={course.introductionAssets.find(a => a.kind === 'video')?.url}
+                        type="video/mp4"
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
+              </figure>
 
+              <div className="cd-hero-content">
+                <h1 className="cd-title">{course.title}</h1>
+                {course.subtitle && <p className="cd-subtitle">{course.subtitle}</p>}
 
-      {/* Quiz Modal */}
-      {showQuizModal && selectedQuizSet && (
-        <QuizModal
-          quizSet={selectedQuizSet}
-          onClose={() => setShowQuizModal(false)}
-          onComplete={handleQuizComplete}
-        />
+                <div className="cd-meta">
+                  {course.level && (
+                    <span className={`cd-chip level-${course.level}`}>
+                      {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
+                    </span>
+                  )}
+                  {course.stats?.totalLessons > 0 && (
+                    <span className="cd-chip">📚 {course.stats.totalLessons} lessons</span>
+                  )}
+                  {course.stats?.totalDurationSec > 0 && (
+                    <span className="cd-chip">⏱ {Math.floor(course.stats.totalDurationSec / 60)} min</span>
+                  )}
+                  {course.stats?.studentCount > 0 && (
+                    <span className="cd-chip">👥 {course.stats.studentCount} students</span>
+                  )}
+                </div>
+
+                <div className="cd-priceRow">
+                  {course.priceType === 'free' || course.price === 0 ? (
+                    <div className="cd-price free">Free</div>
+                  ) : (
+                    <div className="cd-price paid">
+                      {course.salePrice && course.salePrice < course.price && (
+                        <span className="cd-price-original">
+                          {course.currency || 'AUD'}${course.price}
+                        </span>
+                      )}
+                      <span className="cd-price-current">
+                        {course.currency || 'AUD'}${course.salePrice || course.price}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="cd-actions">
+                  {!enrollment ? (
+                    <>
+                      {course.priceType === 'free' || course.price === 0 ? (
+                        <button 
+                          className="cd-btn cd-btn-primary" 
+                          onClick={handleEnroll}
+                          disabled={loading}
+                        >
+                          {loading ? 'Processing...' : 'Enroll Now'}
+                        </button>
+                      ) : (
+                        <>
+                          <button 
+                            className="cd-btn cd-btn-primary" 
+                            onClick={() => {
+                              // For paid courses, open payment modal
+                              setShowPaymentModal(true);
+                            }}
+                            disabled={loading}
+                          >
+                            Enroll Now
+                          </button>
+                          <button
+                            className="cd-btn cd-btn-ghost"
+                            onClick={() => {
+                              // Show course details
+                              alert(`Course: ${course.title}\nPrice: ${course.currency || 'AUD'}${course.price}\n\nThis is a paid course. Complete payment to access all content.`);
+                            }}
+                            disabled={loading}
+                          >
+                            Learn More
+                          </button>
+                        </>
+                      )}
+                    </>
+                  ) : enrollment.status === 'pending' ? (
+                    <div className="cd-enrollment-pending">
+                      <span className="cd-pending-badge">⏳ Pending Approval</span>
+                      <p className="cd-pending-message">Your enrollment is waiting for instructor approval. You'll receive a notification once approved.</p>
+                      <button 
+                        className="cd-btn cd-btn-link" 
+                        onClick={handleCancelEnrollment}
+                        disabled={loading}
+                      >
+                        {loading ? 'Processing...' : 'Cancel Enrollment'}
+                      </button>
+                    </div>
+                  ) : enrollment.status === 'approved' ? (
+                    <div className="cd-enrolled">
+                      <span className="cd-enrolled-badge">✓ Enrolled & Approved</span>
+                      <div className="cd-enrolled-actions">
+                        <button 
+                          className="cd-btn cd-btn-primary"
+                          onClick={() => navigate(`/student/courses/${courseId}/learn`)}
+                        >
+                          🚀 Start Learning
+                        </button>
+                        <button 
+                          className="cd-btn cd-btn-link" 
+                          onClick={handleCancelEnrollment}
+                          disabled={loading}
+                        >
+                          {loading ? 'Processing...' : 'Cancel enrollment'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="cd-enrollment-cancelled">
+                      <span className="cd-cancelled-badge">❌ Enrollment Cancelled</span>
+                      <button 
+                        className="cd-btn cd-btn-primary" 
+                        onClick={handleEnroll}
+                        disabled={loading}
+                      >
+                        {loading ? 'Processing...' : 'Re-enroll'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {course.instructorId && (
+                  <div className="cd-instructor">
+                    <span className="cd-instructor-label">Instructor</span>
+                    <span className="cd-instructor-name">
+                      {typeof course.instructorId === 'object'
+                        ? course.instructorId.name
+                        : 'Unknown'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* MAIN CONTENT */}
+          <main className="cd-content">
+            {/* About / Introduction */}
+            {course.description && (
+              <section className="cd-section">
+                <h2 className="cd-h2">About this course</h2>
+                <p className="cd-lead">{course.description}</p>
+              </section>
+            )}
+
+            {/* Course Syllabus */}
+            <section className="cd-section">
+              <h2 className="cd-h2">Course Content</h2>
+              <div className="cd-syllabus">
+
+                
+                {(syllabus && syllabus.data && syllabus.data.length > 0) || (Array.isArray(syllabus) && syllabus.length > 0) ? (
+                  <>
+                    <div className="cd-syllabus-summary">
+                      <p className="cd-syllabus-overview">
+                        This course contains <strong>{syllabus.data ? syllabus.data.length : syllabus.length} modules</strong> with a total of{' '}
+                        <strong>{(syllabus.data || syllabus).reduce((total, item) => total + (item.lessons ? item.lessons.length : 0), 0)} lessons</strong>
+                      </p>
+                    </div>
+                    
+                    {(syllabus.data || syllabus).map((item, moduleIndex) => {
+                      // Handle both data structures: { module: {...}, lessons: [...] } and direct module object
+                      const moduleData = item.module || item;
+                      const lessons = item.lessons || [];
+                      
+                      return (
+                        <div key={moduleData._id || moduleIndex} className="cd-module">
+                          <div className="cd-module-header">
+                            <div className="cd-module-title-section">
+                              <span className="cd-module-number">{moduleIndex + 1}</span>
+                              <h3 className="cd-module-title">{moduleData.title}</h3>
+                            </div>
+                            <div className="cd-module-meta">
+                              <span className="cd-module-lesson-count">
+                                {lessons.length} lessons
+                              </span>
+                              {moduleData.summary && (
+                                <span className="cd-module-summary">{moduleData.summary}</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {lessons.length > 0 && (
+                            <div className="cd-lessons-list">
+                              {lessons.map((lesson, lessonIndex) => (
+                                <div key={lesson._id || lessonIndex} className="cd-lesson-item">
+                                  <div className="cd-lesson-info">
+                                    <span className="cd-lesson-number">{lessonIndex + 1}</span>
+                                    <span className="cd-lesson-title">{lesson.title}</span>
+                                    {lesson.durationSec && (
+                                      <span className="cd-lesson-duration">
+                                        {Math.floor(lesson.durationSec / 60)}m
+                                      </span>
+                                    )}
+                                  </div>
+                                  {lesson.contentType && (
+                                    <span className="cd-lesson-type">
+                                      {lesson.contentType === 'video' ? '🎥' : 
+                                       lesson.contentType === 'text' ? '📝' : 
+                                       lesson.contentType === 'quiz' ? '❓' : '📎'}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : course.stats && course.stats.totalLessons > 0 ? (
+                  <div className="cd-syllabus-placeholder">
+                    <p>This course contains {course.stats.totalLessons} lessons organized into modules.</p>
+                    <p>Enroll to see the complete course structure and start learning!</p>
+                  </div>
+                ) : (
+                  <div className="cd-syllabus-placeholder">
+                    <p>Course content will be available after enrollment.</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          </main>
+        </div>
       )}
 
-
-      {/* Quiz Results Modal */}
-      {showResultsModal && selectedQuizSet && selectedQuizSet.submission && (
-        <QuizResults
-          submission={selectedQuizSet.submission}
-          onClose={handleCloseResults}
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          course={course}
+          onPaymentSuccess={handlePaymentSuccess}
         />
       )}
-
 
       <Footer />
-    </div>
+    </>
   );
-}
-
+} 

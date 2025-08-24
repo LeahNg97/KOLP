@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { paymentApi } from '../api/paymentApi';
 import './PaymentModal.css';
 
-
 const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
   const [cardNumber, setCardNumber] = useState('');
@@ -12,15 +11,12 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-
   if (!isOpen) return null;
 
-// nhập liệu thanh toán, kiểm tra
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsProcessing(true);
-
 
     try {
       // Validate form
@@ -30,13 +26,11 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
         return;
       }
 
-
       if (cardNumber.length < 13 || cardNumber.length > 19) {
         setError('Please enter a valid card number');
         setIsProcessing(false);
         return;
       }
-
 
       if (cvv.length < 3 || cvv.length > 4) {
         setError('Please enter a valid CVV');
@@ -44,26 +38,24 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
         return;
       }
 
-
       // Process payment
       const result = await paymentApi.createPayment(
         course._id,
         paymentMethod,
-        course.price
+        course.salePrice || course.price,
+        course
       );
-
 
       // Payment successful
       onPaymentSuccess(result);
       onClose();
-     
+      
     } catch (error) {
       setError(error.message || 'Payment failed. Please try again.');
     } finally {
       setIsProcessing(false);
     }
   };
-
 
   const handleClose = () => {
     if (!isProcessing) {
@@ -76,14 +68,13 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
     }
   };
 
-
   return (
     <div className="payment-modal-overlay" onClick={handleClose}>
       <div className="payment-modal" onClick={(e) => e.stopPropagation()}>
         <div className="payment-modal-header">
           <h2>Complete Payment</h2>
-          <button
-            className="close-button"
+          <button 
+            className="close-button" 
             onClick={handleClose}
             disabled={isProcessing}
           >
@@ -91,15 +82,23 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
           </button>
         </div>
 
-
         <div className="payment-modal-body">
           <div className="course-summary">
             <h3>{course.title}</h3>
+            {course.subtitle && <p className="course-subtitle">{course.subtitle}</p>}
             <p className="course-price">
-              {course.price === 0 ? 'Free' : `$${course.price}`}
+              {course.priceType === 'free' || course.price === 0 ? 'Free' : (
+                <>
+                  {course.salePrice && course.salePrice < course.price && (
+                    <span className="original-price">${course.price}</span>
+                  )}
+                  <span className="final-price">
+                    {course.currency || 'AUD'}${course.salePrice || course.price}
+                  </span>
+                </>
+              )}
             </p>
           </div>
-
 
           <form onSubmit={handleSubmit} className="payment-form">
             <div className="form-group">
@@ -114,7 +113,6 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
               </select>
             </div>
 
-
             <div className="form-group">
               <label>Card Number</label>
               <input
@@ -126,7 +124,6 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
                 disabled={isProcessing}
               />
             </div>
-
 
             <div className="form-row">
               <div className="form-group">
@@ -153,7 +150,6 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
               </div>
             </div>
 
-
             <div className="form-group">
               <label>Cardholder Name</label>
               <input
@@ -165,9 +161,7 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
               />
             </div>
 
-
             {error && <div className="error-message">{error}</div>}
-
 
             <div className="payment-actions">
               <button
@@ -183,7 +177,7 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
                 className="pay-button"
                 disabled={isProcessing}
               >
-                {isProcessing ? 'Processing...' : `Pay $${course.price}`}
+                {isProcessing ? 'Processing...' : `Pay ${course.currency || 'AUD'}${course.salePrice || course.price}`}
               </button>
             </div>
           </form>
@@ -193,10 +187,4 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
   );
 };
 
-
 export default PaymentModal;
-
-
-
-
-

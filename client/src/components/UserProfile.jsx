@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { getCurrentUser, updateUserProfile } from '../auth/api/authApi';
 import './UserProfile.css';
 
-
 export default function UserProfile({ isOpen, onClose }) {
   const { user, updateUser } = useAuth();
   const [profileData, setProfileData] = useState(null);
@@ -15,7 +14,6 @@ export default function UserProfile({ isOpen, onClose }) {
     email: ''
   });
 
-
   useEffect(() => {
     if (isOpen && user) {
       fetchProfileData();
@@ -25,7 +23,6 @@ export default function UserProfile({ isOpen, onClose }) {
       });
     }
   }, [isOpen, user]);
-
 
   const fetchProfileData = async () => {
     setLoading(true);
@@ -40,11 +37,9 @@ export default function UserProfile({ isOpen, onClose }) {
     }
   };
 
-
   const handleEdit = () => {
     setIsEditing(true);
   };
-
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -53,7 +48,6 @@ export default function UserProfile({ isOpen, onClose }) {
       email: user.email || ''
     });
   };
-
 
   const handleSave = async () => {
     setLoading(true);
@@ -69,7 +63,6 @@ export default function UserProfile({ isOpen, onClose }) {
     }
   };
 
-
   const handleInputChange = (e) => {
     setEditForm({
       ...editForm,
@@ -77,9 +70,7 @@ export default function UserProfile({ isOpen, onClose }) {
     });
   };
 
-
   if (!isOpen) return null;
-
 
   return (
     <div className="profile-overlay" onClick={onClose}>
@@ -90,7 +81,6 @@ export default function UserProfile({ isOpen, onClose }) {
             ✕
           </button>
         </div>
-
 
         {loading && !profileData ? (
           <div className="profile-loading">Loading profile...</div>
@@ -106,7 +96,6 @@ export default function UserProfile({ isOpen, onClose }) {
                 {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1) || 'User'}
               </div>
             </div>
-
 
             {isEditing ? (
               <div className="profile-edit-form">
@@ -133,15 +122,15 @@ export default function UserProfile({ isOpen, onClose }) {
                   <small>Email cannot be changed</small>
                 </div>
                 <div className="profile-actions">
-                  <button
-                    className="profile-btn profile-btn-save"
+                  <button 
+                    className="profile-btn profile-btn-save" 
                     onClick={handleSave}
                     disabled={loading}
                   >
                     {loading ? 'Saving...' : 'Save Changes'}
                   </button>
-                  <button
-                    className="profile-btn profile-btn-cancel"
+                  <button 
+                    className="profile-btn profile-btn-cancel" 
                     onClick={handleCancel}
                     disabled={loading}
                   >
@@ -167,10 +156,10 @@ export default function UserProfile({ isOpen, onClose }) {
                   <label>Member Since</label>
                   <span>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
                 </div>
-               
+                
                 <div className="profile-actions">
-                  <button
-                    className="profile-btn profile-btn-edit"
+                  <button 
+                    className="profile-btn profile-btn-edit" 
                     onClick={handleEdit}
                   >
                     Edit Profile
@@ -183,7 +172,4 @@ export default function UserProfile({ isOpen, onClose }) {
       </div>
     </div>
   );
-}
-
-
-
+} 

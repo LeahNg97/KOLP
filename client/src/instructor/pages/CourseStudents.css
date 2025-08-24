@@ -32,7 +32,7 @@
 }
 
 .students-header h1 {
-  color: white;
+  color: #333;
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
@@ -659,6 +659,71 @@
   margin-bottom: 8px;
   font-size: 0.98rem;
 }
+
+/* Progress Sections */
+.progress-section {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f8f9fc;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.progress-section h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.progress-section > div {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+/* Lesson Progress List */
+.lesson-progress-list {
+  margin-top: 12px;
+}
+
+.lesson-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.lesson-progress-item.completed {
+  background: #f0fdf4;
+  border-color: #22c55e;
+}
+
+.lesson-progress-item.incomplete {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.lesson-status {
+  font-size: 1.2rem;
+  min-width: 20px;
+}
+
+.lesson-title {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.lesson-completion-date {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }

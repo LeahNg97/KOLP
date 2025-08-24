@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   // Set up axios interceptor for authentication
   useEffect(() => {
     if (token) {
+      console.log('Setting axios authorization header with token');
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       // Load user data from localStorage
       const userData = localStorage.getItem('user');
@@ -32,17 +33,21 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } else {
+      console.log('Removing axios authorization header');
       delete axios.defaults.headers.common['Authorization'];
     }
     setLoading(false);
   }, [token]);
 
   const login = (userData, token) => {
+    console.log('Login called with token:', token ? 'exists' : 'missing');
+    console.log('Token length:', token ? token.length : 0);
     setUser(userData);
     setToken(token);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('Axios header set:', axios.defaults.headers.common['Authorization'] ? 'Yes' : 'No');
   };
 
   const logout = () => {
@@ -80,4 +85,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}; 

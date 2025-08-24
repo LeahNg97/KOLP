@@ -5,7 +5,7 @@
 }
 
 .admin-main {
-  margin-left: 0;
+  margin-left: 270px;
   padding: 30px;
   width: 100%;
   background: #f8f9fc;
@@ -92,19 +92,19 @@
 }
 
 .stat-card.students::before {
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #FF6384, #FF8A80);
 }
 
 .stat-card.instructors::before {
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #36A2EB, #64B5F6);
 }
 
 .stat-card.courses::before {
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #FFCE56, #FFD54F);
 }
 
 .stat-card.certificates::before {
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #4BC0C0, #4DB6AC);
 }
 
 .stat-card:hover {

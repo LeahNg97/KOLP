@@ -1,13 +1,12 @@
 import React from "react";
 import "./Footer.css";
 
-
 export default function Footer() {
   return (
     <footer className="pro-footer">
       <div className="pro-footer-main">
         <div className="pro-footer-brand">
-          <span className="pro-footer-logo">King Online Learning Platform</span>
+          <span className="pro-footer-logo">EduPlatform</span>
           <span className="pro-footer-slogan">Empowering Your Learning Journey</span>
         </div>
         <div className="pro-footer-links">
@@ -28,7 +27,7 @@ export default function Footer() {
             <div className="pro-footer-section-title">Contact</div>
             <div className="pro-footer-contact-row">
               <span>Email:</span>
-              <a href="mailto:support@kolp.com">support@kolp.com</a>
+              <a href="mailto:support@eduplatform.com">support@eduplatform.com</a>
             </div>
             <div className="pro-footer-contact-row">
               <span>Phone:</span>
@@ -36,7 +35,7 @@ export default function Footer() {
             </div>
             <div className="pro-footer-contact-row">
               <span>Address:</span>
-              <span>123 Main St, Sydney, NSW, Australia</span>
+              <span>123 Main St, City, Country</span>
             </div>
           </div>
         </div>
@@ -61,5 +60,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
-
+} 
