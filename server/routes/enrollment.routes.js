@@ -7,7 +7,9 @@ const {
   getInstructorStudents,
   approveEnrollment,
   cancelEnrollment,
-  rejectEnrollment
+  rejectEnrollment,
+  deleteEnrollment,
+  approveCourseCompletion
 } = require('../controllers/enrollment.controller');
 
 const { verifyToken, authorizeRole } = require('../middleware/auth.middleware');
@@ -167,6 +169,33 @@ router.put('/:enrollmentId/approve', verifyToken, authorizeRole('admin', 'instru
 
 /**
  * @swagger
+ * /api/enrollments/{enrollmentId}/delete:
+ *   delete:
+ *     summary: Delete enrollment (Admin/Instructor only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: enrollmentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Enrollment ID
+ *     responses:
+ *       200:
+ *         description: Enrollment deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Not authorized
+ *       404:
+ *         description: Enrollment not found
+ */
+router.delete('/:enrollmentId/delete', verifyToken, authorizeRole('admin', 'instructor'), deleteEnrollment);
+
+/**
+ * @swagger
  * /api/enrollments/{enrollmentId}/reject:
  *   delete:
  *     summary: Reject enrollment (Instructor/Admin only)
@@ -214,5 +243,40 @@ router.delete('/:enrollmentId/reject', verifyToken, authorizeRole('admin', 'inst
  *         description: Enrollment not found
  */
 router.delete('/:enrollmentId', verifyToken, authorizeRole('student'), cancelEnrollment);
+
+/**
+ * @swagger
+ * /api/enrollments/{courseId}/approve-completion/{studentId}:
+ *   patch:
+ *     summary: Approve course completion for a student (Instructor/Admin only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Course ID
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Student ID
+ *     responses:
+ *       200:
+ *         description: Course completion approved successfully
+ *       400:
+ *         description: Student has not completed all lessons
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - not instructor of this course
+ *       404:
+ *         description: Enrollment not found
+ */
+router.patch('/:courseId/approve-completion/:studentId', verifyToken, authorizeRole('admin', 'instructor'), approveCourseCompletion);
 
 module.exports = router;

@@ -185,8 +185,8 @@ export default function Login() {
           >
             {loading ? (
               <>
-                <span className="loading-spinner"></span>
-                Loading...
+          
+                
               </>
             ) : (
               'Login'
