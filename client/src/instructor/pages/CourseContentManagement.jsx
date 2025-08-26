@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   getCourseById, 
-  getCourseSyllabus, 
+  getCourseSyllabus,
   createModule, 
   updateModule, 
   deleteModule,
@@ -10,7 +10,6 @@ import {
   updateLesson,
   deleteLesson
 } from '../api/courseApi';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './CourseContentManagement.css';
 
 export default function CourseContentManagement() {
@@ -20,6 +19,8 @@ export default function CourseContentManagement() {
   const [syllabus, setSyllabus] = useState({ modules: [], lessons: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
   const [editingModule, setEditingModule] = useState(null);
   const [editingLesson, setEditingLesson] = useState(null);
   const [showModuleForm, setShowModuleForm] = useState(false);
@@ -147,29 +148,45 @@ export default function CourseContentManagement() {
   // Module Management
   const handleCreateModule = async (moduleData) => {
     try {
-      const newModule = await createModule(courseId, moduleData);
-      setSyllabus(prev => ({
-        ...prev,
-        modules: [...prev.modules, newModule]
-      }));
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+      
+      await createModule(courseId, moduleData);
+      // Refresh data to ensure consistency
+      await fetchCourseData();
       setShowModuleForm(false);
+      setSuccessMessage('Module created successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create module');
+      console.error('Error creating module:', err);
+      setError(err.response?.data?.message || 'Failed to create module. Please try again.');
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleUpdateModule = async (moduleId, moduleData) => {
     try {
-      const updatedModule = await updateModule(moduleId, moduleData);
-      setSyllabus(prev => ({
-        ...prev,
-        modules: prev.modules.map(m => 
-          m._id === moduleId ? updatedModule : m
-        )
-      }));
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+      
+      await updateModule(moduleId, moduleData);
+      // Refresh data to ensure consistency
+      await fetchCourseData();
       setEditingModule(null);
+      setSuccessMessage('Module updated successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update module');
+      console.error('Error updating module:', err);
+      setError(err.response?.data?.message || 'Failed to update module. Please try again.');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -178,47 +195,72 @@ export default function CourseContentManagement() {
       return;
     }
     try {
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+      
       await deleteModule(moduleId);
-      setSyllabus(prev => ({
-        ...prev,
-        modules: prev.modules.filter(m => m._id !== moduleId)
-      }));
+      // Refresh data to ensure consistency
+      await fetchCourseData();
+      setSuccessMessage('Module deleted successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete module');
+      console.error('Error deleting module:', err);
+      setError(err.response?.data?.message || 'Failed to delete module. Please try again.');
+    } finally {
+      setActionLoading(false);
     }
   };
 
   // Lesson Management
   const handleCreateLesson = async (lessonData) => {
     try {
-      const newLesson = await createLesson({
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+      
+      await createLesson({
         ...lessonData,
         courseId,
         moduleId: selectedModuleId
       });
-      setSyllabus(prev => ({
-        ...prev,
-        lessons: [...prev.lessons, newLesson]
-      }));
+      // Refresh data to ensure consistency
+      await fetchCourseData();
       setShowLessonForm(false);
       setSelectedModuleId(null);
+      setSuccessMessage('Lesson created successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create lesson');
+      console.error('Error creating lesson:', err);
+      setError(err.response?.data?.message || 'Failed to create lesson. Please try again.');
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleUpdateLesson = async (lessonId, lessonData) => {
     try {
-      const updatedLesson = await updateLesson(lessonId, lessonData);
-      setSyllabus(prev => ({
-        ...prev,
-        lessons: prev.lessons.map(l => 
-          l._id === lessonId ? updatedLesson : l
-        )
-      }));
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+      
+      await updateLesson(lessonId, lessonData);
+      // Refresh data to ensure consistency
+      await fetchCourseData();
       setEditingLesson(null);
+      setSuccessMessage('Lesson updated successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update lesson');
+      console.error('Error updating lesson:', err);
+      setError(err.response?.data?.message || 'Failed to update lesson. Please try again.');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -227,13 +269,22 @@ export default function CourseContentManagement() {
       return;
     }
     try {
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+      
       await deleteLesson(lessonId);
-      setSyllabus(prev => ({
-        ...prev,
-        lessons: prev.lessons.filter(l => l._id !== lessonId)
-      }));
+      // Refresh data to ensure consistency
+      await fetchCourseData();
+      setSuccessMessage('Lesson deleted successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete lesson');
+      console.error('Error deleting lesson:', err);
+      setError(err.response?.data?.message || 'Failed to delete lesson. Please try again.');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -264,7 +315,6 @@ export default function CourseContentManagement() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="loading">Loading course content...</div>
         </main>
@@ -275,7 +325,6 @@ export default function CourseContentManagement() {
   if (error) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="error">Error: {error}</div>
         </main>
@@ -285,7 +334,6 @@ export default function CourseContentManagement() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="content-management">
           <div className="page-header">
@@ -313,12 +361,27 @@ export default function CourseContentManagement() {
             </div>
           </div>
 
+          {/* Error and Success Messages */}
+          {error && (
+            <div className="error-message">
+              <span>❌ {error}</span>
+              <button onClick={() => setError('')} className="close-error">×</button>
+            </div>
+          )}
+          
+          {successMessage && (
+            <div className="success-message">
+              <span>✅ {successMessage}</span>
+            </div>
+          )}
+
           <div className="content-actions">
             <button 
               onClick={() => setShowModuleForm(true)}
               className="action-btn primary"
+              disabled={actionLoading}
             >
-              + Add Module
+              {actionLoading ? 'Loading...' : '+ Add Module'}
             </button>
           </div>
 
@@ -340,8 +403,9 @@ export default function CourseContentManagement() {
                       <button 
                         onClick={() => handleDeleteModule(module._id)}
                         className="action-btn danger"
+                        disabled={actionLoading}
                       >
-                        Delete
+                        {actionLoading ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </div>
@@ -349,15 +413,16 @@ export default function CourseContentManagement() {
                   <div className="lessons-section">
                     <div className="lessons-header">
                       <h4>Lessons ({getLessonsForModule(module._id)?.length || 0})</h4>
-                      <button 
-                        onClick={() => {
-                          setSelectedModuleId(module._id);
-                          setShowLessonForm(true);
-                        }}
-                        className="action-btn secondary"
-                      >
-                        + Add Lesson
-                      </button>
+                                              <button 
+                          onClick={() => {
+                            setSelectedModuleId(module._id);
+                            setShowLessonForm(true);
+                          }}
+                          className="action-btn secondary"
+                          disabled={actionLoading}
+                        >
+                          {actionLoading ? 'Loading...' : '+ Add Lesson'}
+                        </button>
                     </div>
 
                     <div className="lessons-list">
@@ -382,14 +447,16 @@ export default function CourseContentManagement() {
                             <button 
                               onClick={() => setEditingLesson(lesson)}
                               className="action-btn small"
+                              disabled={actionLoading}
                             >
                               Edit
                             </button>
                             <button 
                               onClick={() => handleDeleteLesson(lesson._id)}
                               className="action-btn small danger"
+                              disabled={actionLoading}
                             >
-                              Delete
+                              {actionLoading ? 'Deleting...' : 'Delete'}
                             </button>
                           </div>
                         </div>
@@ -409,6 +476,7 @@ export default function CourseContentManagement() {
             onSubmit={handleCreateModule}
             onCancel={() => setShowModuleForm(false)}
             nextOrder={(syllabus?.modules?.length || 0) + 1}
+            loading={actionLoading}
           />
         )}
 
@@ -419,6 +487,7 @@ export default function CourseContentManagement() {
             onSubmit={(data) => handleUpdateModule(editingModule._id, data)}
             onCancel={() => setEditingModule(null)}
             isEditing={true}
+            loading={actionLoading}
           />
         )}
 
@@ -432,6 +501,7 @@ export default function CourseContentManagement() {
             }}
             moduleId={selectedModuleId}
             nextOrder={(getLessonsForModule(selectedModuleId)?.length || 0) + 1}
+            loading={actionLoading}
           />
         )}
 
@@ -442,6 +512,7 @@ export default function CourseContentManagement() {
             onSubmit={(data) => handleUpdateLesson(editingLesson._id, data)}
             onCancel={() => setEditingLesson(null)}
             isEditing={true}
+            loading={actionLoading}
           />
         )}
       </main>
@@ -450,7 +521,7 @@ export default function CourseContentManagement() {
 }
 
 // Module Form Component
-function ModuleForm({ module, onSubmit, onCancel, nextOrder, isEditing = false }) {
+function ModuleForm({ module, onSubmit, onCancel, nextOrder, isEditing = false, loading = false }) {
   const [formData, setFormData] = useState({
     title: module?.title || '',
     summary: module?.summary || '',
@@ -459,10 +530,19 @@ function ModuleForm({ module, onSubmit, onCancel, nextOrder, isEditing = false }
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate required fields
     if (!formData.title.trim()) {
       alert('Module title is required');
       return;
     }
+    
+    // Validate order
+    if (formData.order < 1) {
+      alert('Order must be at least 1');
+      return;
+    }
+    
     onSubmit(formData);
   };
 
@@ -506,8 +586,8 @@ function ModuleForm({ module, onSubmit, onCancel, nextOrder, isEditing = false }
             <button type="button" onClick={onCancel} className="cancel-btn">
               Cancel
             </button>
-            <button type="submit" className="submit-btn">
-              {isEditing ? 'Update Module' : 'Create Module'}
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? 'Loading...' : (isEditing ? 'Update Module' : 'Create Module')}
             </button>
           </div>
         </form>
@@ -517,7 +597,7 @@ function ModuleForm({ module, onSubmit, onCancel, nextOrder, isEditing = false }
 }
 
 // Lesson Form Component
-function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing = false }) {
+function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing = false, loading = false }) {
   const [formData, setFormData] = useState({
     title: lesson?.title || '',
     description: lesson?.description || '',
@@ -531,14 +611,32 @@ function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate required fields
     if (!formData.title.trim()) {
       alert('Lesson title is required');
       return;
     }
-    if (!formData.url.trim() && !formData.textContent.trim()) {
-      alert('Either URL or text content is required');
+    
+    // Validate content based on contentType
+    if (formData.contentType === 'text') {
+      if (!formData.textContent.trim()) {
+        alert('Text content is required for text lessons');
+        return;
+      }
+    } else {
+      if (!formData.url.trim()) {
+        alert('URL is required for non-text lessons');
+        return;
+      }
+    }
+    
+    // Validate order
+    if (formData.order < 1) {
+      alert('Order must be at least 1');
       return;
     }
+    
     onSubmit(formData);
   };
 
@@ -635,8 +733,8 @@ function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing
             <button type="button" onClick={onCancel} className="cancel-btn">
               Cancel
             </button>
-            <button type="submit" className="submit-btn">
-              {isEditing ? 'Update Lesson' : 'Create Lesson'}
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? 'Loading...' : (isEditing ? 'Update Lesson' : 'Create Lesson')}
             </button>
           </div>
         </form>

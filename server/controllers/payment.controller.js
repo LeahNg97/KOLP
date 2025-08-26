@@ -5,14 +5,60 @@ const Enrollment = require('../models/enrollment.model');
 // Create a new payment
 exports.createPayment = async (req, res) => {
   try {
+    console.log('Full request body:', req.body);
+    console.log('User from token:', req.user);
+    
     const { courseId, paymentMethod, amount } = req.body;
     const studentId = req.user.id;
 
+    console.log('User authentication check:', {
+      userId: studentId,
+      userRole: req.user.role,
+      hasToken: !!req.user
+    });
+
+    // Log the request for debugging
+    console.log('Payment request:', { courseId, paymentMethod, amount, studentId });
+
+    // Validate required fields
+    if (!courseId || !paymentMethod || amount === undefined || amount === null) {
+      return res.status(400).json({ 
+        message: 'Missing required fields: courseId, paymentMethod, and amount are required' 
+      });
+    }
+
+    // Validate amount is a positive number
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount) || numericAmount < 0) {
+      return res.status(400).json({ 
+        message: 'Amount must be a valid positive number' 
+      });
+    }
+    
+    // Update amount to ensure it's a number
+    const finalAmount = numericAmount;
+
     // Validate course exists and is active
+    if (!courseId || typeof courseId !== 'string') {
+      console.log('Invalid courseId:', courseId);
+      return res.status(400).json({ message: 'Invalid course ID' });
+    }
+
     const course = await Course.findById(courseId);
     if (!course) {
+      console.log('Course not found for ID:', courseId);
       return res.status(404).json({ message: 'Course not found' });
     }
+
+    console.log('Found course:', {
+      id: course._id,
+      title: course.title,
+      price: course.price,
+      salePrice: course.salePrice,
+      priceType: course.priceType,
+      currency: course.currency,
+      status: course.status
+    });
 
     if (course.status !== 'active') {
       return res.status(400).json({ message: 'Course is not available for enrollment' });
@@ -28,33 +74,55 @@ exports.createPayment = async (req, res) => {
       return res.status(400).json({ message: 'You are already enrolled in this course' });
     }
 
-    // Validate amount matches course price
-    if (amount !== course.price) {
-      return res.status(400).json({ message: 'Payment amount does not match course price' });
+    // Validate amount matches course price (consider sale price if available)
+    const expectedAmount = course.salePrice || course.price;
+    console.log('Amount validation:', {
+      receivedAmount: amount,
+      numericAmount: numericAmount,
+      finalAmount: finalAmount,
+      expectedAmount: expectedAmount,
+      coursePrice: course.price,
+      courseSalePrice: course.salePrice,
+      matches: finalAmount === expectedAmount
+    });
+    
+    if (finalAmount !== expectedAmount) {
+      return res.status(400).json({ 
+        message: `Payment amount (${finalAmount}) does not match expected amount (${expectedAmount})` 
+      });
     }
 
     // Generate transaction ID
     const transactionId = `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     // Create payment record
-    const payment = await Payment.create({
+    const paymentData = {
       studentId,
       courseId,
-      amount,
+      amount: finalAmount,
+      currency: course.currency || 'AUD',
       paymentMethod,
       transactionId,
       paymentStatus: 'completed' // For demo purposes, assume payment is successful
-    });
+    };
+    
+    console.log('Creating payment with data:', paymentData);
+    
+    const payment = await Payment.create(paymentData);
 
     // Create enrollment after successful payment
-    const enrollment = await Enrollment.create({
+    const enrollmentData = {
       studentId,
       courseId,
       status: 'approved', // Auto-approve after payment
       enrollmentDate: new Date()
-    });
+    };
+    
+    console.log('Creating enrollment with data:', enrollmentData);
+    
+    const enrollment = await Enrollment.create(enrollmentData);
 
-    res.status(201).json({
+    const response = {
       message: 'Payment successful and enrollment completed',
       payment: {
         id: payment._id,
@@ -68,10 +136,30 @@ exports.createPayment = async (req, res) => {
         status: enrollment.status,
         date: enrollment.enrollmentDate
       }
-    });
+    };
+    
+    console.log('Sending response:', response);
+    res.status(201).json(response);
 
   } catch (error) {
     console.error('Payment creation error:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Handle specific error types
+    if (error.name === 'ValidationError') {
+      console.log('Validation error details:', error.errors);
+      return res.status(400).json({ 
+        message: 'Validation error: ' + Object.values(error.errors).map(e => e.message).join(', ')
+      });
+    }
+    
+    if (error.name === 'CastError') {
+      console.log('Cast error details:', error);
+      return res.status(400).json({ 
+        message: 'Invalid ID format' 
+      });
+    }
+    
     res.status(500).json({ message: 'Error processing payment: ' + error.message });
   }
 };

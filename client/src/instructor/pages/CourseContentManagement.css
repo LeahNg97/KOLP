@@ -6,8 +6,9 @@
 
 .instructor-main {
   flex: 1;
-  margin-left: 250px;
+  margin-left: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 100%;
 }
 
 /* Content Management Page */
@@ -58,9 +59,15 @@
   text-decoration: none;
 }
 
-.back-btn:hover {
+.back-btn:hover:not(:disabled) {
   background: rgba(113, 128, 150, 0.2);
   transform: translateY(-1px);
+}
+
+.back-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 /* Course Overview */
@@ -101,6 +108,53 @@
   font-weight: 500;
 }
 
+/* Error and Success Messages */
+.error-message {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.3);
+  color: #c53030;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.success-message {
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.3);
+  color: #22543d;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.close-error {
+  background: none;
+  border: none;
+  color: #c53030;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.close-error:hover:not(:disabled) {
+  background: rgba(245, 101, 101, 0.2);
+}
+
+.close-error:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Content Actions */
 .content-actions {
   margin-bottom: 2rem;
@@ -123,9 +177,16 @@
   box-shadow: 0 4px 16px rgba(72, 187, 120, 0.3);
 }
 
-.action-btn.primary:hover {
+.action-btn.primary:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Modules Container */
@@ -199,7 +260,7 @@
   transition: all 0.3s ease;
 }
 
-.action-btn.secondary:hover {
+.action-btn.secondary:hover:not(:disabled) {
   background: rgba(113, 128, 150, 0.2);
   transform: translateY(-1px);
 }
@@ -216,7 +277,7 @@
   transition: all 0.3s ease;
 }
 
-.action-btn.danger:hover {
+.action-btn.danger:hover:not(:disabled) {
   background: rgba(245, 101, 101, 0.2);
   transform: translateY(-1px);
 }
@@ -338,6 +399,10 @@
   font-size: 0.8rem;
 }
 
+.action-btn.small:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -389,9 +454,14 @@
   transition: all 0.2s ease;
 }
 
-.close-btn:hover {
+.close-btn:hover:not(:disabled) {
   background: rgba(113, 128, 150, 0.1);
   color: #4a5568;
+}
+
+.close-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Modal Form */
@@ -431,6 +501,34 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-group input:disabled,
+.form-group textarea:disabled,
+.form-group select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f7fafc;
+}
+
+.form-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.form-group input[type="checkbox"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-group input[type="checkbox"]:disabled ~ label,
+.form-group input[type="checkbox"]:disabled + label,
+.form-group input[type="checkbox"]:disabled + span,
+.form-group input[type="checkbox"]:disabled ~ span,
+.form-group input[type="checkbox"]:disabled ~ *,
+.form-group input[type="checkbox"]:disabled + * {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .form-group textarea {
   resize: vertical;
   min-height: 80px;
@@ -462,8 +560,13 @@
   transition: all 0.3s ease;
 }
 
-.cancel-btn:hover {
+.cancel-btn:hover:not(:disabled) {
   background: rgba(113, 128, 150, 0.2);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .submit-btn {
@@ -478,9 +581,16 @@
   transition: all 0.3s ease;
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(72, 187, 120, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Loading and Error States */

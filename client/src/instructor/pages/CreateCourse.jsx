@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCourse } from '../api/courseApi';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './CreateCourse.css';
 
 export default function CreateCourse() {
@@ -42,24 +41,17 @@ export default function CreateCourse() {
     setFormData(prev => {
       let newValue = type === 'checkbox' ? checked : value;
       
-      // Handle price type change
-      if (name === 'priceType') {
-        if (value === 'free') {
-          newValue = { ...prev, priceType: value, price: 0, salePrice: 0 };
-        } else {
-          newValue = { ...prev, priceType: value };
-        }
-      }
-      
       const newData = {
         ...prev,
         [name]: newValue
       };
       
-      // If price type is free, reset price fields
-      if (name === 'priceType' && value === 'free') {
-        newData.price = 0;
-        newData.salePrice = 0;
+      // Handle price type change
+      if (name === 'priceType') {
+        if (value === 'free') {
+          newData.price = 0;
+          newData.salePrice = 0;
+        }
       }
       
       console.log('Updated form data:', newData);
@@ -244,7 +236,6 @@ export default function CreateCourse() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="create-course">
           <div className="create-course-header">
@@ -283,7 +274,7 @@ export default function CreateCourse() {
               <div className="form-section">
                 <h3>Course Information</h3>
                 
-                <div className="form-group">
+                <div className="form-group-cr-coure">
                   <label htmlFor="title">Course Title *</label>
                   <input
                     type="text"
@@ -292,13 +283,13 @@ export default function CreateCourse() {
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="Enter course title"
-                    className="form-input"
+                    className="form-input-cr-coure"
                     required
                     disabled={loading}
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-cr-coure">
                   <label htmlFor="subtitle">Course Subtitle</label>
                   <input
                     type="text"
@@ -307,12 +298,12 @@ export default function CreateCourse() {
                     value={formData.subtitle}
                     onChange={handleChange}
                     placeholder="Enter course subtitle"
-                    className="form-input"
+                    className="form-input-cr-coure"
                     disabled={loading}
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-cr-coure">
                   <label htmlFor="description">Course Description *</label>
                   <textarea
                     id="description"
@@ -328,14 +319,14 @@ export default function CreateCourse() {
                 </div>
 
                 <div className="form-row">
-                  <div className="form-group">
+                  <div className="form-group-cr-coure">
                     <label htmlFor="level">Course Level</label>
                     <select
                       id="level"
                       name="level"
                       value={formData.level}
                       onChange={handleChange}
-                      className="form-select"
+                      className="form-select-cr-coure"
                       disabled={loading}
                     >
                       <option value="beginner">Beginner</option>
@@ -344,14 +335,14 @@ export default function CreateCourse() {
                     </select>
                   </div>
 
-                  <div className="form-group">
+                  <div className="form-group-cr-coure">
                     <label htmlFor="priceType">Price Type</label>
                     <select
                       id="priceType"
                       name="priceType"
                       value={formData.priceType}
                       onChange={handleChange}
-                      className="form-select"
+                      className="form-select-cr-coure"
                       disabled={loading}
                     >
                       <option value="free">Free</option>
@@ -361,7 +352,7 @@ export default function CreateCourse() {
 
                   {formData.priceType === 'paid' && (
                     <>
-                      <div className="form-group">
+                      <div className="form-group-cr-coure">
                         <label htmlFor="price">Course Price (AUD) *</label>
                         <input
                           type="number"
@@ -370,7 +361,7 @@ export default function CreateCourse() {
                           value={formData.price}
                           onChange={handleChange}
                           placeholder="0"
-                          className="form-input"
+                          className="form-input-cr-coure"
                           min="0.01"
                           step="0.01"
                           required
@@ -378,7 +369,7 @@ export default function CreateCourse() {
                         />
                       </div>
 
-                      <div className="form-group">
+                      <div className="form-group-cr-coure">
                         <label htmlFor="salePrice">Sale Price (AUD) - Optional</label>
                         <input
                           type="number"
@@ -387,7 +378,7 @@ export default function CreateCourse() {
                           value={formData.salePrice}
                           onChange={handleChange}
                           placeholder="0"
-                          className="form-input"
+                          className="form-input-cr-coure"
                           min="0"
                           step="0.01"
                           disabled={loading}
@@ -395,25 +386,9 @@ export default function CreateCourse() {
                       </div>
                     </>
                   )}
-
-                  <div className="form-group">
-                    <label htmlFor="currency">Currency</label>
-                    <select
-                      id="currency"
-                      name="currency"
-                      value={formData.currency}
-                      onChange={handleChange}
-                      className="form-select"
-                      disabled={loading}
-                    >
-                      <option value="AUD">AUD</option>
-                      <option value="USD">USD</option>
-                      <option value="EUR">EUR</option>
-                    </select>
-                  </div>
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-cr-coure">
                   <label htmlFor="thumbnailUrl">Course Thumbnail URL</label>
                   <input
                     type="url"
@@ -422,12 +397,12 @@ export default function CreateCourse() {
                     value={formData.thumbnailUrl}
                     onChange={handleChange}
                     placeholder="https://example.com/image.jpg"
-                    className="form-input"
+                    className="form-input-cr-coure"
                     disabled={loading}
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-cr-coure">
                   <label htmlFor="promoVideoUrl">Course Promo Video URL</label>
                   <input
                     type="url"
@@ -436,19 +411,19 @@ export default function CreateCourse() {
                     value={formData.promoVideoUrl}
                     onChange={handleChange}
                     placeholder="https://example.com/video.mp4"
-                    className="form-input"
+                    className="form-input-cr-coure"
                     disabled={loading}
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-cr-coure">
                   <label htmlFor="status">Course Status</label>
                   <select
                     id="status"
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="form-select"
+                    className="form-select-cr-coure"
                     disabled={loading}
                   >
                     <option value="draft">Draft - Save as draft for later editing</option>
@@ -493,20 +468,20 @@ export default function CreateCourse() {
                       </button>
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group-cr-coure">
                       <label>Module Title *</label>
                       <input
                         type="text"
                         value={module.title}
                         onChange={(e) => updateModule(moduleIndex, 'title', e.target.value)}
                         placeholder="Enter module title"
-                        className="form-input"
+                        className="form-input-cr-coure"
                         required
                         disabled={loading}
                       />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group-cr-coure">
                       <label>Module Summary</label>
                       <textarea
                         value={module.summary}
@@ -546,25 +521,25 @@ export default function CreateCourse() {
                           </div>
 
                           <div className="form-row">
-                            <div className="form-group">
+                            <div className="form-group-cr-coure">
                               <label>Lesson Title *</label>
                               <input
                                 type="text"
                                 value={lesson.title}
                                 onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'title', e.target.value)}
                                 placeholder="Enter lesson title"
-                                className="form-input"
+                                className="form-input-cr-coure"
                                 required
                                 disabled={loading}
                               />
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group-cr-coure">
                               <label>Lesson Type</label>
                               <select
                                 value={lesson.contentType}
                                 onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'contentType', e.target.value)}
-                                className="form-select"
+                                className="form-select-cr-coure"
                                 disabled={loading}
                               >
                                 <option value="video">Video</option>
@@ -575,7 +550,7 @@ export default function CreateCourse() {
                             </div>
                           </div>
 
-                          <div className="form-group">
+                          <div className="form-group-cr-coure">
                             <label>Lesson Description</label>
                             <textarea
                               value={lesson.description}
@@ -588,19 +563,19 @@ export default function CreateCourse() {
                           </div>
 
                           <div className="form-row">
-                            <div className="form-group">
+                            <div className="form-group-cr-coure">
                               <label>Content URL</label>
                               <input
                                 type="url"
                                 value={lesson.url}
                                 onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'url', e.target.value)}
                                 placeholder="https://example.com/lesson-content"
-                                className="form-input"
+                                className="form-input-cr-coure"
                                 disabled={loading}
                               />
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group-cr-coure">
                               <label>Text Content</label>
                               <textarea
                                 value={lesson.textContent}
@@ -612,21 +587,21 @@ export default function CreateCourse() {
                               />
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group-cr-coure">
                               <label>Duration (seconds)</label>
                               <input
                                 type="number"
                                 value={lesson.durationSec}
                                 onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'durationSec', parseInt(e.target.value) || 0)}
                                 placeholder="0"
-                                className="form-input"
+                                className="form-input-cr-coure"
                                 min="0"
                                 disabled={loading}
                               />
                             </div>
                           </div>
 
-                          <div className="form-group">
+                          <div className="form-group-cr-coure">
                             <label>Preview Lesson</label>
                             <input
                               type="checkbox"

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './StudentManagement.css';
 import { getMyCourses } from '../api/courseApi';
 import { getInstructorStudents } from '../api/enrollmentApi';
@@ -139,7 +138,6 @@ export default function StudentManagement() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="students-loading">
             <div className="loading-spinner"></div>
@@ -152,7 +150,6 @@ export default function StudentManagement() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="student-management">
           <div className="students-header">

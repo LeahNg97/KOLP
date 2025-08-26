@@ -35,11 +35,43 @@ export default function Navbar() {
       <div className="navbar-menu">
         {user?.role === 'admin' && (
           <>
+            <Link to="/admin" className="nav-link">
+              <span className="nav-icon">🏠</span>
+              Dashboard
+            </Link>
+            <Link to="/admin/users" className="nav-link">
+              <span className="nav-icon">👥</span>
+              User Management
+            </Link>
+            <Link to="/admin/courses" className="nav-link">
+              <span className="nav-icon">📚</span>
+              Course Management
+            </Link>
+            <Link to="/admin/certificates" className="nav-link">
+              <span className="nav-icon">🎓</span>
+              Certificate Management
+            </Link>
+            <Link to="/admin/analytics" className="nav-link">
+              <span className="nav-icon">📊</span>
+              Analytics
+            </Link>
           </>
         )}
 
         {user?.role === 'instructor' && (
           <>
+            <Link to="/instructor/courses" className="nav-link">
+              <span className="nav-icon">📚</span>
+              My Courses
+            </Link>
+            <Link to="/instructor/students" className="nav-link">
+              <span className="nav-icon">👥</span>
+              All Students
+            </Link>
+            <Link to="/instructor/analytics" className="nav-link">
+              <span className="nav-icon">📈</span>
+              Analytics
+            </Link>
           </>
         )}
 

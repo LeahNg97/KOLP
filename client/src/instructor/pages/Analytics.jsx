@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import InstructorSidebar from '../components/InstructorSidebar';
-import './Analytics.css';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Analytics.css';
 
-export default function InstructorAnalytics() {
+export default function Analytics() {
   const [stats, setStats] = useState({
     totalQuizzes: 0,
     totalSubmissions: 0,
@@ -72,7 +71,6 @@ export default function InstructorAnalytics() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="analytics-page">
           <h1>📈 Instructor Analytics</h1>

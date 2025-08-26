@@ -6,10 +6,11 @@
 
 .instructor-main {
   flex: 1;
-  margin-left: 250px;
+  margin-left: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   padding: 2rem;
+  width: 100%;
 }
 
 /* Create Course Page */
@@ -103,11 +104,11 @@
 }
 
 /* Form Groups */
-.form-group {
+.form-group-cr-coure {
   margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.form-group-cr-coure label {
   display: block;
   margin-bottom: 0.5rem;
   color: #2d3748;
@@ -115,9 +116,9 @@
   font-size: 0.9rem;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
+.form-group-cr-coure input,
+.form-group-cr-coure textarea,
+.form-group-cr-coure select {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #e2e8f0;
@@ -126,28 +127,29 @@
   transition: all 0.2s ease;
   box-sizing: border-box;
   background: white;
+  color: #2d3748 !important;
 }
 
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+.form-group-cr-coure input:focus,
+.form-group-cr-coure textarea:focus,
+.form-group-cr-coure select:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-group textarea {
+.form-group-cr-coure textarea {
   resize: vertical;
   min-height: 100px;
 }
 
-.form-group input[type="checkbox"] {
+.form-group-cr-coure input[type="checkbox"] {
   width: auto;
   margin-right: 0.5rem;
   transform: scale(1.2);
 }
 
-.form-group input[type="checkbox"] + label {
+.form-group-cr-coure input[type="checkbox"] + label {
   display: inline;
   margin-left: 0.5rem;
   font-weight: normal;
@@ -436,11 +438,11 @@
   margin-bottom: 1rem;
 }
 
-.price-type-section .form-group {
+.price-type-section .form-group-cr-coure {
   margin-bottom: 1rem;
 }
 
-.price-type-section .form-group:last-child {
+.price-type-section .form-group-cr-coure:last-child {
   margin-bottom: 0;
 }
 

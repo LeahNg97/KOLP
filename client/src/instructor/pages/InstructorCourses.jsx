@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getMyCourses, deleteCourse, updateCourseStatus } from '../api/courseApi';
-import InstructorSidebar from '../components/InstructorSidebar';
 import InstructorCourseCard from '../components/InstructorCourseCard';
 import './InstructorCourses.css';
 
@@ -68,7 +67,6 @@ export default function InstructorCourses() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="loading">Loading your courses...</div>
         </main>
@@ -78,7 +76,6 @@ export default function InstructorCourses() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="instructor-courses">
           <div className="courses-header">

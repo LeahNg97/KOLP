@@ -11,7 +11,30 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
+  // Debug: Log course data
+  console.log('PaymentModal received course:', {
+    id: course?._id,
+    title: course?.title,
+    priceType: course?.priceType,
+    price: course?.price,
+    salePrice: course?.salePrice,
+    currency: course?.currency,
+    status: course?.status
+  });
+
   if (!isOpen) return null;
+
+  // Validate course object
+  if (!course || !course._id) {
+    console.error('Invalid course object:', course);
+    return null;
+  }
+
+  // Check if course is free
+  if (course.priceType === 'free' || course.price === 0) {
+    console.log('Course is free, no payment needed');
+    return null;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,11 +61,37 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
         return;
       }
 
+      // Calculate the correct amount
+      const amount = course.salePrice || course.price;
+      
+      // Validate amount
+      if (!amount || amount <= 0) {
+        setError('Invalid course price');
+        setIsProcessing(false);
+        return;
+      }
+      
+      console.log('Payment details:', {
+        courseId: course._id,
+        courseTitle: course.title,
+        coursePrice: course.price,
+        courseSalePrice: course.salePrice,
+        calculatedAmount: amount,
+        paymentMethod
+      });
+      
+      console.log('Sending payment with:', {
+        courseId: course._id,
+        paymentMethod,
+        amount,
+        courseData: course
+      });
+      
       // Process payment
       const result = await paymentApi.createPayment(
         course._id,
         paymentMethod,
-        course.salePrice || course.price,
+        amount,
         course
       );
 
@@ -51,6 +100,7 @@ const PaymentModal = ({ isOpen, onClose, course, onPaymentSuccess }) => {
       onClose();
       
     } catch (error) {
+      console.error('Payment error:', error);
       setError(error.message || 'Payment failed. Please try again.');
     } finally {
       setIsProcessing(false);

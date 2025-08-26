@@ -28,18 +28,22 @@ export const paymentApi = {
   // Create payment and enroll in course
   createPayment: async (courseId, paymentMethod, amount, courseData = {}) => {
     try {
+      console.log('Sending payment request:', { courseId, paymentMethod, amount, courseData });
+      
       const response = await api.post('/payments/create', {
         courseId,
         paymentMethod,
-        amount,
-        currency: courseData.currency || 'AUD',
-        originalPrice: courseData.price,
-        salePrice: courseData.salePrice,
-        priceType: courseData.priceType
+        amount
       });
+      
+      console.log('Payment response:', response.data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      console.error('Payment API error:', error);
+      if (error.response?.data) {
+        throw new Error(error.response.data.message || 'Payment failed');
+      }
+      throw new Error(error.message || 'Payment failed');
     }
   },
 

@@ -63,29 +63,10 @@ router.get('/active', getActiveCourses);
  */
 router.get('/my-courses', verifyToken, authorizeRole('instructor'), getCoursesByInstructor);
 
-/**
- * @swagger
- * /api/courses/{id}/syllabus:
- *   get:
- *     summary: Get syllabus (modules & lessons) for a course
- *     tags: [Courses]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Syllabus (modules + lessons)
- *       404:
- *         description: Course not found
- */
-router.get('/:id/syllabus', verifyToken, getSyllabus);
-
 // Sync course stats with actual data
 router.post('/:courseId/sync-stats', verifyToken, authorizeRole('admin', 'instructor'), syncCourseStats);
+
+
 
 /**
  * @swagger
@@ -322,6 +303,27 @@ router.patch('/:id', verifyToken, authorizeRole('admin', 'instructor'), updateCo
  *         description: Course not found
  */
 router.get('/:id', verifyToken, getCourseById);
+
+/**
+ * @swagger
+ * /api/courses/{id}/syllabus:
+ *   get:
+ *     summary: Get syllabus (modules & lessons) for a course
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Syllabus (modules + lessons)
+ *       404:
+ *         description: Course not found
+ */
+router.get('/:id/syllabus', verifyToken, getSyllabus);
 
 /**
  * @swagger

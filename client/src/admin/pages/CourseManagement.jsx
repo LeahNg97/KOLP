@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import AdminSidebar from '../components/AdminSidebar';
 import './CourseManagement.css';
 
 export default function CourseManagement() {
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterPublished, setFilterPublished] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [approvingId, setApprovingId] = useState(null);
   const [rejectingId, setRejectingId] = useState(null);
@@ -20,6 +21,7 @@ export default function CourseManagement() {
   const fetchCourses = async () => {
     setLoading(true);
     setError('');
+    setSuccessMessage(''); // Clear any previous success message
     try {
       const res = await axios.get('http://localhost:8080/api/courses');
       setCourses(res.data);
@@ -37,6 +39,8 @@ export default function CourseManagement() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this course?')) return;
     setDeletingId(id);
+    setSuccessMessage(''); // Clear any previous success message
+    setError(''); // Clear any previous errors
     try {
       await axios.delete(`http://localhost:8080/api/courses/${id}`);
       setCourses(courses.filter(c => c._id !== id));
@@ -49,20 +53,32 @@ export default function CourseManagement() {
 
   const handleUpdate = (id) => {
     // You can implement a modal or redirect to an edit page
+    setSuccessMessage(''); // Clear any previous success message
+    setError(''); // Clear any previous errors
     alert('Update course feature coming soon!');
   };
 
   const handleApprove = async (courseId) => {
     setApprovingId(courseId);
+    setSuccessMessage(''); // Clear any previous success message
+    setError(''); // Clear any previous errors
     try {
       const token = localStorage.getItem('token');
       await axios.patch(`http://localhost:8080/api/courses/${courseId}/admin-status`, 
-        { status: 'active', adminNote: adminNote || 'Approved by admin' },
+        { 
+          status: 'active', 
+          isPublished: true,
+          adminNote: adminNote || 'Approved by admin' 
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchCourses(); // Refresh the list
       setAdminNote('');
       setShowModal(false);
+      // Show success message
+      setError(''); // Clear any previous errors
+      setSuccessMessage('Course approved successfully! The course is now published and visible to students.');
+      setTimeout(() => setSuccessMessage(''), 5000); // Auto-hide after 5 seconds
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to approve course.');
     } finally {
@@ -72,15 +88,25 @@ export default function CourseManagement() {
 
   const handleReject = async (courseId) => {
     setRejectingId(courseId);
+    setSuccessMessage(''); // Clear any previous success message
+    setError(''); // Clear any previous errors
     try {
       const token = localStorage.getItem('token');
       await axios.patch(`http://localhost:8080/api/courses/${courseId}/admin-status`, 
-        { status: 'inactive', adminNote: adminNote || 'Rejected by admin' },
+        { 
+          status: 'inactive', 
+          isPublished: false,
+          adminNote: adminNote || 'Rejected by admin' 
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchCourses(); // Refresh the list
       setAdminNote('');
       setShowModal(false);
+      // Show success message
+      setError(''); // Clear any previous errors
+      setSuccessMessage('Course rejected successfully! The course is now unpublished and hidden from students.');
+      setTimeout(() => setSuccessMessage(''), 5000); // Auto-hide after 5 seconds
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to reject course.');
     } finally {
@@ -92,11 +118,15 @@ export default function CourseManagement() {
     setSelectedCourse(course);
     setAdminNote('');
     setShowModal(true);
+    setSuccessMessage(''); // Clear any previous success message
+    setError(''); // Clear any previous errors
   };
 
   const openCourseDetail = (course) => {
     setSelectedCourse(course);
     setShowCourseDetail(true);
+    setSuccessMessage(''); // Clear any previous success message
+    setError(''); // Clear any previous errors
   };
 
   const filteredCourses = courses.filter(course => {
@@ -104,7 +134,9 @@ export default function CourseManagement() {
                          course.description?.toLowerCase().includes(search.toLowerCase()) ||
                          course.instructorId?.name?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = filterStatus === 'all' || course.status === filterStatus;
-    return matchesSearch && matchesStatus;
+    const matchesPublished = filterPublished === 'all' || course.isPublished === (filterPublished === 'true');
+    
+    return matchesSearch && matchesStatus && matchesPublished;
   });
 
   const getStatusBadgeClass = (status) => {
@@ -130,7 +162,6 @@ export default function CourseManagement() {
   if (loading) {
     return (
       <div className="admin-layout">
-        <AdminSidebar />
         <main className="admin-main">
           <div className="loading">Loading courses...</div>
         </main>
@@ -140,7 +171,6 @@ export default function CourseManagement() {
 
   return (
     <div className="admin-layout">
-      <AdminSidebar />
       <main className="admin-main">
         <div className="course-management">
           <div className="page-header">
@@ -154,19 +184,33 @@ export default function CourseManagement() {
             </div>
           )}
 
+          {successMessage && (
+            <div className="success-message">
+              {successMessage}
+            </div>
+          )}
+
           <div className="controls">
             <div className="search-filter">
               <input
                 type="text"
                 placeholder="Search courses..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setSuccessMessage(''); // Clear success message when searching
+                  setError(''); // Clear any previous errors
+                }}
                 className="search-input"
               />
               
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setSuccessMessage(''); // Clear success message when filtering
+                  setError(''); // Clear any previous errors
+                }}
                 className="filter-select"
               >
                 <option value="all">All Statuses</option>
@@ -175,6 +219,39 @@ export default function CourseManagement() {
                 <option value="inactive">Inactive</option>
                 <option value="draft">Draft</option>
               </select>
+
+              <select
+                value={filterPublished}
+                onChange={(e) => {
+                  setFilterPublished(e.target.value);
+                  setSuccessMessage(''); // Clear success message when filtering
+                  setError(''); // Clear any previous errors
+                }}
+                className="filter-select"
+              >
+                <option value="all">All Published</option>
+                <option value="true">Published</option>
+                <option value="false">Not Published</option>
+              </select>
+            </div>
+
+            <div className="course-summary-stats">
+              <div className="stat-item">
+                <span className="stat-number">{courses.filter(c => c.status === 'active').length}</span>
+                <span className="stat-label">Active</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{courses.filter(c => c.status === 'pending').length}</span>
+                <span className="stat-label">Pending</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{courses.filter(c => c.isPublished).length}</span>
+                <span className="stat-label">Published</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{courses.filter(c => !c.isPublished).length}</span>
+                <span className="stat-label">Not Published</span>
+              </div>
             </div>
           </div>
 
@@ -188,6 +265,7 @@ export default function CourseManagement() {
                   <th>Price</th>
                   <th>Content</th>
                   <th>Status</th>
+                  <th>Admin Notes</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -248,11 +326,36 @@ export default function CourseManagement() {
                       </div>
                     </td>
                     <td>
-                      <span className={`status-badge ${getStatusBadgeClass(course.status)}`}>
-                        {getStatusBadgeText(course.status)}
-                      </span>
-                      {course.isPublished && (
-                        <span className="published-badge">Published</span>
+                      <div className="status-info">
+                        <span className={`status-badge ${getStatusBadgeClass(course.status)}`}>
+                          {getStatusBadgeText(course.status)}
+                        </span>
+                        {course.isPublished && (
+                          <span className="published-badge">Published</span>
+                        )}
+                        {course.publishedAt && (
+                          <small className="publish-date">
+                            {new Date(course.publishedAt).toLocaleDateString()}
+                          </small>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      {course.adminNote ? (
+                        <div className="admin-notes-display">
+                          <p>{course.adminNote}</p>
+                          {course.publishedAt && (
+                            <small>Published on: {new Date(course.publishedAt).toLocaleDateString()}</small>
+                          )}
+                          {course.reviewedAt && (
+                            <small>Reviewed on: {new Date(course.reviewedAt).toLocaleDateString()}</small>
+                          )}
+                          {course.reviewedBy && (
+                            <small>by {course.reviewedBy.name}</small>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="no-notes">No notes</span>
                       )}
                     </td>
                     <td className="actions">
@@ -270,22 +373,27 @@ export default function CourseManagement() {
                       >
                         ✏️
                       </button>
-                      {course.status === 'pending' && (
+                      {/* Show approve/reject buttons for all courses except deleted ones */}
+                      {course.status !== 'deleted' && (
                         <>
-                          <button
-                            onClick={() => openApprovalModal(course)}
-                            className="action-btn approve-btn"
-                            title="Approve Course"
-                          >
-                            ✅
-                          </button>
-                          <button
-                            onClick={() => openApprovalModal(course)}
-                            className="action-btn reject-btn"
-                            title="Reject Course"
-                          >
-                            ❌
-                          </button>
+                          {course.status !== 'active' && (
+                            <button
+                              onClick={() => openApprovalModal(course)}
+                              className="action-btn approve-btn"
+                              title="Approve Course"
+                            >
+                              ✅
+                            </button>
+                          )}
+                          {course.status !== 'inactive' && (
+                            <button
+                              onClick={() => openApprovalModal(course)}
+                              className="action-btn reject-btn"
+                              title="Reject Course"
+                            >
+                              ❌
+                            </button>
+                          )}
                         </>
                       )}
                       <button
@@ -316,7 +424,24 @@ export default function CourseManagement() {
             <div className="modal">
               <div className="modal-header">
                 <h3>Review Course: {selectedCourse.title}</h3>
-                <button onClick={() => setShowModal(false)} className="close-btn">✕</button>
+                <button onClick={() => {
+                  setShowModal(false);
+                  setSuccessMessage(''); // Clear success message when closing modal
+                  setError(''); // Clear any previous errors
+                }} className="close-btn">✕</button>
+              </div>
+              <div className="modal-subheader">
+                <p><strong>Current Status:</strong> {getStatusBadgeText(selectedCourse.status)}</p>
+                <p><strong>Published:</strong> {selectedCourse.isPublished ? 'Yes' : 'No'}</p>
+                {selectedCourse.publishedAt && (
+                  <p><strong>Published At:</strong> {new Date(selectedCourse.publishedAt).toLocaleString()}</p>
+                )}
+                {selectedCourse.reviewedAt && (
+                  <p><strong>Last Reviewed:</strong> {new Date(selectedCourse.reviewedAt).toLocaleString()}</p>
+                )}
+                {selectedCourse.reviewedBy && (
+                  <p><strong>Reviewed By:</strong> {selectedCourse.reviewedBy?.name || 'Admin'}</p>
+                )}
               </div>
               <div className="modal-body">
                 <div className="course-review">
@@ -329,18 +454,26 @@ export default function CourseManagement() {
                   
                   <div className="admin-notes">
                     <label htmlFor="adminNote">Admin Notes:</label>
+                    {selectedCourse.adminNote && (
+                      <div className="current-admin-note">
+                        <strong>Current Note:</strong> {selectedCourse.adminNote}
+                      </div>
+                    )}
                     <textarea
                       id="adminNote"
                       value={adminNote}
                       onChange={(e) => setAdminNote(e.target.value)}
-                      placeholder="Add notes about this course..."
+                      placeholder="Add or update notes about this course..."
                       rows="3"
                     />
                   </div>
                 </div>
               </div>
               <div className="modal-footer">
-                <button onClick={() => setShowModal(false)} className="cancel-btn">
+                <button onClick={() => {
+                  setShowModal(false);
+                  setSuccessMessage(''); // Clear success message when closing modal
+                }} className="cancel-btn">
                   Cancel
                 </button>
                 <button
@@ -348,14 +481,16 @@ export default function CourseManagement() {
                   className="reject-btn"
                   disabled={rejectingId === selectedCourse._id}
                 >
-                  {rejectingId === selectedCourse._id ? 'Rejecting...' : 'Reject'}
+                  {rejectingId === selectedCourse._id ? 'Rejecting...' : 
+                   selectedCourse.status === 'inactive' ? 'Keep Rejected' : 'Reject'}
                 </button>
                 <button
                   onClick={() => handleApprove(selectedCourse._id)}
                   className="approve-btn"
                   disabled={approvingId === selectedCourse._id}
                 >
-                  {approvingId === selectedCourse._id ? 'Approving...' : 'Approve'}
+                  {approvingId === selectedCourse._id ? 'Approving...' : 
+                   selectedCourse.status === 'active' ? 'Keep Approved' : 'Approve'}
                 </button>
               </div>
             </div>
@@ -368,7 +503,11 @@ export default function CourseManagement() {
             <div className="modal large-modal">
               <div className="modal-header">
                 <h3>Course Details: {selectedCourse.title}</h3>
-                <button onClick={() => setShowCourseDetail(false)} className="close-btn">✕</button>
+                <button onClick={() => {
+                  setShowCourseDetail(false);
+                  setSuccessMessage(''); // Clear success message when closing modal
+                  setError(''); // Clear any previous errors
+                }} className="close-btn">✕</button>
               </div>
               <div className="modal-body">
                 <div className="course-detail-view">

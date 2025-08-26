@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import InstructorSidebar from '../components/InstructorSidebar';
 import './QuizManagement.css';
 import { getCourseById } from '../api/courseApi';
 import { getQuizByCourseId, getQuizResultsByCourseId, createQuiz, updateQuiz } from '../api/quizApi';
@@ -486,7 +485,6 @@ export default function QuizManagement() {
   if (loading) {
     return (
       <div className="instructor-layout">
-        <InstructorSidebar />
         <main className="instructor-main">
           <div className="quiz-loading">
             <div className="loading-spinner"></div>
@@ -499,7 +497,6 @@ export default function QuizManagement() {
 
   return (
     <div className="instructor-layout">
-      <InstructorSidebar />
       <main className="instructor-main">
         <div className="quiz-management">
           <div className="quiz-header">

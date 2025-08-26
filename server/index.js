@@ -49,6 +49,18 @@ app.use('/api/lesson-progress', lessonProgressRoutes);
 app.use('/api/quiz-progress', quizProgressRoutes);
 
 app.use('/api/users', userRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ message: 'Internal server error' });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 const PORT = process.env.PORT || 8080;
 
 connectDB().then(() => {

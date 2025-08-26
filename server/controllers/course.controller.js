@@ -21,15 +21,9 @@ exports.getAllCourses = async (req, res, next) => {
   try {
     const courses = await Course.find()
       .populate('instructorId', 'name email role')
+      .populate('reviewedBy', 'name email')
       .lean();
 
-    console.log(`Found ${courses.length} total courses`);
-    
-    // studentCount is now automatically maintained in Course.stats.studentCount
-    // No need to calculate it manually
-    courses.forEach(c => {
-      console.log(`Course ${c._id} (${c.title}): ${c.stats?.studentCount || 0} students (from model)`);
-    });
 
     res.json(courses);
   } catch (e) { 
@@ -282,23 +276,44 @@ exports.updateCourseStatus = async (req, res, next) => {
 // =======================================================
 exports.adminUpdateCourseStatus = async (req, res, next) => {
   try {
-    const { status, adminNote } = req.body;
+    const { status, adminNote, isPublished } = req.body;
     if (!['active', 'inactive'].includes(status)) {
       return res.status(400).json({ message: 'Admin can only approve (active) or reject (inactive) courses' });
+    }
+
+    // Prepare update object
+    const updateData = {
+      status,
+      adminNote: adminNote || null,
+      reviewedAt: new Date(),
+      reviewedBy: req.user.id
+    };
+
+    // If approving (status = 'active'), set isPublished to true and set publishedAt
+    // If rejecting (status = 'inactive'), set isPublished to false
+    if (status === 'active') {
+      updateData.isPublished = true;
+      updateData.publishedAt = new Date();
+    } else if (status === 'inactive') {
+      updateData.isPublished = false;
+    }
+
+    // If isPublished is explicitly provided in request, use that value
+    if (typeof isPublished === 'boolean') {
+      updateData.isPublished = isPublished;
+      // If setting to published, also set publishedAt
+      if (isPublished && !updateData.publishedAt) {
+        updateData.publishedAt = new Date();
+      }
     }
 
     const course = await Course.findByIdAndUpdate(
       req.params.id,
       {
-        $set: {
-          status,
-          adminNote: adminNote || null,
-          reviewedAt: new Date(),
-          reviewedBy: req.user.id
-        }
+        $set: updateData
       },
       { new: true }
-    );
+    ).populate('reviewedBy', 'name email');
 
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
