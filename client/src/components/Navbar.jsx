@@ -108,7 +108,7 @@ export default function Navbar() {
         </div>
         <button onClick={handleLogout} className="logout-button">
           <span className="logout-icon">🚪</span>
-          Đăng xuất
+          Log Out
         </button>
       </div>
 

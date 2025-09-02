@@ -674,12 +674,12 @@ export default function QuizManagement() {
                         className="generate-btn"
                         onClick={handleGenerateQuestions}
                       >
-                        🎲 Generate Questions
+                        Generate Questions
                       </button>
                     </div>
                     {hasUnsavedChanges && (
                       <div className="generate-notice">
-                        📝 Questions generated! Click "💾 Save Quiz" above to save your changes.
+                        Questions generated! Click "💾 Save Quiz" above to save your changes.
                       </div>
                     )}
                   </div>

@@ -710,7 +710,7 @@ function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Duration (seconds)</label>
+              <label>Duration (hour)</label>
               <input
                 type="number"
                 value={formData.durationSec}
@@ -725,7 +725,7 @@ function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing
                   checked={formData.isPreview}
                   onChange={(e) => setFormData(prev => ({ ...prev, isPreview: e.target.checked }))}
                 />
-                Preview Lesson
+                {/* Preview Lesson */}
               </label>
             </div>
           </div>

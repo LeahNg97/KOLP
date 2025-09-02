@@ -4,8 +4,8 @@ export const getDefaultNotifications = (userRole) => {
   const baseNotifications = [
     {
       id: 1,
-      title: 'Chào mừng bạn!',
-      message: 'Chào mừng bạn đến với nền tảng học tập KOLP',
+      title: 'Welcome!',
+      message: 'Welcome to KOLP',
       time: 'Vừa xong',
       isRead: true,
       type: 'welcome'
@@ -17,33 +17,33 @@ export const getDefaultNotifications = (userRole) => {
       ...baseNotifications,
       {
         id: 2,
-        title: 'Khóa học mới',
-        message: 'Khóa học "React Advanced" đã được thêm vào danh sách',
-        time: '2 giờ trước',
+        title: 'New Course Added',
+        message: 'Course "React Advanced" added to your enrolled courses',
+        time: '2 hours ago',
         isRead: false,
         type: 'course'
       },
       {
         id: 3,
-        title: 'Bài tập mới',
-        message: 'Bài tập mới đã được giao trong khóa học "JavaScript Basics"',
-        time: '1 ngày trước',
+        title: 'New Assignment',
+        message: 'New assignment is added in "JavaScript Basics"',
+        time: '1 day ago',
         isRead: false,
         type: 'assignment'
       },
       {
         id: 4,
-        title: 'Điểm số',
-        message: 'Bạn đã nhận được điểm cho bài kiểm tra "HTML & CSS"',
-        time: '2 ngày trước',
+        title: 'Grade Released',
+        message: 'you have been graded for "HTML & CSS"',
+        time: '2 days ago',
         isRead: true,
         type: 'grade'
       },
       {
         id: 5,
-        title: 'Nhắc nhở học tập',
-        message: 'Bạn có bài kiểm tra sắp đến trong 3 ngày tới',
-        time: '3 ngày trước',
+        title: 'Upcoming Quiz Reminder',
+        message: 'Quiz on "React Basics" is scheduled for tomorrow',
+        time: '3 days ago',
         isRead: false,
         type: 'reminder'
       }
@@ -55,33 +55,33 @@ export const getDefaultNotifications = (userRole) => {
       ...baseNotifications,
       {
         id: 2,
-        title: 'Học viên mới',
-        message: 'Bạn có 5 học viên mới đăng ký khóa học "Web Development"',
-        time: '1 giờ trước',
+        title: 'New Student Enrollments',
+        message: 'You have 5 students enroll in "Web Development"',
+        time: '1 hour ago',
         isRead: false,
         type: 'student'
       },
       {
         id: 3,
-        title: 'Bài nộp mới',
-        message: 'Học viên Nguyễn Văn A đã nộp bài tập "Project 1"',
-        time: '3 giờ trước',
+        title: 'New Assignment Submission',
+        message: 'Alice has just submitted "Project 1"',
+        time: '3 hours ago',
         isRead: false,
         type: 'submission'
       },
       {
         id: 4,
-        title: 'Đánh giá khóa học',
-        message: 'Khóa học "JavaScript Basics" nhận được đánh giá 5 sao',
-        time: '1 ngày trước',
+        title: 'New Course Review',
+        message: '"JavaScript Basics" received a new 5-star review',
+        time: '1 day ago',
         isRead: true,
         type: 'review'
       },
       {
         id: 5,
-        title: 'Nhắc nhở chấm bài',
-        message: 'Bạn có 3 bài tập cần chấm điểm trước ngày mai',
-        time: '2 ngày trước',
+        title: 'Grading Reminder',
+        message: 'Please grade pending assignments for "HTML & CSS"',
+        time: '2 days ago',
         isRead: false,
         type: 'reminder'
       }

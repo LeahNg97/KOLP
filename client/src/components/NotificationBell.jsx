@@ -98,7 +98,7 @@ export default function NotificationBell({ userRole = 'student' }) {
       <button 
         className="notification-button" 
         onClick={toggleDropdown}
-        aria-label="Thông báo"
+        aria-label="Notifications"
       >
         <span className="bell-icon">🔔</span>
         {unreadCount > 0 && (
@@ -109,13 +109,13 @@ export default function NotificationBell({ userRole = 'student' }) {
       {isOpen && (
         <div className="notification-dropdown">
           <div className="notification-header">
-            <h3>Thông báo</h3>
+            <h3>Notifications</h3>
             {unreadCount > 0 && (
               <button 
                 className="mark-all-read-btn"
                 onClick={markAllAsRead}
               >
-                Đánh dấu đã đọc
+                Mark all as read
               </button>
             )}
           </div>
@@ -123,7 +123,7 @@ export default function NotificationBell({ userRole = 'student' }) {
           <div className="notification-list">
             {notifications.length === 0 ? (
               <div className="no-notifications">
-                <span>Không có thông báo nào</span>
+                <span>No notification to show</span>
               </div>
             ) : (
               notifications.map(notification => (
@@ -139,7 +139,7 @@ export default function NotificationBell({ userRole = 'student' }) {
                     <div className="notification-title">{notification.title}</div>
                     <div className="notification-message">{notification.message}</div>
                     <div className="notification-time">
-                      {notification.timeAgo || new Date(notification.createdAt).toLocaleDateString('vi-VN')}
+                      {notification.timeAgo || new Date(notification.createdAt).toLocaleDateString('en-US')}
                     </div>
                   </div>
                   {!notification.isRead && (
@@ -151,7 +151,7 @@ export default function NotificationBell({ userRole = 'student' }) {
           </div>
           
           <div className="notification-footer">
-            <button className="view-all-btn">Xem tất cả</button>
+            <button className="view-all-btn">View all</button>
           </div>
         </div>
       )}

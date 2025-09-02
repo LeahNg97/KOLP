@@ -7,7 +7,7 @@
 .instructor-main {
   flex: 1;
   margin-left: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: ghostwhite;
   min-height: 100vh;
   padding: 2rem;
   width: 100%;
@@ -105,14 +105,14 @@
 
 /* Form Groups */
 .form-group-cr-coure {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .form-group-cr-coure label {
   display: block;
   margin-bottom: 0.5rem;
   color: #2d3748;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 0.9rem;
 }
 
@@ -120,7 +120,7 @@
 .form-group-cr-coure textarea,
 .form-group-cr-coure select {
   width: 100%;
-  padding: 0.75rem;
+  padding: 3rem;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 1rem;
@@ -140,7 +140,7 @@
 
 .form-group-cr-coure textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 300px;
 }
 
 .form-group-cr-coure input[type="checkbox"] {
