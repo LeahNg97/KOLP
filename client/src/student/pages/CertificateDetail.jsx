@@ -39,30 +39,69 @@ export default function CertificateDetail() {
           <div className="cert-error">{error}</div>
         ) : certificate ? (
           <div className="certificate">
-            <div className="background-icon">📜</div>
-            <div className="logo">KOLP <span className="logo-academy">Lerning Platform</span></div>
-            <div className="title">COMPLETION</div>
-            <div className="subtitle">CERTIFICATE</div>
-            <div className="subtitle">THIS CERTIFICATE IS PRESENTED TO</div>
-
-            <div className="recipient">
-              {certificate.studentId?.name || certificate.studentId?.email}
-            </div>
-
-            <div className="description">
-              Who has successfully completed the<br/>
-              <strong>{certificate.courseId?.title}</strong>
-            </div>
-
-            <div className="footer">
-              <div className="signature">
-                <strong>SKILL ACADEMY</strong>
-                Director
+            {/* Decorative corner elements */}
+            <div className="corner-decoration top-left"></div>
+            <div className="corner-decoration top-right"></div>
+            <div className="corner-decoration bottom-left"></div>
+            <div className="corner-decoration bottom-right"></div>
+            
+            {/* Background pattern */}
+            <div className="background-pattern"></div>
+            
+            {/* Header with university-style design */}
+            <div className="certificate-header">
+              <div className="university-seal">
+                <div className="seal-inner">
+                  <div className="seal-text">KOLP</div>
+                  <div className="seal-subtext">ACADEMY</div>
+                </div>
               </div>
-              <div className="medal">🏅</div>
-              <div className="signature">
-                <strong>DATE OF ISSUE</strong>
-                {certificate.issuedAt ? new Date(certificate.issuedAt).toLocaleDateString() : 'N/A'}
+              <div className="university-name">KOLP LEARNING PLATFORM</div>
+              <div className="university-motto">Excellence in Education</div>
+            </div>
+
+            {/* Main certificate content */}
+            <div className="certificate-body">
+              <div className="certificate-title">CERTIFICATE OF ACHIEVEMENT</div>
+              <div className="certificate-subtitle">THE FOLLOWING AWARD IS GIVEN TO</div>
+              
+              <div className="recipient-name">
+                {certificate.studentId?.name || certificate.studentId?.email}
+              </div>
+              
+              <div className="achievement-description">
+                Who has successfully completed the course of study in<br/>
+                <span className="course-title">{certificate.courseId?.title}</span>
+                and has demonstrated exceptional proficiency and dedication<br/>
+                in the pursuit of knowledge and academic excellence.
+              </div>
+            </div>
+
+            {/* Footer with signatures and date */}
+            <div className="certificate-footer">
+              <div className="signature-section">
+                <div className="signature-line"></div>
+                <div className="signature-label">Head of Academy</div>
+              </div>
+              
+              <div className="official-seal">
+                <div className="seal-ring">
+                  <div className="seal-center">
+                    <div className="seal-symbol">⚜</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="date-section">
+                <div className="date-line"></div>
+                <div className="date-label">Date of Issue</div>
+                <div className="issue-date">
+                  {certificate.issuedAt ? new Date(certificate.issuedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  }) : 'N/A'}
+                </div>
               </div>
             </div>
           </div>

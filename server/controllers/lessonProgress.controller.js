@@ -225,40 +225,8 @@ exports.updateLessonAccess = asyncHandler(async (req, res) => {
 // Helper function to update overall course progress
 async function updateCourseProgress(studentId, courseId) {
   try {
-    const completedLessons = await LessonProgress.countDocuments({
-      studentId,
-      courseId,
-      completed: true
-    });
-
-    // Get total lessons from Lesson model instead of LessonProgress
-    const totalLessons = await Lesson.countDocuments({
-      courseId
-    });
-
-    // Calculate lesson progress (60% weight)
-    const lessonProgressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 60 : 0;
-
-    // Get quiz progress (40% weight if passed)
-    const QuizProgress = require('../models/quizProgress.model');
-    const quizProgress = await QuizProgress.findOne({ courseId, studentId });
-    const quizProgressPercentage = quizProgress && quizProgress.passed ? 40 : 0;
-
-    // Calculate total progress (lesson + quiz)
-    const totalProgress = Math.min(lessonProgressPercentage + quizProgressPercentage, 100);
-
-    // Update enrollment progress
-    await Enrollment.findOneAndUpdate(
-      {
-        studentId,
-        courseId
-      },
-      {
-        progress: Math.round(totalProgress)
-      }
-    );
-
-    console.log(`✅ Updated course progress for student ${studentId} in course ${courseId}: ${Math.round(totalProgress)}% (Lessons: ${Math.round(lessonProgressPercentage)}%, Quiz: ${Math.round(quizProgressPercentage)}%)`);
+    const CourseProgressService = require('../services/courseProgress.service');
+    await CourseProgressService.updateCourseProgress(courseId, studentId);
   } catch (error) {
     console.error('Error updating course progress:', error);
   }

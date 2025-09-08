@@ -26,6 +26,7 @@ export default function CourseContentManagement() {
   const [showModuleForm, setShowModuleForm] = useState(false);
   const [showLessonForm, setShowLessonForm] = useState(false);
   const [selectedModuleId, setSelectedModuleId] = useState(null);
+  const [activeTab, setActiveTab] = useState('content'); // 'content', 'quiz', 'short-questions'
 
   useEffect(() => {
     console.log('CourseContentManagement loaded with courseId:', courseId);
@@ -338,7 +339,7 @@ export default function CourseContentManagement() {
         <div className="content-management">
           <div className="page-header">
             <div className="header-content">
-              <h1>Course Content Management</h1>
+              <h1>Course Management</h1>
               <p>{course?.title}</p>
             </div>
             <button 
@@ -346,6 +347,34 @@ export default function CourseContentManagement() {
               className="back-btn"
             >
               ← Back to Courses
+            </button>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="course-nav-tabs">
+            <button 
+              className={`nav-tab ${activeTab === 'content' ? 'active' : ''}`}
+              onClick={() => setActiveTab('content')}
+            >
+              📚 Content
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'quiz' ? 'active' : ''}`}
+              onClick={() => navigate(`/instructor/courses/${courseId}/quiz`)}
+            >
+              🧠 Quiz
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'short-questions' ? 'active' : ''}`}
+              onClick={() => navigate(`/instructor/courses/${courseId}/short-questions`)}
+            >
+              📝 Short Questions
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'students' ? 'active' : ''}`}
+              onClick={() => navigate(`/instructor/courses/${courseId}/students`)}
+            >
+              👥 Students
             </button>
           </div>
 
@@ -418,7 +447,7 @@ export default function CourseContentManagement() {
                             setSelectedModuleId(module._id);
                             setShowLessonForm(true);
                           }}
-                          className="action-btn secondary"
+                          className="action-btn secondary add-lesson-btn"
                           disabled={actionLoading}
                         >
                           {actionLoading ? 'Loading...' : '+ Add Lesson'}
@@ -439,7 +468,6 @@ export default function CourseContentManagement() {
                                 {lesson.durationSec > 0 && (
                                   <span>{Math.floor(lesson.durationSec / 60)}m</span>
                                 )}
-                                {lesson.isPreview && <span className="preview-badge">Preview</span>}
                               </div>
                             </div>
                           </div>
@@ -493,27 +521,31 @@ export default function CourseContentManagement() {
 
         {/* Lesson Form Modal */}
         {showLessonForm && selectedModuleId && (
-          <LessonForm 
-            onSubmit={handleCreateLesson}
-            onCancel={() => {
-              setShowLessonForm(false);
-              setSelectedModuleId(null);
-            }}
-            moduleId={selectedModuleId}
-            nextOrder={(getLessonsForModule(selectedModuleId)?.length || 0) + 1}
-            loading={actionLoading}
-          />
+          <div className="lesson-form">
+            <LessonForm 
+              onSubmit={handleCreateLesson}
+              onCancel={() => {
+                setShowLessonForm(false);
+                setSelectedModuleId(null);
+              }}
+              moduleId={selectedModuleId}
+              nextOrder={(getLessonsForModule(selectedModuleId)?.length || 0) + 1}
+              loading={actionLoading}
+            />
+          </div>
         )}
 
         {/* Edit Lesson Modal */}
         {editingLesson && (
-          <LessonForm 
-            lesson={editingLesson}
-            onSubmit={(data) => handleUpdateLesson(editingLesson._id, data)}
-            onCancel={() => setEditingLesson(null)}
-            isEditing={true}
-            loading={actionLoading}
-          />
+          <div className="lesson-form">
+            <LessonForm 
+              lesson={editingLesson}
+              onSubmit={(data) => handleUpdateLesson(editingLesson._id, data)}
+              onCancel={() => setEditingLesson(null)}
+              isEditing={true}
+              loading={actionLoading}
+            />
+          </div>
         )}
       </main>
     </div>
@@ -605,8 +637,7 @@ function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing
     url: lesson?.url || '',
     textContent: lesson?.textContent || '',
     durationSec: lesson?.durationSec || 0,
-    order: lesson?.order || nextOrder,
-    isPreview: lesson?.isPreview || false
+    order: lesson?.order || nextOrder
   });
 
   const handleSubmit = (e) => {
@@ -710,23 +741,13 @@ function LessonForm({ lesson, onSubmit, onCancel, moduleId, nextOrder, isEditing
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Duration (hour)</label>
+              <label>Duration (seconds)</label>
               <input
                 type="number"
                 value={formData.durationSec}
                 onChange={(e) => setFormData(prev => ({ ...prev, durationSec: parseInt(e.target.value) || 0 }))}
                 min="0"
               />
-            </div>
-            <div className="form-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={formData.isPreview}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isPreview: e.target.checked }))}
-                />
-                {/* Preview Lesson */}
-              </label>
             </div>
           </div>
           <div className="form-actions">

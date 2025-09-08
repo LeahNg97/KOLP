@@ -73,6 +73,7 @@ export default function CourseDetail() {
         setEnrollment(null);
       }
       
+      
     } catch (err) {
       console.error('Failed to load course data:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load course data';
@@ -461,6 +462,7 @@ export default function CourseDetail() {
                 )}
               </div>
             </section>
+
           </main>
         </div>
       )}

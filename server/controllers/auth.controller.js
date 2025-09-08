@@ -20,10 +20,10 @@ exports.login = async (req, res) => {
 
   try {
     const user = await findUserByEmail(email);
-    if (!user) return res.status(400).json({ message: 'Email không tồn tại' });
+    if (!user) return res.status(400).json({ message: 'Email is not found' });
 
     const match = await verifyPassword(password, user.password);
-    if (!match) return res.status(400).json({ message: 'Mật khẩu không đúng' });
+    if (!match) return res.status(400).json({ message: 'Password is not correct' });
 
     const token = signToken({ id: user._id, role: user.role });
 
@@ -40,12 +40,12 @@ exports.register = async (req, res) => {
   
     try {
       const existingUser = await User.findOne({ email });
-      if (existingUser) return res.status(400).json({ message: 'Email đã tồn tại' });
+      if (existingUser) return res.status(400).json({ message: 'Email is already exists' });
   
       const hashed = await bcrypt.hash(password, 10);
       const newUser = await User.create({ name, email, password: hashed, role });
 
-      // Tạo thông báo chào mừng
+      // Create welcome notification
       try {
         await NotificationService.notifyWelcome(newUser._id, role);
       } catch (error) {
@@ -53,31 +53,31 @@ exports.register = async (req, res) => {
       }
   
       res.status(201).json({
-        message: 'Đăng ký thành công',
+        message: 'Register successfully',
         user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }
       });
     } catch (err) {
-      res.status(500).json({ message: 'Lỗi server: ' + err.message });
+      res.status(500).json({ message: 'Server error: ' + err.message });
     }
   };
 
-// Đổi mật khẩu khi đã đăng nhập
+// Change password when logged in
 exports.changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
   
     try {
       const user = await User.findById(req.user.id);
-      if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      if (!user) return res.status(404).json({ message: 'User not found' });
   
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) return res.status(400).json({ message: 'Mật khẩu hiện tại không đúng' });
+      if (!isMatch) return res.status(400).json({ message: 'Current password is not correct' });
   
       user.password = await bcrypt.hash(newPassword, 10);
       await user.save();
   
-      res.json({ message: 'Đổi mật khẩu thành công' });
+      res.json({ message: 'Change password successfully' });
     } catch (err) {
-      res.status(500).json({ message: 'Lỗi server: ' + err.message });
+      res.status(500).json({ message: 'Server error: ' + err.message });
     }
   };
 
@@ -85,7 +85,7 @@ exports.changePassword = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
     
     res.json({
       user: { 
@@ -97,17 +97,17 @@ exports.getMe = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };
 
-// Update user profile
+// Update user profile when logged in
 exports.updateProfile = async (req, res) => {
   const { name } = req.body;
 
   try {
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     // Update name if provided
     if (name && name.trim()) {
@@ -117,7 +117,7 @@ exports.updateProfile = async (req, res) => {
     await user.save();
 
     res.json({
-      message: 'Cập nhật thông tin thành công',
+      message: 'Update profile successfully',
       user: { 
         id: user._id, 
         name: user.name, 
@@ -127,6 +127,6 @@ exports.updateProfile = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };

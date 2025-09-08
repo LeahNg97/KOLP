@@ -575,7 +575,7 @@ export default function CreateCourse() {
                               />
                             </div>
 
-                            {/* <div className="form-group-cr-coure">
+                            <div className="form-group-cr-coure">
                               <label>Text Content</label>
                               <textarea
                                 value={lesson.textContent}
@@ -585,13 +585,13 @@ export default function CreateCourse() {
                                 rows="2"
                                 disabled={loading}
                               />
-                            </div> */}
+                            </div>
 
                             <div className="form-group-cr-coure">
-                              <label>Duration (hour)</label>
+                              <label>Duration (seconds)</label>
                               <input
                                 type="number"
-                                value={lesson.durationHour}
+                                value={lesson.durationSec}
                                 onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'durationSec', parseInt(e.target.value) || 0)}
                                 placeholder="0"
                                 className="form-input-cr-coure"
@@ -601,7 +601,7 @@ export default function CreateCourse() {
                             </div>
                           </div>
 
-                          {/* <div className="form-group-cr-coure">
+                          <div className="form-group-cr-coure">
                             <label>Preview Lesson</label>
                             <input
                               type="checkbox"
@@ -609,7 +609,7 @@ export default function CreateCourse() {
                               onChange={(e) => updateLesson(moduleIndex, lessonIndex, 'isPreview', e.target.checked)}
                               disabled={loading}
                             />
-                          </div> */}
+                          </div>
                         </div>
                       ))}
                     </div>

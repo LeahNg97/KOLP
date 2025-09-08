@@ -234,6 +234,18 @@
   transform: translateY(-1px);
 }
 
+.cc-btn--disabled {
+  background: var(--muted) !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.cc-btn--disabled:hover {
+  filter: none !important;
+  transform: none !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .cc-card {

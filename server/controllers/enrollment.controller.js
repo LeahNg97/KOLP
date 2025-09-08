@@ -3,7 +3,7 @@ const Enrollment = require('../models/enrollment.model');
 const Course = require('../models/course.model');
 const NotificationService = require('../services/notification.service');
 
-// Approve (admin duyệt) — chỉ +1 nếu trước đó chưa approved
+// Approve (admin approval) — only +1 if not previously approved
 exports.adminApproveEnrollment = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
@@ -31,7 +31,7 @@ exports.adminApproveEnrollment = async (req, res, next) => {
   }
 };
 
-// Enroll (student tự đăng ký) — tất cả đều cần instructor duyệt
+// Enroll (student self-registration) — all require instructor approval
 exports.enrollCourse = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
@@ -39,14 +39,14 @@ exports.enrollCourse = async (req, res, next) => {
       const { courseId } = req.body;
       const studentId = req.user.id;
 
-      // tránh trùng
+      // avoid duplicates
       const exists = await Enrollment.findOne({ courseId, studentId }).session(session);
       if (exists) return res.status(409).json({ message: 'Already enrolled' });
 
       const course = await Course.findById(courseId).session(session);
       if (!course) return res.status(404).json({ message: 'Course not found' });
 
-      // Tất cả enrollments đều cần instructor duyệt
+      // All enrollments require instructor approval
       const enrollment = await Enrollment.create([{
         studentId,
         courseId,
@@ -151,34 +151,47 @@ exports.getInstructorStudents = async (req, res) => {
 
 // Instructor/Admin duyệt đăng ký khóa học
 exports.approveEnrollment = async (req, res, next) => {
-  const session = await mongoose.startSession();
   try {
-    await session.withTransaction(async () => {
-      const { enrollmentId } = req.params;
-      const enrollment = await Enrollment.findById(enrollmentId).session(session);
-      if (!enrollment) return res.status(404).json({ message: 'Enrollment not found' });
-      
-      if (enrollment.status === 'approved') {
-        return res.status(400).json({ message: 'Enrollment already approved' });
-      }
-      
-      enrollment.status = 'approved';
-      enrollment.approvedAt = new Date();
-      await enrollment.save({ session });
-      
-      // Increment student count
-      await Course.updateOne(
-        { _id: enrollment.courseId },
-        { $inc: { 'stats.studentCount': 1 } },
-        { session }
-      );
-      
-      res.json({ message: 'Enrollment approved successfully', enrollment });
-    });
+    const { enrollmentId } = req.params;
+    console.log('Approving enrollment:', enrollmentId);
+    
+    const enrollment = await Enrollment.findById(enrollmentId);
+    if (!enrollment) {
+      console.log('Enrollment not found:', enrollmentId);
+      return res.status(404).json({ message: 'Enrollment not found' });
+    }
+    
+    if (enrollment.status === 'approved') {
+      console.log('Enrollment already approved:', enrollmentId);
+      return res.status(400).json({ message: 'Enrollment already approved' });
+    }
+    
+    console.log('Current enrollment status:', enrollment.status);
+    
+    // Simple update without transaction to avoid conflicts
+    const updatedEnrollment = await Enrollment.findOneAndUpdate(
+      { _id: enrollmentId, status: { $ne: 'approved' } }, // Guard against double approval
+      { 
+        status: 'approved',
+        approvedAt: new Date()
+      },
+      { new: true }
+    );
+    
+    if (!updatedEnrollment) {
+      console.log('Failed to update enrollment - might be already approved');
+      return res.status(400).json({ message: 'Enrollment already approved or not found' });
+    }
+    
+    console.log('Enrollment updated successfully:', updatedEnrollment._id);
+    
+    // Let the post middleware handle course stats update
+    // (The post middleware will automatically increment studentCount)
+    
+    res.json({ message: 'Enrollment approved successfully', enrollment: updatedEnrollment });
   } catch (e) {
+    console.error('Approve enrollment error:', e);
     next(e);
-  } finally {
-    session.endSession();
   }
 };
 

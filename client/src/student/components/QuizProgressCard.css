@@ -144,7 +144,11 @@
 }
 
 .progress-fill.quiz-fill {
-  background: linear-gradient(90deg, #48bb78, #38a169);
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-fill.short-question-fill {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
 }
 
 .progress-fill.total-fill {

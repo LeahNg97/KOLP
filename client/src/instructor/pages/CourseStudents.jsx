@@ -249,7 +249,7 @@ export default function CourseStudents() {
               >
                 ← Back to Courses
               </button>
-              <h1>Enrolled Students</h1>
+              <h1>Course Students 👥</h1>
               {course && (
                 <p className="course-title">{course.title}</p>
               )}

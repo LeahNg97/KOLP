@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './StudentManagement.css';
 import { getMyCourses } from '../api/courseApi';
-import { getInstructorStudents } from '../api/enrollmentApi';
+import { getInstructorStudents, approveEnrollment, rejectEnrollment, testBackendConnection } from '../api/enrollmentApi';
 
 export default function StudentManagement() {
   const [students, setStudents] = useState([]);
@@ -13,10 +13,24 @@ export default function StudentManagement() {
   const [filterCourse, setFilterCourse] = useState('all');
   const [courses, setCourses] = useState([]);
   const [expandedStudent, setExpandedStudent] = useState(null);
+  const [processingEnrollment, setProcessingEnrollment] = useState(null);
 
   useEffect(() => {
-    fetchStudents();
-    fetchCourses();
+    const initializeData = async () => {
+      // Test backend connection first
+      const isBackendConnected = await testBackendConnection();
+      if (!isBackendConnected) {
+        setError('Backend server is not running. Please start the server.');
+        setLoading(false);
+        return;
+      }
+      
+      // If backend is connected, fetch data
+      await fetchStudents();
+      await fetchCourses();
+    };
+    
+    initializeData();
   }, []);
 
   const clearAllFilters = () => {
@@ -74,6 +88,40 @@ export default function StudentManagement() {
       setCourses(response);
     } catch (err) {
       console.error('Failed to fetch courses:', err);
+    }
+  };
+
+  const handleApprove = async (enrollmentId) => {
+    try {
+      setProcessingEnrollment(enrollmentId);
+      console.log('Approving enrollment:', enrollmentId);
+      const result = await approveEnrollment(enrollmentId);
+      console.log('Approve result:', result);
+      // Refresh the students list to show updated status
+      await fetchStudents();
+      setError(''); // Clear any previous errors
+    } catch (err) {
+      console.error('Approve error:', err);
+      setError(err.response?.data?.message || 'Failed to approve enrollment');
+    } finally {
+      setProcessingEnrollment(null);
+    }
+  };
+
+  const handleReject = async (enrollmentId) => {
+    try {
+      setProcessingEnrollment(enrollmentId);
+      console.log('Rejecting enrollment:', enrollmentId);
+      const result = await rejectEnrollment(enrollmentId);
+      console.log('Reject result:', result);
+      // Refresh the students list to show updated status
+      await fetchStudents();
+      setError(''); // Clear any previous errors
+    } catch (err) {
+      console.error('Reject error:', err);
+      setError(err.response?.data?.message || 'Failed to reject enrollment');
+    } finally {
+      setProcessingEnrollment(null);
     }
   };
 
@@ -333,7 +381,7 @@ export default function StudentManagement() {
                           </tr>
                           {expandedStudent === student._id && (
                             <tr className="student-details-row">
-                              <td colSpan={6}>
+                              <td colSpan={7}>
                                 <div className="student-details-expand">
                                   <h4>Course Enrollments ({enrollments.length})</h4>
                                   <div className="student-enrollments-table">
@@ -345,6 +393,7 @@ export default function StudentManagement() {
                                           <th>Progress</th>
                                           <th>Enrolled</th>
                                           <th>Completed</th>
+                                          <th>Actions</th>
                                         </tr>
                                       </thead>
                                       <tbody>
@@ -366,6 +415,33 @@ export default function StudentManagement() {
                                             </td>
                                             <td>{new Date(enrollment.createdAt).toLocaleDateString()}</td>
                                             <td>{enrollment.completed ? 'Yes' : 'No'}</td>
+                                            <td>
+                                              {enrollment.status === 'pending' && (
+                                                <div className="action-buttons">
+                                                  <button
+                                                    className="approve-btn"
+                                                    onClick={() => handleApprove(enrollment._id)}
+                                                    title="Approve enrollment"
+                                                    disabled={processingEnrollment === enrollment._id}
+                                                  >
+                                                    {processingEnrollment === enrollment._id ? '⏳' : '✅'} 
+                                                    {processingEnrollment === enrollment._id ? 'Processing...' : 'Approve'}
+                                                  </button>
+                                                  <button
+                                                    className="reject-btn"
+                                                    onClick={() => handleReject(enrollment._id)}
+                                                    title="Reject enrollment"
+                                                    disabled={processingEnrollment === enrollment._id}
+                                                  >
+                                                    {processingEnrollment === enrollment._id ? '⏳' : '❌'} 
+                                                    {processingEnrollment === enrollment._id ? 'Processing...' : 'Reject'}
+                                                  </button>
+                                                </div>
+                                              )}
+                                              {enrollment.status === 'approved' && (
+                                                <span className="status-text">Already Approved</span>
+                                              )}
+                                            </td>
                                           </tr>
                                         ))}
                                       </tbody>

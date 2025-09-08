@@ -66,11 +66,10 @@ exports.getCourseById = async (req, res, next) => {
       .populate('instructorId', 'name email role');
     if (!course) return res.status(404).json({ message: 'Course not found' });
     
-    console.log(`Getting course ${req.params.id}: ${course.title}`);
     
     // studentCount is now automatically maintained in Course.stats.studentCount
     const studentCount = course.stats?.studentCount || 0;
-    console.log(`Course ${course._id} (${course.title}): ${studentCount} students (from model)`);
+
     
     // Include quiz stats from the course model
     const quizStats = {
@@ -85,12 +84,7 @@ exports.getCourseById = async (req, res, next) => {
       quizStats
     };
     
-    console.log('Final course with stats:', { 
-      id: courseWithStats._id, 
-      title: courseWithStats.title, 
-      studentCount: courseWithStats.studentCount,
-      quizStats: courseWithStats.quizStats
-    });
+    
     
     res.json(courseWithStats);
   } catch (e) { 

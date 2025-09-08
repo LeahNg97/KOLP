@@ -36,7 +36,6 @@ enrollmentSchema.post('save', async function(doc) {
         { _id: doc.courseId },
         { $inc: { 'stats.studentCount': 1 } }
       );
-      console.log(`Increased student count for course ${doc.courseId}`);
     }
   } catch (error) {
     console.error('Error updating course stats after enrollment save:', error);
@@ -53,7 +52,6 @@ enrollmentSchema.post('findOneAndUpdate', async function(doc) {
         { _id: doc.courseId },
         { $inc: { 'stats.studentCount': 1 } }
       );
-      console.log(`Increased student count for course ${doc.courseId} after update`);
     }
   } catch (error) {
     console.error('Error updating course stats after enrollment update:', error);

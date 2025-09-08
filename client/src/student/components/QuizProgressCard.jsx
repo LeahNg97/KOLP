@@ -102,7 +102,7 @@ export default function QuizProgressCard({ courseId, courseTitle }) {
 
       <div className="progress-section">
         <div className="lesson-progress">
-          <label>Lessons Progress</label>
+          <label>Lessons Progress (60%)</label>
           <div className="progress-bar">
             <div 
               className="progress-fill lesson-fill"
@@ -113,16 +113,27 @@ export default function QuizProgressCard({ courseId, courseTitle }) {
         </div>
 
         <div className="quiz-progress">
-          <label>Quiz Progress</label>
+          <label>Quiz Progress (20%)</label>
           <div className="progress-bar">
             <div 
               className="progress-fill quiz-fill"
-              style={{ width: progress.passed ? '40%' : '0%' }}
+              style={{ width: progress.passed ? '20%' : '0%' }}
             ></div>
           </div>
           <span className="progress-text">
-            {progress.passed ? '40% (Passed)' : '0% (Not passed)'}
+            {progress.passed ? '20% (Passed)' : '0% (Not passed)'}
           </span>
+        </div>
+
+        <div className="short-question-progress">
+          <label>Short Questions (20%)</label>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill short-question-fill"
+              style={{ width: '0%' }}
+            ></div>
+          </div>
+          <span className="progress-text">0% (Not available)</span>
         </div>
 
         <div className="total-progress">
@@ -132,7 +143,7 @@ export default function QuizProgressCard({ courseId, courseTitle }) {
               className="progress-fill total-fill"
               style={{ 
                 width: `${Math.min(
-                  (completedLessons / totalLessons) * 60 + (progress.passed ? 40 : 0), 
+                  (completedLessons / totalLessons) * 60 + (progress.passed ? 20 : 0), 
                   100
                 )}%` 
               }}
@@ -140,7 +151,7 @@ export default function QuizProgressCard({ courseId, courseTitle }) {
           </div>
           <span className="progress-text">
             {Math.round(Math.min(
-              (completedLessons / totalLessons) * 60 + (progress.passed ? 40 : 0), 
+              (completedLessons / totalLessons) * 60 + (progress.passed ? 20 : 0), 
               100
             ))}%
           </span>

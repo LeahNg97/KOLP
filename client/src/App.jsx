@@ -9,6 +9,7 @@ import Register from './auth/Register';
 import AdminDashboard from './admin/pages/AdminDashboard';
 import UserManagement from './admin/pages/UserManagement';
 import CourseManagement from './admin/pages/CourseManagement';
+import AdminWorkshopManagement from './admin/pages/WorkshopManagement';
 import CertificateManagement from './admin/pages/CertificateManagement';
 import QuizResultsAnalytics from './admin/pages/QuizResultsAnalytics';
 
@@ -17,8 +18,10 @@ import CourseStudents from './instructor/pages/CourseStudents';
 import CourseContentManagement from './instructor/pages/CourseContentManagement';
 import CreateCourse from './instructor/pages/CreateCourse';
 import QuizManagement from './instructor/pages/QuizManagement';
+import ShortQuestionManagement from './instructor/pages/ShortQuestionManagement';
 import StudentManagement from './instructor/pages/StudentManagement';
 import InstructorAnalytics from './instructor/pages/Analytics';
+import WorkshopManagement from './instructor/pages/WorkshopManagement';
 
 
 import StudentDashboard from './student/pages/StudentDashboard';
@@ -28,7 +31,10 @@ import CourseDetailLearning from './student/pages/CourseDetailLearning';
 import CertificatePage from './student/pages/CertificatePage';
 import CertificateDetail from './student/pages/CertificateDetail';
 import Quiz from './student/components/Quiz';
+import ShortQuestion from './student/components/ShortQuestion';
+import ShortQuestionResults from './student/components/ShortQuestionResults';
 import QuizProgressCard from './student/components/QuizProgressCard';
+import WorkshopList from './student/pages/WorkshopList';
 
 function AppContent() {
   const location = useLocation();
@@ -45,22 +51,28 @@ function AppContent() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/courses" element={<CourseManagement />} />
+        <Route path="/admin/workshops" element={<AdminWorkshopManagement />} />
         <Route path="/admin/certificates" element={<CertificateManagement />} />
         <Route path="/admin/analytics" element={<QuizResultsAnalytics />} />
         {/* Instructor routes */}
         <Route path="/instructor/courses" element={<InstructorCourses />} />
+        <Route path="/instructor/workshops" element={<WorkshopManagement />} />
         <Route path="/instructor/create-course" element={<CreateCourse />} />
         <Route path="/instructor/courses/:courseId/students" element={<CourseStudents />} />
         <Route path="/instructor/courses/:courseId/content" element={<CourseContentManagement />} />
         <Route path="/instructor/courses/:courseId/quiz" element={<QuizManagement />} />
+        <Route path="/instructor/courses/:courseId/short-questions" element={<ShortQuestionManagement />} />
         <Route path="/instructor/students" element={<StudentManagement />} />
         <Route path="/instructor/analytics" element={<InstructorAnalytics />} />
         {/* Student routes */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/my-courses" element={<StudentCourse />} />
+        <Route path="/student/workshops" element={<WorkshopList />} />
         <Route path="/student/courses/:courseId" element={<CourseDetail />} />
         <Route path="/student/courses/:courseId/learn" element={<CourseDetailLearning />} />
         <Route path="/student/courses/:courseId/quiz" element={<Quiz />} />
+        <Route path="/student/courses/:courseId/short-question/:shortQuestionId" element={<ShortQuestion />} />
+        <Route path="/student/courses/:courseId/short-question/:shortQuestionId/results" element={<ShortQuestionResults />} />
         <Route path="/student/certificates" element={<CertificatePage />} />
         <Route path="/student/certificates/:certificateId" element={<CertificateDetail />} />
       </Routes>

@@ -88,7 +88,7 @@ exports.getAdminStats = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };
 
@@ -103,7 +103,86 @@ exports.getInstructorStats = async (req, res) => {
       totalStudents
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
+  }
+};
+
+// Get detailed instructor analytics
+exports.getInstructorAnalytics = async (req, res) => {
+  try {
+    const instructorId = req.user.id;
+    
+    // Get instructor's courses
+    const myCourses = await Course.find({ instructorId });
+    const courseIds = myCourses.map(c => c._id);
+    
+    // Basic course stats
+    const totalCourses = myCourses.length;
+    const totalStudents = await Enrollment.countDocuments({ courseId: { $in: courseIds } });
+    const totalEnrollments = await Enrollment.countDocuments({ courseId: { $in: courseIds } });
+    const completedCourses = await Enrollment.countDocuments({ 
+      courseId: { $in: courseIds }, 
+      completed: true 
+    });
+
+    // Quiz analytics
+    const Quiz = require('../models/quiz.model');
+    const QuizProgress = require('../models/quizProgress.model');
+    
+    let totalQuizzes = 0;
+    let totalSubmissions = 0;
+    let totalScore = 0;
+    let submissionCount = 0;
+    let passCount = 0;
+
+    // Get quiz data for each course
+    for (const course of myCourses) {
+      const quizzes = await Quiz.find({ courseId: course._id });
+      totalQuizzes += quizzes.length;
+
+      for (const quiz of quizzes) {
+        const quizProgresses = await QuizProgress.find({ 
+          quizId: quiz._id,
+          status: 'completed'
+        });
+        
+        totalSubmissions += quizProgresses.length;
+        
+        for (const progress of quizProgresses) {
+          if (progress.score !== undefined) {
+            totalScore += progress.score;
+            submissionCount++;
+            
+            const numQuestions = quiz.questions?.length || 1;
+            const percent = (progress.score / numQuestions) * 100;
+            if (percent >= 60) passCount++;
+          }
+        }
+      }
+    }
+
+    const averageScore = submissionCount > 0 ? (totalScore / submissionCount).toFixed(1) : 0;
+    const passRate = submissionCount > 0 ? `${Math.round((passCount / submissionCount) * 100)}%` : '0%';
+
+    res.json({
+      success: true,
+      data: {
+        totalCourses,
+        totalStudents,
+        totalEnrollments,
+        completedCourses,
+        totalQuizzes,
+        totalSubmissions,
+        averageScore: parseFloat(averageScore),
+        passRate
+      }
+    });
+  } catch (err) {
+    console.error('Instructor analytics error:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error: ' + err.message 
+    });
   }
 };
 
@@ -119,6 +198,6 @@ exports.getStudentStats = async (req, res) => {
       completed
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };

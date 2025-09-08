@@ -3,7 +3,8 @@ const router = express.Router();
 const {
   getAdminStats,
   getInstructorStats,
-  getStudentStats
+  getStudentStats,
+  getInstructorAnalytics
 } = require('../controllers/dashboard.controller');
 
 const { verifyToken, authorizeRole } = require('../middleware/auth.middleware');
@@ -106,5 +107,49 @@ router.get('/instructor', verifyToken, authorizeRole('instructor'), getInstructo
  *         description: Forbidden - Student access required
  */
 router.get('/student', verifyToken, authorizeRole('student'), getStudentStats);
+
+/**
+ * @swagger
+ * /api/dashboard/instructor/analytics:
+ *   get:
+ *     summary: Get detailed instructor analytics (Instructor only)
+ *     tags: [Dashboard]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Detailed instructor analytics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalCourses:
+ *                       type: number
+ *                     totalStudents:
+ *                       type: number
+ *                     totalEnrollments:
+ *                       type: number
+ *                     completedCourses:
+ *                       type: number
+ *                     totalQuizzes:
+ *                       type: number
+ *                     totalSubmissions:
+ *                       type: number
+ *                     averageScore:
+ *                       type: number
+ *                     passRate:
+ *                       type: string
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Instructor access required
+ */
+router.get('/instructor/analytics', verifyToken, authorizeRole('instructor'), getInstructorAnalytics);
 
 module.exports = router;

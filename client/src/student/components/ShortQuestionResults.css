@@ -1,0 +1,356 @@
+/* Short Question Results Component Styles */
+.short-question-results-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Loading State */
+.short-question-results-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.short-question-results-error {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.short-question-results-error h3 {
+  color: #dc3545;
+  margin-bottom: 10px;
+}
+
+.short-question-results-error p {
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.retry-btn, .back-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px;
+  font-size: 16px;
+}
+
+.retry-btn:hover, .back-btn:hover {
+  background: #0056b3;
+}
+
+/* Results Container */
+.short-question-results {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Results Header */
+.results-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.results-header h2 {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.score {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.separator {
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+.total {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.percentage {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-left: 0.5rem;
+}
+
+.status {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  display: inline-block;
+}
+
+.status.passed {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 2px solid rgba(40, 167, 69, 0.3);
+}
+
+.status.failed {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 2px solid rgba(220, 53, 69, 0.3);
+}
+
+/* Results Summary */
+.results-summary {
+  padding: 1.5rem 2rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.summary-item .label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.summary-item .value {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Answers Section */
+.answers-section {
+  padding: 2rem;
+}
+
+.answers-section h3 {
+  margin: 0 0 1.5rem 0;
+  color: #2d3748;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.answer-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+.answer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.answer-header h4 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.answer-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.answer-status.correct {
+  background: #d4edda;
+  color: #155724;
+}
+
+.answer-status.incorrect {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.answer-content {
+  padding: 1.5rem;
+}
+
+.answer-field {
+  margin-bottom: 1rem;
+}
+
+.answer-field:last-child {
+  margin-bottom: 0;
+}
+
+.answer-field label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.answer-text {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 0.75rem;
+  min-height: 60px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.correct-answer {
+  background: #d4edda !important;
+  border-color: #c3e6cb !important;
+  color: #155724;
+}
+
+.explanation {
+  background: #e7f3ff !important;
+  border-color: #b8daff !important;
+  color: #004085;
+}
+
+.answer-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.answer-meta span {
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Results Actions */
+.results-actions {
+  padding: 1.5rem 2rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.course-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.course-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .short-question-results-container {
+    padding: 10px;
+  }
+  
+  .results-header {
+    padding: 1.5rem 1rem;
+  }
+  
+  .results-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .score-display {
+    font-size: 1.2rem;
+  }
+  
+  .score {
+    font-size: 2rem;
+  }
+  
+  .results-summary {
+    padding: 1rem;
+    grid-template-columns: 1fr;
+  }
+  
+  .answers-section {
+    padding: 1rem;
+  }
+  
+  .answer-header {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .answer-content {
+    padding: 1rem;
+  }
+  
+  .results-actions {
+    padding: 1rem;
+  }
+}

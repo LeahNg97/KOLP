@@ -98,7 +98,7 @@ export default function NotificationBell({ userRole = 'student' }) {
       <button 
         className="notification-button" 
         onClick={toggleDropdown}
-        aria-label="Notifications"
+        aria-label="Notification"
       >
         <span className="bell-icon">🔔</span>
         {unreadCount > 0 && (
@@ -109,13 +109,13 @@ export default function NotificationBell({ userRole = 'student' }) {
       {isOpen && (
         <div className="notification-dropdown">
           <div className="notification-header">
-            <h3>Notifications</h3>
+            <h3>Notification</h3>
             {unreadCount > 0 && (
               <button 
                 className="mark-all-read-btn"
                 onClick={markAllAsRead}
               >
-                Mark all as read
+                Mark as read
               </button>
             )}
           </div>
@@ -123,7 +123,7 @@ export default function NotificationBell({ userRole = 'student' }) {
           <div className="notification-list">
             {notifications.length === 0 ? (
               <div className="no-notifications">
-                <span>No notification to show</span>
+                <span>There is no notification</span>
               </div>
             ) : (
               notifications.map(notification => (
@@ -139,7 +139,7 @@ export default function NotificationBell({ userRole = 'student' }) {
                     <div className="notification-title">{notification.title}</div>
                     <div className="notification-message">{notification.message}</div>
                     <div className="notification-time">
-                      {notification.timeAgo || new Date(notification.createdAt).toLocaleDateString('en-US')}
+                      {notification.timeAgo || new Date(notification.createdAt).toLocaleDateString('vi-VN')}
                     </div>
                   </div>
                   {!notification.isRead && (

@@ -59,10 +59,10 @@ const QuizProgressSchema = new Schema({
     type: Number,
     default: 3
   },
-  // Progress weight (40% of course progress)
+  // Progress weight (20% of course progress)
   progressWeight: {
     type: Number,
-    default: 40
+    default: 20
   },
   // Detailed answers for review
   answers: [{
@@ -91,7 +91,7 @@ QuizProgressSchema.index({ quizId: 1 });
 // Virtual để tính toán progress percentage
 QuizProgressSchema.virtual('progressPercentage').get(function() {
   if (this.passed) {
-    return this.progressWeight; // 40% nếu pass
+    return this.progressWeight; // 20% nếu pass
   }
   return 0; // 0% nếu fail hoặc chưa làm
 });

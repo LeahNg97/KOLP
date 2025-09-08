@@ -1,12 +1,12 @@
-// NotificationService.js - Service để quản lý thông báo
+// NotificationService.js - Service for managing notifications
 
 export const getDefaultNotifications = (userRole) => {
   const baseNotifications = [
     {
       id: 1,
-      title: 'Welcome!',
+      title: 'Welcome !',
       message: 'Welcome to KOLP',
-      time: 'Vừa xong',
+      time: 'Just Now',
       isRead: true,
       type: 'welcome'
     }
@@ -17,8 +17,8 @@ export const getDefaultNotifications = (userRole) => {
       ...baseNotifications,
       {
         id: 2,
-        title: 'New Course Added',
-        message: 'Course "React Advanced" added to your enrolled courses',
+        title: 'New Course',
+        message: 'Course "React Advanced" has been added to the list',
         time: '2 hours ago',
         isRead: false,
         type: 'course'
@@ -26,23 +26,23 @@ export const getDefaultNotifications = (userRole) => {
       {
         id: 3,
         title: 'New Assignment',
-        message: 'New assignment is added in "JavaScript Basics"',
+        message: 'New assignment has been assigned in the course "JavaScript Basics"',
         time: '1 day ago',
         isRead: false,
         type: 'assignment'
       },
       {
         id: 4,
-        title: 'Grade Released',
-        message: 'you have been graded for "HTML & CSS"',
+        title: 'Grade',
+        message: 'You have received a grade for the test "HTML & CSS"',
         time: '2 days ago',
         isRead: true,
         type: 'grade'
       },
       {
         id: 5,
-        title: 'Upcoming Quiz Reminder',
-        message: 'Quiz on "React Basics" is scheduled for tomorrow',
+        title: 'Reminder',
+        message: 'You have a test coming up in 3 days',
         time: '3 days ago',
         isRead: false,
         type: 'reminder'
@@ -55,32 +55,32 @@ export const getDefaultNotifications = (userRole) => {
       ...baseNotifications,
       {
         id: 2,
-        title: 'New Student Enrollments',
-        message: 'You have 5 students enroll in "Web Development"',
+        title: 'New Student',
+        message: 'You have 5 new students enrolled in the course "Web Development"',
         time: '1 hour ago',
         isRead: false,
         type: 'student'
       },
       {
         id: 3,
-        title: 'New Assignment Submission',
-        message: 'Alice has just submitted "Project 1"',
+        title: 'New Submission',
+        message: 'Student Nguyen Van A has submitted the assignment "Project 1"',
         time: '3 hours ago',
         isRead: false,
         type: 'submission'
       },
       {
         id: 4,
-        title: 'New Course Review',
-        message: '"JavaScript Basics" received a new 5-star review',
+        title: 'Course Review',
+        message: 'Course "JavaScript Basics" has received a 5-star rating',
         time: '1 day ago',
         isRead: true,
         type: 'review'
       },
       {
         id: 5,
-        title: 'Grading Reminder',
-        message: 'Please grade pending assignments for "HTML & CSS"',
+        title: 'Reminder',
+        message: 'You have 3 assignments that need to be graded before tomorrow',
         time: '2 days ago',
         isRead: false,
         type: 'reminder'

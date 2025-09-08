@@ -242,10 +242,6 @@
 }
 
 
-.login-button.loading {
-  cursor: wait;
-}
-
 
 /* .loading-spinner {
   display: inline-block;

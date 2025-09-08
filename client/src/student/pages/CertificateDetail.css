@@ -1,15 +1,16 @@
 .certificate-detail-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #e8f5f0, #ffffff);
+  background: linear-gradient(135deg, #f8f6f0 0%, #e8e2d5 50%, #d4c4a8 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 0 0 0;
+  font-family: 'Times New Roman', 'Georgia', serif;
 }
 
 .certificate-detail-container {
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -17,158 +18,413 @@
 .back-btn {
   background: none;
   border: none;
-  color: #17c3b2;
+  color: #8B0000;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 50px !important;
   transition: color 0.2s;
+  font-family: 'Times New Roman', serif;
+
 }
 
 .back-btn:hover {
-  color: #0f9b8a;
+  color: #A52A2A;
 }
 
 .certificate {
-  border: 8px solid #17c3b2;
-  padding: 40px;
-  max-width: 800px;
+  border: 12px solid #8B0000;
+  padding: 50px 80px;
+  max-width: 1000px;
+  width: 100%;
+  aspect-ratio: 1.4;
   margin: auto;
-  background-color: white;
-  border-radius: 20px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  background-color: #fefefe;
+  border-radius: 0;
+  box-shadow: 
+    0 0 40px rgba(139, 0, 0, 0.3),
+    inset 0 0 0 2px #8B0000,
+    inset 0 0 0 4px #fefefe,
+    inset 0 0 0 6px #8B0000;
   position: relative;
   margin-bottom: 32px;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(139, 0, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.05) 0%, transparent 50%);
 }
 
-.logo {
+/* Decorative corner elements */
+.corner-decoration {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 3px solid #8B0000;
+  z-index: 1;
+}
+
+.corner-decoration::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #8B0000;
+  top: -6px;
+  left: -6px;
+}
+
+.corner-decoration::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #8B0000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.corner-decoration.top-left {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-decoration.top-right {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner-decoration.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+}
+
+.corner-decoration.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Background pattern */
+.background-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(139, 0, 0, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 0, 0, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Certificate Header */
+.certificate-header {
   text-align: center;
-  font-size: 28px;
-  color: #17c3b2;
-  font-weight: bold;
-  font-family: 'Arial', sans-serif;
-}
-
-.logo-academy {
-  color: #000;
-}
-
-.title {
-  text-align: center;
-  font-size: 36px;
-  margin-top: 10px;
-  letter-spacing: 2px;
-  font-weight: bold;
-  color: #333;
-}
-
-.subtitle {
-  text-align: center;
-  font-size: 20px;
-  margin-bottom: 30px;
-  color: #777;
-}
-
-.recipient {
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  margin: 20px 0;
-  color: #333;
-}
-
-.description {
-  text-align: center;
-  font-size: 18px;
   margin-bottom: 40px;
-  color: #444;
-  line-height: 1.6;
+  position: relative;
+  z-index: 2;
 }
 
-.description strong {
-  color: #17c3b2;
+.university-seal {
+  width: 120px;
+  height: 120px;
+  border: 4px solid #8B0000;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fefefe 0%, #f5f5f5 100%);
+  box-shadow: 
+    0 0 20px rgba(139, 0, 0, 0.2),
+    inset 0 0 0 2px #8B0000;
+}
+
+.seal-inner {
+  text-align: center;
+}
+
+.seal-text {
+  font-size: 24px;
   font-weight: bold;
+  color: #8B0000;
+  font-family: 'Times New Roman', serif;
+  letter-spacing: 2px;
 }
 
-.footer {
+.seal-subtext {
+  font-size: 10px;
+  color: #8B0000;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.university-name {
+  font-size: 32px;
+  font-weight: bold;
+  color: #8B0000;
+  margin-bottom: 8px;
+  letter-spacing: 3px;
+  font-family: 'Times New Roman', serif;
+}
+
+.university-motto {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  letter-spacing: 1px;
+}
+
+/* Certificate Body */
+.certificate-body {
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.certificate-title {
+  font-size: 42px;
+  font-weight: bold;
+  color: #8B0000;
+  margin-bottom: 20px;
+  letter-spacing: 4px;
+  font-family: 'Times New Roman', serif;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.certificate-subtitle {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.recipient-name {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin: 30px 0;
+  font-family: 'Times New Roman', serif;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: 1px;
+}
+
+.achievement-description {
+  font-size: 18px;
+  color: #444;
+  line-height: 1.8;
+  max-width: 700px;
+  margin: 0 auto;
+  font-style: italic;
+  text-align: center;
+}
+
+.course-title {
+  color: #8B0000;
+  font-weight: bold;
+  font-style: normal;
+  font-size: 20px;
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+}
+
+/* Certificate Footer */
+.certificate-footer {
   display: flex;
   justify-content: space-between;
-  padding: 0 60px;
+  align-items: flex-end;
+  margin-top: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.signature-section, .date-section {
+  flex: 1;
+  text-align: center;
+}
+
+.signature-line, .date-line {
+  width: 200px;
+  height: 2px;
+  background: #8B0000;
+  margin: 0 auto 10px;
+  position: relative;
+}
+
+.signature-line::after, .date-line::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #8B0000;
+}
+
+.signature-label, .date-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.issue-date {
+  font-size: 14px;
+  color: #8B0000;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.official-seal {
+  flex: 0 0 120px;
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
-.footer .signature {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
+.seal-ring {
+  width: 80px;
+  height: 80px;
+  border: 3px solid #8B0000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fefefe 0%, #f5f5f5 100%);
+  box-shadow: 
+    0 0 15px rgba(139, 0, 0, 0.3),
+    inset 0 0 0 1px #8B0000;
 }
 
-.footer .signature strong {
-  display: block;
-  font-size: 16px;
-  margin-bottom: 5px;
-  color: #333;
+.seal-center {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #8B0000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #8B0000;
 }
 
-.medal {
-  text-align: center;
-  font-size: 40px;
-  color: #ffd700;
-}
-
-.background-icon {
-  position: absolute;
-  opacity: 0.05;
-  font-size: 120px;
-  top: 20px;
-  right: 40px;
-  transform: rotate(-15deg);
+.seal-symbol {
+  font-size: 24px;
+  color: #fefefe;
+  font-weight: bold;
 }
 
 .cert-loading, .cert-error {
   text-align: center;
-  color: #a0aec0;
+  color: #8B0000;
   font-size: 1.1rem;
   margin: 32px 0;
+  font-family: 'Times New Roman', serif;
 }
 
 @media (max-width: 768px) {
   .certificate {
-    padding: 20px;
+    padding: 30px 20px;
     margin: 0 10px 32px 10px;
+    border-width: 8px;
+    aspect-ratio: 1.2;
+    max-width: 100%;
   }
   
-  .title {
+  .corner-decoration {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .corner-decoration::after {
+    width: 15px;
+    height: 15px;
+  }
+  
+  .university-seal {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .seal-text {
+    font-size: 20px;
+  }
+  
+  .seal-subtext {
+    font-size: 8px;
+  }
+  
+  .university-name {
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+  
+  .certificate-title {
+    font-size: 32px;
+    letter-spacing: 2px;
+  }
+  
+  .certificate-subtitle {
+    font-size: 16px;
+  }
+  
+  .recipient-name {
     font-size: 28px;
   }
   
-  .subtitle {
+  .achievement-description {
     font-size: 16px;
+    max-width: 100%;
+    text-align: center;
   }
   
-  .recipient {
-    font-size: 24px;
+  .course-title {
+    font-size: 18px;
+    text-align: center;
+    display: block;
   }
   
-  .description {
-    font-size: 16px;
-  }
-  
-  .footer {
-    padding: 0 20px;
+  .certificate-footer {
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
+    align-items: center;
   }
   
-  .footer .signature {
-    font-size: 12px;
+  .signature-line, .date-line {
+    width: 150px;
   }
   
-  .footer .signature strong {
-    font-size: 14px;
+  .signature-label, .date-label {
+    font-size: 11px;
   }
   
-  .medal {
-    font-size: 30px;
+  .issue-date {
+    font-size: 13px;
+  }
+  
+  .seal-ring {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .seal-center {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .seal-symbol {
+    font-size: 18px;
   }
 } 

@@ -447,6 +447,70 @@
   font-weight: 600;
 }
 
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.approve-btn {
+  padding: 0.4rem 0.8rem;
+  background: #38a169;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.approve-btn:hover:not(:disabled) {
+  background: #2f855a;
+}
+
+.approve-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.reject-btn {
+  padding: 0.4rem 0.8rem;
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.reject-btn:hover:not(:disabled) {
+  background: #c53030;
+}
+
+.reject-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.status-text {
+  font-size: 0.8rem;
+  color: #38a169;
+  font-weight: 600;
+  font-style: italic;
+}
+
 /* Loading */
 .students-loading {
   display: flex;

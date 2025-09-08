@@ -496,446 +496,389 @@ export default function QuizManagement() {
   }
 
   return (
-    <div className="instructor-layout">
-      <main className="instructor-main">
-        <div className="quiz-management">
-          <div className="quiz-header">
-            <div className="header-content">
-              <h1>Quiz Management 🧠</h1>
-              <p>Manage quiz for: <strong>{course?.title}</strong></p>
-            </div>
-            <button 
-              className="back-btn"
-              onClick={() => navigate('/instructor/courses')}
-            >
-              ← Back to Courses
-            </button>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="quiz-tabs">
-            <button 
-              className={`tab-btn ${activeTab === 'quiz' ? 'active' : ''}`}
-              onClick={() => setActiveTab('quiz')}
-            >
-              📝 Quiz Editor
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`}
-              onClick={() => setActiveTab('results')}
-            >
-              📊 Quiz Results ({submissions.length})
-            </button>
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-          
-          {/* Success Message */}
-          {successMessage && (
-            <div className="success-message">
-              {successMessage}
-            </div>
-          )}
-
-          {/* Quiz Editor Tab */}
-          {activeTab === 'quiz' && (
-            <div className="quiz-editor">
-              <div className="editor-header">
-                <h2>Quiz Settings</h2>
-                <div className="editor-actions">
-                  {quiz && quiz.data && quiz.data.length > 0 ? (
-                    <div className="quiz-status">
-                      📝 Quiz ID: {quiz.data[0]._id} | Questions: {quizData.questions.filter(q => q && q.question && q.question.trim()).length}
-                    </div>
-                  ) : (
-                    <div className="quiz-status">
-                      📝 No quiz created yet | Form Questions: {quizData.questions.filter(q => q && q.question && q.question.trim()).length}
-                    </div>
-                  )}
-                  {hasUnsavedChanges && (
-                    <div className="save-reminder">
-                      ⚠️ You have unsaved changes!
-                    </div>
-                  )}
-                  <button 
-                    className="save-btn"
-                    onClick={handleSaveQuiz}
-                    disabled={saving}
-                  >
-                    {saving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save Quiz*' : '💾 Save Quiz'}
-                  </button>
-                  <button 
-                    className="test-btn"
-                    onClick={() => {
-                      console.log('🧪 Current quiz state:', quiz);
-                      console.log('🧪 Current quizData:', quizData);
-                      console.log('🧪 Has unsaved changes:', hasUnsavedChanges);
-                    }}
-                    title="Test current state"
-                  >
-                    🧪 Test
-                  </button>
-                  <button 
-                    className="refresh-btn"
-                    onClick={refreshQuizData}
-                    title="Refresh quiz data from server"
-                  >
-                    🔄 Refresh
-                  </button>
-                </div>
+      <div id="quiz-page" className="kolp-layout">
+        <main id="main" className="kolp-main" role="main">
+          <article id="quiz-management" className="qm" itemScope itemType="https://schema.org/Article">
+            <header id="qm-header" className="qm__header" role="banner">
+              <div className="qm__headerContent">
+                <h1 className="qm__title" itemProp="headline">Quiz Management 🧠</h1>
+                <p className="qm__subtitle">
+                  Manage quiz for: <strong itemProp="about">{course?.title}</strong>
+                </p>
               </div>
-
-              <div className="quiz-form">
-                {/* Quiz Basic Settings */}
-                <div className="quiz-settings-section">
-                  <h3>Basic Settings</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Quiz Title:</label>
-                      <input
-                        type="text"
-                        value={quizData.title}
-                        onChange={(e) => handleQuizDataChange('title', e.target.value)}
-                        placeholder="Enter quiz title..."
-                        className="quiz-title-input"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Description:</label>
-                      <textarea
-                        value={quizData.description}
-                        onChange={(e) => handleQuizDataChange('description', e.target.value)}
-                        placeholder="Enter quiz description..."
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Instructions:</label>
-                      <textarea
-                        value={quizData.instructions}
-                        onChange={(e) => handleQuizDataChange('instructions', e.target.value)}
-                        placeholder="Enter instructions for students..."
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Passing Score (%):</label>
-                      <input
-                        type="number"
-                        value={quizData.passingScore}
-                        onChange={(e) => handleQuizDataChange('passingScore', parseInt(e.target.value) || 70)}
-                        min="0"
-                        max="100"
-                        className="passing-score-input"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Time Limit (minutes):</label>
-                      <input
-                        type="number"
-                        value={quizData.timeLimit || ''}
-                        onChange={(e) => handleQuizDataChange('timeLimit', e.target.value ? parseInt(e.target.value) : null)}
-                        min="1"
-                        placeholder="No limit"
-                        className="time-limit-input"
-                      />
-                    </div>
+              <button
+                id="btn-back"
+                className="btn btn--ghost"
+                onClick={() => navigate('/instructor/courses')}
+              >
+                ← Back to Courses
+              </button>
+            </header>
+    
+            {/* Tabs */}
+            <nav id="qm-tabs" className="tabs" role="tablist" aria-label="Quiz sections">
+              <button
+                id="tab-editor"
+                role="tab"
+                aria-selected={activeTab === 'quiz'}
+                aria-controls="panel-editor"
+                className={`tabs__btn ${activeTab === 'quiz' ? 'is-active' : ''}`}
+                onClick={() => setActiveTab('quiz')}
+              >
+                📝 Quiz Editor
+              </button>
+              <button
+                id="tab-results"
+                role="tab"
+                aria-selected={activeTab === 'results'}
+                aria-controls="panel-results"
+                className={`tabs__btn ${activeTab === 'results' ? 'is-active' : ''}`}
+                onClick={() => setActiveTab('results')}
+              >
+                📊 Quiz Results ({submissions.length})
+              </button>
+            </nav>
+    
+            {/* Alerts */}
+            {error && (
+              <div id="alert-error" className="alert alert--error" role="alert" aria-live="assertive">
+                {error}
+              </div>
+            )}
+            {successMessage && (
+              <div id="alert-success" className="alert alert--success" role="status" aria-live="polite">
+                {successMessage}
+              </div>
+            )}
+    
+            {/* Editor */}
+            <section
+              id="panel-editor"
+              className="qm__panel"
+              role="tabpanel"
+              aria-labelledby="tab-editor"
+              hidden={activeTab !== 'quiz'}
+            >
+              <div className="editor">
+                <div className="editor__top">
+                  <h2 className="editor__title">Quiz Settings</h2>
+                  <div className="editor__actions">
+                    
+                    {hasUnsavedChanges && <div className="editor__warning">⚠️ You have unsaved changes!</div>}
+    
+                    <button id="btn-save" className="btn btn--primary" onClick={handleSaveQuiz} disabled={saving}>
+                      {saving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save Quiz*' : '💾 Save Quiz'}
+                    </button>
                   </div>
                 </div>
-
-                {/* Questions Section */}
-                <div className="questions-section">
-                  <div className="questions-header">
-                    <h3>Questions</h3>
-                    <div className="questions-controls">
-                      <div className="question-count-control">
-                        <label>Number of Questions:</label>
+    
+                <form id="quiz-form" className="form" noValidate>
+                  {/* Basic */}
+                  <fieldset className="card" aria-labelledby="legend-basic">
+                    <legend id="legend-basic" className="card__legend">Basic Settings</legend>
+    
+                    <div className="grid">
+                      <div className="field">
+                        <label htmlFor="quiz-title">Quiz Title</label>
                         <input
+                          id="quiz-title"
+                          type="text"
+                          value={quizData.title}
+                          onChange={(e) => handleQuizDataChange('title', e.target.value)}
+                          placeholder="Enter quiz title..."
+                          className="input"
+                          required
+                        />
+                      </div>
+    
+                      <div className="field">
+                        <label htmlFor="quiz-desc">Description</label>
+                        <textarea
+                          id="quiz-desc"
+                          value={quizData.description}
+                          onChange={(e) => handleQuizDataChange('description', e.target.value)}
+                          placeholder="Enter quiz description..."
+                          rows={2}
+                          className="textarea"
+                        />
+                      </div>
+                    </div>
+    
+                    <div className="grid">
+                      <div className="field">
+                        <label htmlFor="quiz-instructions">Instructions</label>
+                        <textarea
+                          id="quiz-instructions"
+                          value={quizData.instructions}
+                          onChange={(e) => handleQuizDataChange('instructions', e.target.value)}
+                          placeholder="Enter instructions for students..."
+                          rows={2}
+                          className="textarea"
+                        />
+                      </div>
+                    </div>
+    
+                    <div className="grid">
+                      <div className="field">
+                        <label htmlFor="quiz-pass">Passing Score (%)</label>
+                        <input
+                          id="quiz-pass"
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={quizData.passingScore}
+                          onChange={(e) => handleQuizDataChange('passingScore', parseInt(e.target.value) || 70)}
+                          className="input input--sm"
+                        />
+                      </div>
+    
+                      <div className="field">
+                        <label htmlFor="quiz-time">Time Limit (minutes)</label>
+                        <input
+                          id="quiz-time"
+                          type="number"
+                          min="1"
+                          value={quizData.timeLimit || ''}
+                          onChange={(e) => handleQuizDataChange('timeLimit', e.target.value ? parseInt(e.target.value) : null)}
+                          placeholder="No limit"
+                          className="input input--sm"
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
+    
+                  {/* Questions */}
+                  <fieldset className="card" aria-labelledby="legend-questions">
+                    <legend id="legend-questions" className="card__legend">Questions</legend>
+    
+                    <div className="qs__header">
+                      <div className="qs__controls">
+                        <label htmlFor="qs-count">Number of Questions</label>
+                        <input
+                          id="qs-count"
                           type="number"
                           min="1"
                           max="20"
                           value={newQuestionCount}
                           onChange={(e) => handleQuestionCountChange(parseInt(e.target.value) || 5)}
-                          className="question-count-input"
+                          className="input input--xs"
                         />
+                        <button id="btn-generate" className="btn btn--accent" onClick={handleGenerateQuestions} type="button">
+                          🎲 Generate Questions
+                        </button>
                       </div>
-                      <button 
-                        className="generate-btn"
-                        onClick={handleGenerateQuestions}
-                      >
-                        Generate Questions
-                      </button>
+    
+                      {hasUnsavedChanges && (
+                        <p className="qs__notice">📝 Questions generated! Click “Save Quiz” to persist changes.</p>
+                      )}
                     </div>
-                    {hasUnsavedChanges && (
-                      <div className="generate-notice">
-                        Questions generated! Click "💾 Save Quiz" above to save your changes.
+    
+                    {quizData.questions.filter(q => q && q.question && q.question.trim()).length > 0 && (
+                      <div className="qs__list">
+                        <p className="qs__info">
+                          {quizData.questions.filter(q => q && q.question && q.question.trim()).length} questions in this quiz
+                          {hasUnsavedChanges && <span className="qs__unsaved"> ⚠️ Unsaved changes</span>}
+                        </p>
+    
+                        {quizData.questions
+                          .filter(q => q && q.question && q.question.trim())
+                          .map((question, questionIndex) => {
+                            const isExpanded = expandedQuestions.has(questionIndex);
+                            return (
+                              <section key={questionIndex} className="qItem" aria-label={`Question ${questionIndex + 1}`}>
+                                <header className="qItem__head">
+                                  <button
+                                    className="qItem__toggle"
+                                    aria-expanded={isExpanded}
+                                    aria-controls={`q-body-${questionIndex}`}
+                                    onClick={() => {
+                                      setExpandedQuestions(prev => {
+                                        const s = new Set(prev);
+                                        isExpanded ? s.delete(questionIndex) : s.add(questionIndex);
+                                        return s;
+                                      });
+                                    }}
+                                  >
+                                    {isExpanded ? '▼' : '▶'} Question {questionIndex + 1}
+                                  </button>
+                                </header>
+    
+                                {isExpanded && (
+                                  <div id={`q-body-${questionIndex}`} className="qItem__body">
+                                    <div className="field">
+                                      <label htmlFor={`q-text-${questionIndex}`}>Question Text</label>
+                                      <textarea
+                                        id={`q-text-${questionIndex}`}
+                                        value={question.question || ''}
+                                        onChange={(e) => handleQuestionChange(questionIndex, 'question', e.target.value)}
+                                        placeholder="Enter your question here..."
+                                        rows={3}
+                                        className="textarea"
+                                      />
+                                    </div>
+    
+                                    <div className="field">
+                                      <label>Options</label>
+                                      {question.options.filter(Boolean).map((option, optionIndex) => (
+                                        <div key={optionIndex} className="optionRow">
+                                          <input
+                                            type="text"
+                                            className="input"
+                                            value={option || ''}
+                                            onChange={(e) => handleOptionChange(questionIndex, optionIndex, e.target.value)}
+                                            placeholder={`Option ${optionIndex + 1}`}
+                                          />
+                                          <label className="optionRow__right">
+                                            <input
+                                              type="radio"
+                                              name={`correct-${questionIndex}`}
+                                              checked={question.correctIndex === optionIndex}
+                                              onChange={() => handleQuestionChange(questionIndex, 'correctIndex', optionIndex)}
+                                            />
+                                            <span>Correct</span>
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+    
+                                    <div className="grid">
+                                      <div className="field">
+                                        <label htmlFor={`q-exp-${questionIndex}`}>Explanation</label>
+                                        <textarea
+                                          id={`q-exp-${questionIndex}`}
+                                          value={question.explanation || ''}
+                                          onChange={(e) => handleQuestionChange(questionIndex, 'explanation', e.target.value)}
+                                          placeholder="Explain why this is the correct answer..."
+                                          rows={2}
+                                          className="textarea"
+                                        />
+                                      </div>
+    
+                                      <div className="field">
+                                        <label htmlFor={`q-pts-${questionIndex}`}>Points</label>
+                                        <input
+                                          id={`q-pts-${questionIndex}`}
+                                          type="number"
+                                          min="1"
+                                          max="10"
+                                          className="input input--xs"
+                                          value={question.points || 1}
+                                          onChange={(e) => handleQuestionChange(questionIndex, 'points', parseInt(e.target.value) || 1)}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </section>
+                            );
+                          })}
                       </div>
                     )}
+                  </fieldset>
+                </form>
+              </div>
+            </section>
+    
+            {/* Results */}
+            <section
+              id="panel-results"
+              className="qm__panel"
+              role="tabpanel"
+              aria-labelledby="tab-results"
+              hidden={activeTab !== 'results'}
+            >
+              <header className="results__header">
+                <h2>Student Quiz Results</h2>
+                {quizData.questions.filter(q => q && q.question && q.question.trim()).length > 0 && (
+                  <p>
+                    Total Questions: {quizData.questions.filter(q => q && q.question && q.question.trim()).length} | Passing Score: {quizData.passingScore}%
+                  </p>
+                )}
+              </header>
+    
+              <div className="stats">
+                <div className="stat"><div className="stat__icon">📊</div><div className="stat__content"><h3>{stats.totalSubmissions}</h3><p>Total Submissions</p></div></div>
+                <div className="stat"><div className="stat__icon">📈</div><div className="stat__content"><h3>{stats.averageScore}</h3><p>Average Score</p></div></div>
+                <div className="stat"><div className="stat__icon">🏆</div><div className="stat__content"><h3>{stats.highestScore}</h3><p>Highest Score</p></div></div>
+                <div className="stat"><div className="stat__icon">✅</div><div className="stat__content"><h3>{stats.passedCount}</h3><p>Students Passed</p></div></div>
+              </div>
+    
+              <div className="results card">
+                {submissions.length === 0 ? (
+                  <div className="results__empty">
+                    <div className="results__emptyIcon">📊</div>
+                    <h3>No quiz submissions yet</h3>
+                    <p>Students haven't taken the quiz yet.</p>
                   </div>
-
-                  {quizData.questions.filter(q => q && q.question && q.question.trim()).length > 0 && (
-                    <div className="questions-list">
-                      <p className="questions-info">
-                        {quizData.questions.filter(q => q && q.question && q.question.trim()).length} questions in this quiz
-                        {hasUnsavedChanges && (
-                          <span className="unsaved-notice"> ⚠️ Unsaved changes - Click "Save Quiz" to save!</span>
-                        )}
-                      </p>
-                      
-                      {quizData.questions.filter(q => q && q.question && q.question.trim()).map((question, questionIndex) => {
-                        const isExpanded = expandedQuestions.has(questionIndex);
-                        return (
-                          <div key={questionIndex} className="question-form">
-                           <div className="question-header">
-                             <button 
-                               className="expand-btn"
-                               onClick={() => {
-                                 setExpandedQuestions(prev => {
-                                   const newSet = new Set(prev);
-                                   if (isExpanded) {
-                                     newSet.delete(questionIndex);
-                                   } else {
-                                     newSet.add(questionIndex);
-                                   }
-                                   return newSet;
-                                 });
-                               }}
-                             >
-                               {isExpanded ? '▼' : '▶'} Question {questionIndex + 1}
-                             </button>
-                           </div>
-                           
-                           {isExpanded && (
-                             <div className="question-content">
-                               <div className="form-group">
-                                 <label>Question Text:</label>
-                                 <textarea
-                                   value={question.question || ''}
-                                   onChange={(e) => handleQuestionChange(questionIndex, 'question', e.target.value)}
-                                   placeholder="Enter your question here..."
-                                   rows={3}
-                                 />
-                               </div>
-                               
-                               <div className="form-group">
-                                 <label>Options:</label>
-                                 {question.options.filter(opt => opt).map((option, optionIndex) => (
-                                   <div key={optionIndex} className="option-input">
-                                     <input
-                                       type="text"
-                                       value={option || ''}
-                                       onChange={(e) => handleOptionChange(questionIndex, optionIndex, e.target.value)}
-                                       placeholder={`Option ${optionIndex + 1}`}
-                                     />
-                                     <input
-                                       type="radio"
-                                       name={`correct-${questionIndex}`}
-                                       checked={question.correctIndex === optionIndex}
-                                       onChange={() => handleQuestionChange(questionIndex, 'correctIndex', optionIndex)}
-                                     />
-                                     <label>Correct Answer</label>
-                                   </div>
-                                 ))}
-                               </div>
-
-                               <div className="form-row">
-                                 <div className="form-group">
-                                   <label>Explanation:</label>
-                                   <textarea
-                                     value={question.explanation || ''}
-                                     onChange={(e) => handleQuestionChange(questionIndex, 'explanation', e.target.value)}
-                                     placeholder="Explain why this is the correct answer..."
-                                     rows={2}
-                                   />
-                                 </div>
-                                 <div className="form-group">
-                                   <label>Points:</label>
-                                   <input
-                                     type="number"
-                                     value={question.points || 1}
-                                     onChange={(e) => handleQuestionChange(questionIndex, 'points', parseInt(e.target.value) || 1)}
-                                     min="1"
-                                     max="10"
-                                     className="points-input"
-                                   />
-                                 </div>
-                               </div>
-                             </div>
-                           )}
-                         </div>
-                       );
-                     })}
-                   </div>
-                 )}
-               </div>
-             </div>
-           </div>
-         )}
-
-         {/* Quiz Results Tab */}
-         {activeTab === 'results' && (
-           <div className="quiz-results">
-             <div className="results-header">
-               <h2>Student Quiz Results</h2>
-               {quizData.questions.filter(q => q && q.question && q.question.trim()).length > 0 && (
-                 <p>Total Questions: {quizData.questions.filter(q => q && q.question && q.question.trim()).length} | Passing Score: {quizData.passingScore}%</p>
-               )}
-             </div>
-
-             {/* Statistics Cards */}
-             <div className="stats-container">
-               <div className="stat-card">
-                 <div className="stat-icon">📊</div>
-                 <div className="stat-content">
-                   <h3>{stats.totalSubmissions}</h3>
-                   <p>Total Submissions</p>
-                 </div>
-               </div>
-               <div className="stat-card">
-                 <div className="stat-icon">📈</div>
-                 <div className="stat-content">
-                   <h3>{stats.averageScore}</h3>
-                   <p>Average Score</p>
-                 </div>
-               </div>
-               <div className="stat-card">
-                 <div className="stat-icon">🏆</div>
-                 <div className="stat-content">
-                   <h3>{stats.highestScore}</h3>
-                   <p>Highest Score</p>
-                 </div>
-               </div>
-               <div className="stat-card">
-                 <div className="stat-icon">✅</div>
-                 <div className="stat-content">
-                   <h3>{stats.passedCount}</h3>
-                   <p>Students Passed</p>
-                 </div>
-               </div>
-             </div>
-
-             {/* Results Table */}
-             <div className="results-section">
-               {submissions.length === 0 ? (
-                 <div className="no-results">
-                   <div className="no-results-icon">📊</div>
-                   <h3>No quiz submissions yet</h3>
-                   <p>Students haven't taken the quiz yet.</p>
-                 </div>
-               ) : (
-                 <div className="results-table-wrapper">
-                   <table className="results-table">
-                     <thead>
-                       <tr>
-                         <th>Student</th>
-                         <th>Email</th>
-                         <th>Score</th>
-                         <th>Percentage</th>
-                         <th>Status</th>
-                         <th>Submitted</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       {submissions.map((submission) => {
-                         const totalQuestions = quizData.questions.filter(q => q).length || 1;
-                         const score = submission.score || 0;
-                         const percentage = (score / totalQuestions) * 100;
-                         const passed = percentage >= quizData.passingScore;
-                        return (
-                          <tr key={submission._id || Math.random()}>
-                            <td>
-                              <div className="student-info">
-                                <div className="student-avatar">
-                                  {submission.studentId?.name?.charAt(0).toUpperCase() || 'S'}
+                ) : (
+                  <div className="tableWrap">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Student</th><th>Email</th><th>Score</th><th>Percentage</th><th>Status</th><th>Submitted</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {submissions.map((submission) => {
+                          const totalQuestions = quizData.questions.filter(q => q).length || 1;
+                          const score = submission.score || 0;
+                          const percentage = (score / totalQuestions) * 100;
+                          const passed = percentage >= quizData.passingScore;
+                          return (
+                            <tr key={submission._id || Math.random()}>
+                              <td>
+                                <div className="student">
+                                  <div className="student__avatar">
+                                    {submission.studentId?.name?.charAt(0).toUpperCase() || 'S'}
+                                  </div>
+                                  <span>{submission.studentId?.name || 'Unknown Student'}</span>
                                 </div>
-                                <span>{submission.studentId?.name || 'Unknown Student'}</span>
-                              </div>
-                            </td>
-                            <td>{submission.studentId?.email || 'No email'}</td>
-                            <td>
-                              <span className="score-display">
-                                {score}/{totalQuestions}
-                              </span>
-                            </td>
-                            <td>
-                              <div className="percentage-bar">
-                                <div 
-                                  className="percentage-fill"
-                                  style={{
-                                    width: `${percentage}%`,
-                                    backgroundColor: getScoreColor(score, totalQuestions)
-                                  }}
-                                ></div>
-                              </div>
-                              <span className="percentage-text">{percentage.toFixed(1)}%</span>
-                            </td>
-                            <td>
-                              <span className={`status-badge ${passed ? 'passed' : 'failed'}`}>
-                                {passed ? '✅ Passed' : '❌ Failed'}
-                              </span>
-                            </td>
-                            <td>{new Date(submission.createdAt || Date.now()).toLocaleDateString()}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                              </td>
+                              <td>{submission.studentId?.email || 'No email'}</td>
+                              <td><span className="score">{score}/{totalQuestions}</span></td>
+                              <td>
+                                <div className="pctBar"><div className="pctBar__fill" style={{ width: `${percentage}%`, backgroundColor: getScoreColor(score, totalQuestions) }} /></div>
+                                <span className="pctText">{percentage.toFixed(1)}%</span>
+                              </td>
+                              <td><span className={`badge ${passed ? 'badge--pass' : 'badge--fail'}`}>{passed ? '✅ Passed' : '❌ Failed'}</span></td>
+                              <td>{new Date(submission.createdAt || Date.now()).toLocaleDateString()}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </section>
+          </article>
+        </main>
+    
+        {/* Save Alert Modal */}
+        {showSaveAlert && (
+          <div id="save-alert" className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div className="modal__box">
+              <div className="modal__head">
+                <div className="modal__icon">💾</div>
+                <h3 id="modal-title">Unsaved Changes</h3>
+              </div>
+              <div className="modal__content">
+                <p>You have unsaved changes to your quiz. What would you like to do?</p>
+              </div>
+              <div className="modal__actions">
+                <button className="btn btn--primary" onClick={handleSaveAndContinue} disabled={saving}>
+                  {saving ? '💾 Saving...' : '💾 Save & Continue'}
+                </button>
+                <button className="btn btn--neutral" onClick={handleContinueWithoutSaving} disabled={saving}>
+                  ⚠️ Continue Without Saving
+                </button>
+                <button className="btn btn--ghost" onClick={handleCancelAction} disabled={saving}>
+                  ❌ Cancel
+                </button>
+              </div>
             </div>
           </div>
-         )}
-        </div>
-      </main>
-
-      {/* Custom Save Alert Modal */}
-      {showSaveAlert && (
-        <div className="save-alert-overlay">
-          <div className="save-alert-modal">
-            <div className="alert-header">
-              <div className="alert-icon">💾</div>
-              <h3>Unsaved Changes</h3>
-            </div>
-            <div className="alert-content">
-              <p>You have unsaved changes to your quiz. What would you like to do?</p>
-            </div>
-            <div className="alert-actions">
-              <button 
-                className="alert-btn primary"
-                onClick={handleSaveAndContinue}
-                disabled={saving}
-              >
-                {saving ? '💾 Saving...' : '💾 Save & Continue'}
-              </button>
-              <button 
-                className="alert-btn secondary"
-                onClick={handleContinueWithoutSaving}
-                disabled={saving}
-              >
-                ⚠️ Continue Without Saving
-              </button>
-              <button 
-                className="alert-btn cancel"
-                onClick={handleCancelAction}
-                disabled={saving}
-              >
-                ❌ Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
 }

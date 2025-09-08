@@ -47,6 +47,10 @@ export default function Navbar() {
               <span className="nav-icon">📚</span>
               Course Management
             </Link>
+            <Link to="/admin/workshops" className="nav-link">
+              <span className="nav-icon">🎯</span>
+              Workshop Management
+            </Link>
             <Link to="/admin/certificates" className="nav-link">
               <span className="nav-icon">🎓</span>
               Certificate Management
@@ -63,6 +67,10 @@ export default function Navbar() {
             <Link to="/instructor/courses" className="nav-link">
               <span className="nav-icon">📚</span>
               My Courses
+            </Link>
+            <Link to="/instructor/workshops" className="nav-link">
+              <span className="nav-icon">🎯</span>
+              Workshops
             </Link>
             <Link to="/instructor/students" className="nav-link">
               <span className="nav-icon">👥</span>
@@ -84,6 +92,10 @@ export default function Navbar() {
             <Link to="/student/my-courses" className="nav-link">
               <span className="nav-icon">🎓</span>
               My Courses
+            </Link>
+            <Link to="/student/workshops" className="nav-link">
+              <span className="nav-icon">🎯</span>
+              Workshops
             </Link>
             <Link to="/student/certificates" className="nav-link">
               <span className="nav-icon">📄</span>
@@ -108,7 +120,7 @@ export default function Navbar() {
         </div>
         <button onClick={handleLogout} className="logout-button">
           <span className="logout-icon">🚪</span>
-          Log Out
+          Logout
         </button>
       </div>
 

@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentModal from "./PaymentModal";
+import { getEnrollmentByCourseId } from "../api/enrollmentApi";
 import "./CourseCard.css";
 
 export default function CourseCard({
@@ -12,6 +13,8 @@ export default function CourseCard({
   const navigate = useNavigate();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollmentStatus, setEnrollmentStatus] = useState(null);
+  const [isLoadingEnrollment, setIsLoadingEnrollment] = useState(true);
 
   // ===== Derived data =====
   const imgSrc = useMemo(() => {
@@ -29,6 +32,35 @@ export default function CourseCard({
   const studentCount = course?.stats?.studentCount || course?.studentCount || 0;
   const totalLessons = course?.stats?.totalLessons || 0;
 
+  // ===== Effects =====
+  useEffect(() => {
+    const checkEnrollmentStatus = async () => {
+      if (!course?._id) return;
+      
+      try {
+        setIsLoadingEnrollment(true);
+        const token = localStorage.getItem('token');
+        const enrollment = await getEnrollmentByCourseId(token, course._id);
+        
+        if (enrollment) {
+          setEnrollmentStatus(enrollment.status);
+          setIsEnrolled(enrollment.status === 'approved');
+        } else {
+          setEnrollmentStatus(null);
+          setIsEnrolled(false);
+        }
+      } catch (error) {
+        console.error('Error checking enrollment status:', error);
+        setEnrollmentStatus(null);
+        setIsEnrolled(false);
+      } finally {
+        setIsLoadingEnrollment(false);
+      }
+    };
+
+    checkEnrollmentStatus();
+  }, [course?._id]);
+
   // ===== Handlers =====
   const handleView = () => {
     if (onClick) return onClick(course._id);
@@ -37,21 +69,39 @@ export default function CourseCard({
 
   const handleLearnNow = (e) => {
     e.stopPropagation();
+    
+    // Nếu đã được duyệt (approved), chuyển thẳng đến trang learning
+    if (enrollmentStatus === 'approved') {
+      navigate(`/student/courses/${course._id}/learn`);
+      return;
+    }
+    
+    // Nếu khóa học miễn phí, chuyển đến trang course detail
     if (isFree) {
       navigate(`/student/courses/${course._id}`);
     } else {
+      // Nếu khóa học trả phí, hiển thị modal payment
       setShowPaymentModal(true);
     }
   };
 
   const handlePaymentSuccess = (result) => {
     setIsEnrolled(true);
+    setEnrollmentStatus('approved');
     onEnrollmentSuccess?.(result);
-    navigate(`/student/courses/${course._id}`);
+    // Sau khi thanh toán thành công, chuyển thẳng đến trang learning
+    navigate(`/student/courses/${course._id}/learn`);
   };
 
   // ===== UI helpers =====
-  const buttonText = isEnrolled ? "Continue Learning" : "Start Learning";
+  const getButtonText = () => {
+    if (isLoadingEnrollment) return "Loading...";
+    if (enrollmentStatus === 'approved') return "Continue Learning";
+    if (enrollmentStatus === 'pending') return "Pending Approval";
+    return "Start Learning";
+  };
+
+  const buttonText = getButtonText();
 
   return (
     <>
@@ -113,9 +163,10 @@ export default function CourseCard({
         {/* ACTION BUTTON */}
         <div className="cc-action" onClick={(e) => e.stopPropagation()}>
           <button
-            className="cc-btn cc-btn--primary"
+            className={`cc-btn cc-btn--primary ${enrollmentStatus === 'pending' ? 'cc-btn--disabled' : ''}`}
             type="button"
             onClick={handleLearnNow}
+            disabled={enrollmentStatus === 'pending' || isLoadingEnrollment}
             aria-label={buttonText}
           >
             {buttonText}

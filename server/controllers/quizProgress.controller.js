@@ -363,26 +363,8 @@ const getQuizResults = asyncHandler(async (req, res) => {
 
 // Helper function to calculate course progress
 const calculateCourseProgress = async (courseId, studentId) => {
-  // Get lesson progress
-  const lessonProgress = await LessonProgress.find({ courseId, studentId });
-  const totalLessons = lessonProgress.length;
-  const completedLessons = lessonProgress.filter(lp => lp.completed).length;
-  const lessonProgressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 60 : 0; // 60% for lessons
-
-  // Get quiz progress
-  const quizProgress = await QuizProgress.findOne({ courseId, studentId });
-  const quizProgressPercentage = quizProgress && quizProgress.passed ? 40 : 0; // 40% for quiz
-
-  const totalProgress = Math.min(lessonProgressPercentage + quizProgressPercentage, 100);
-
-  return {
-    totalProgress: Math.round(totalProgress),
-    lessonProgress: Math.round(lessonProgressPercentage),
-    quizProgress: Math.round(quizProgressPercentage),
-    completedLessons,
-    totalLessons,
-    quizPassed: quizProgress ? quizProgress.passed : false
-  };
+  const CourseProgressService = require('../services/courseProgress.service');
+  return await CourseProgressService.calculateCourseProgress(courseId, studentId);
 };
 
 // Get course progress summary

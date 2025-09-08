@@ -499,119 +499,147 @@ export default function CourseManagement() {
 
         {/* Course Detail Modal */}
         {showCourseDetail && selectedCourse && (
-          <div className="modal-overlay">
+          <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="course-detail-title">
             <div className="modal large-modal">
-              <div className="modal-header">
-                <h3>Course Details: {selectedCourse.title}</h3>
-                <button onClick={() => {
-                  setShowCourseDetail(false);
-                  setSuccessMessage(''); // Clear success message when closing modal
-                  setError(''); // Clear any previous errors
-                }} className="close-btn">✕</button>
-              </div>
-              <div className="modal-body">
-                <div className="course-detail-view">
-                  <div className="course-header">
+              <header className="modal-header">
+                <h2 id="course-detail-title">Course Details: {selectedCourse.title}</h2>
+                <button 
+                  onClick={() => {
+                    setShowCourseDetail(false);
+                    setSuccessMessage(''); // Clear success message when closing modal
+                    setError(''); // Clear any previous errors
+                  }} 
+                  className="close-btn"
+                  aria-label="Close course details"
+                >
+                  ✕
+                </button>
+              </header>
+              <main className="modal-body">
+                <article className="course-detail-view">
+                  <header className="course-header">
                     {selectedCourse.thumbnailUrl && (
-                      <img src={selectedCourse.thumbnailUrl} alt={selectedCourse.title} className="course-thumbnail-large" />
+                      <img 
+                        src={selectedCourse.thumbnailUrl} 
+                        alt={`Course thumbnail for ${selectedCourse.title}`} 
+                        className="course-thumbnail-large"
+                        loading="lazy"
+                      />
                     )}
                     <div className="course-info">
-                      <h4>{selectedCourse.title}</h4>
+                      <h1>{selectedCourse.title}</h1>
                       {selectedCourse.subtitle && <p className="subtitle">{selectedCourse.subtitle}</p>}
                       <p className="description">{selectedCourse.description}</p>
                       
-                      <div className="course-meta">
-                        <span className="level-badge level-{selectedCourse.level}">{selectedCourse.level}</span>
-                        <span className="price-badge">
+                      <div className="course-meta" role="group" aria-label="Course metadata">
+                        <span className={`level-badge level-${selectedCourse.level}`} aria-label={`Course level: ${selectedCourse.level}`}>
+                          {selectedCourse.level}
+                        </span>
+                        <span className="price-badge" aria-label={`Course price: ${selectedCourse.priceType === 'free' ? 'Free' : `$${selectedCourse.price} AUD`}`}>
                           {selectedCourse.priceType === 'free' ? 'Free' : `$${selectedCourse.price} AUD`}
                         </span>
-                        <span className="status-badge {getStatusBadgeClass(selectedCourse.status)}">
+                        <span className={`status-badge ${getStatusBadgeClass(selectedCourse.status)}`} aria-label={`Course status: ${getStatusBadgeText(selectedCourse.status)}`}>
                           {getStatusBadgeText(selectedCourse.status)}
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </header>
 
-                  <div className="course-stats">
-                    <h5>Course Statistics</h5>
-                    <div className="stats-grid">
-                      <div className="stat-item">
-                        <span className="stat-number">{selectedCourse.stats?.totalLessons || 0}</span>
+                  <section className="course-stats" aria-labelledby="course-stats-title">
+                    <h3 id="course-stats-title">Course Statistics</h3>
+                    <div className="stats-grid" role="group" aria-label="Course statistics">
+                      <div className="stat-item" role="article" aria-label="Total lessons">
+                        <span className="stat-number" aria-label={`${selectedCourse.stats?.totalLessons || 0} total lessons`}>
+                          {selectedCourse.stats?.totalLessons || 0}
+                        </span>
                         <span className="stat-label">Total Lessons</span>
                       </div>
-                      <div className="stat-item">
-                        <span className="stat-number">{Math.floor((selectedCourse.stats?.totalDurationSec || 0) / 60)}</span>
+                      <div className="stat-item" role="article" aria-label="Total duration">
+                        <span className="stat-number" aria-label={`${Math.floor((selectedCourse.stats?.totalDurationSec || 0) / 60)} total minutes`}>
+                          {Math.floor((selectedCourse.stats?.totalDurationSec || 0) / 60)}
+                        </span>
                         <span className="stat-label">Total Minutes</span>
                       </div>
-                      <div className="stat-item">
-                        <span className="stat-number">{selectedCourse.stats?.studentCount || 0}</span>
+                      <div className="stat-item" role="article" aria-label="Student enrollment">
+                        <span className="stat-number" aria-label={`${selectedCourse.stats?.studentCount || 0} students enrolled`}>
+                          {selectedCourse.stats?.studentCount || 0}
+                        </span>
                         <span className="stat-label">Students Enrolled</span>
                       </div>
                       {selectedCourse.stats?.ratingCount > 0 && (
-                        <div className="stat-item">
-                          <span className="stat-number">{selectedCourse.stats.ratingAvg?.toFixed(1) || 0}</span>
+                        <div className="stat-item" role="article" aria-label="Average rating">
+                          <span className="stat-number" aria-label={`${selectedCourse.stats.ratingAvg?.toFixed(1) || 0} average rating`}>
+                            {selectedCourse.stats.ratingAvg?.toFixed(1) || 0}
+                          </span>
                           <span className="stat-label">Average Rating</span>
                         </div>
                       )}
                     </div>
-                  </div>
+                  </section>
 
                   {selectedCourse.introductionAssets && selectedCourse.introductionAssets.length > 0 && (
-                    <div className="course-introduction">
-                      <h5>Introduction Content</h5>
-                      <div className="introduction-list">
+                    <section className="course-introduction" aria-labelledby="course-introduction-title">
+                      <h3 id="course-introduction-title">Introduction Content</h3>
+                      <div className="introduction-list" role="list" aria-label="Introduction content items">
                         {selectedCourse.introductionAssets.map((content, index) => (
-                          <div key={index} className="intro-item">
-                            <span className="content-type">{content.kind}</span>
-                            <h6>{content.title || `Content ${index + 1}`}</h6>
+                          <article key={index} className="intro-item" role="listitem">
+                            <span className="content-type" aria-label={`Content type: ${content.kind}`}>
+                              {content.kind}
+                            </span>
+                            <h4>{content.title || `Content ${index + 1}`}</h4>
                             {content.description && <p>{content.description}</p>}
-                          </div>
+                          </article>
                         ))}
                       </div>
-                    </div>
+                    </section>
                   )}
 
                   {selectedCourse.sections && selectedCourse.sections.length > 0 && (
-                    <div className="course-sections">
-                      <h5>Course Sections ({selectedCourse.sections.length})</h5>
-                      <div className="sections-list">
+                    <section className="course-sections" aria-labelledby="course-sections-title">
+                      <h3 id="course-sections-title">Course Sections ({selectedCourse.sections.length})</h3>
+                      <div className="sections-list" role="list" aria-label="Course sections">
                         {selectedCourse.sections.map((section, sectionIndex) => (
-                          <div key={sectionIndex} className="section-item">
-                            <h6>Section {section.order}: {section.title}</h6>
+                          <article key={sectionIndex} className="section-item" role="listitem">
+                            <h4>Section {section.order}: {section.title}</h4>
                             {section.description && <p>{section.description}</p>}
                             
                             {section.lessons && section.lessons.length > 0 && (
                               <div className="lessons-list">
-                                {section.lessons.map((lesson, lessonIndex) => (
-                                  <div key={lessonIndex} className="lesson-item">
-                                    <span className="lesson-title">Lesson {lesson.order}: {lesson.title}</span>
-                                    <span className="lesson-type">{lesson.contentType}</span>
-                                    {lesson.durationSec > 0 && (
-                                      <span className="lesson-duration">
-                                        {Math.floor(lesson.durationSec / 60)}m {lesson.durationSec % 60}s
+                                <h5>Lessons in this section</h5>
+                                <div role="list" aria-label={`Lessons in section ${section.order}`}>
+                                  {section.lessons.map((lesson, lessonIndex) => (
+                                    <div key={lessonIndex} className="lesson-item" role="listitem">
+                                      <span className="lesson-title">Lesson {lesson.order}: {lesson.title}</span>
+                                      <span className="lesson-type" aria-label={`Lesson type: ${lesson.contentType}`}>
+                                        {lesson.contentType}
                                       </span>
-                                    )}
-                                  </div>
-                                ))}
+                                      {lesson.durationSec > 0 && (
+                                        <span className="lesson-duration" aria-label={`Duration: ${Math.floor(lesson.durationSec / 60)} minutes ${lesson.durationSec % 60} seconds`}>
+                                          {Math.floor(lesson.durationSec / 60)}m {lesson.durationSec % 60}s
+                                        </span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             )}
-                          </div>
+                          </article>
                         ))}
                       </div>
-                    </div>
+                    </section>
                   )}
 
                   {selectedCourse.adminNote && (
-                    <div className="admin-notes-display">
-                      <h5>Admin Notes</h5>
+                    <section className="admin-notes-display" aria-labelledby="admin-notes-title">
+                      <h3 id="admin-notes-title">Admin Notes</h3>
                       <p>{selectedCourse.adminNote}</p>
                       {selectedCourse.reviewedAt && (
                         <small>Reviewed on: {new Date(selectedCourse.reviewedAt).toLocaleDateString()}</small>
                       )}
-                    </div>
+                    </section>
                   )}
-                </div>
-              </div>
+                </article>
+              </main>
             </div>
           </div>
         )}

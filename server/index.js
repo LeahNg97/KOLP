@@ -15,6 +15,9 @@ const moduleRoutes = require('./routes/module.routes');
 const lessonRoutes = require('./routes/lesson.routes');
 const lessonProgressRoutes = require('./routes/lessonProgress.routes');
 const quizProgressRoutes = require('./routes/quizProgress.routes');
+const shortQuestionRoutes = require('./routes/shortQuestion.routes');
+const courseProgressRoutes = require('./routes/courseProgress.routes');
+const workshopRoutes = require('./routes/workshop.routes');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -24,6 +27,15 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => res.send('KOLP Backend is running'));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.use('/api/user', userRoutes);
 
@@ -47,6 +59,12 @@ app.use('/api/lessons', lessonRoutes);
 
 app.use('/api/lesson-progress', lessonProgressRoutes);
 app.use('/api/quiz-progress', quizProgressRoutes);
+
+app.use('/api/short-questions', shortQuestionRoutes);
+
+app.use('/api/course-progress', courseProgressRoutes);
+
+app.use('/api/workshops', workshopRoutes);
 
 app.use('/api/users', userRoutes);
 
