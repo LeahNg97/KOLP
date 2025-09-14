@@ -601,6 +601,29 @@
   .action-btn {
     flex: none;
   }
+  
+  .progress-modal {
+    max-width: 95%;
+    max-height: 90vh;
+  }
+  
+  .modal-content {
+    padding: 15px;
+    font-size: 0.85rem;
+  }
+  
+  .progress-section {
+    margin: 10px 0;
+    padding: 10px;
+  }
+  
+  .progress-section h4 {
+    font-size: 0.9rem;
+  }
+  
+  .progress-section > div {
+    font-size: 0.8rem;
+  }
 } 
 
 .progress-modal-overlay {
@@ -619,11 +642,14 @@
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  max-width: 420px;
-  width: 95%;
+  max-width: 500px;
+  max-height: 80vh;
+  width: 90%;
   padding: 0;
   overflow: hidden;
   animation: fadeIn 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 .modal-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -635,7 +661,7 @@
 }
 .modal-header h2 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 .modal-close-btn {
@@ -647,9 +673,32 @@
   padding: 0 0 0 12px;
 }
 .modal-content {
-  padding: 24px;
+  padding: 20px;
   color: #333;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(80vh - 80px);
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f1f1f1;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #5a67d8;
 }
 .modal-content ul {
   margin: 12px 0 0 0;
@@ -662,39 +711,63 @@
 
 /* Progress Sections */
 .progress-section {
-  margin: 20px 0;
-  padding: 16px;
+  margin: 15px 0;
+  padding: 12px;
   background: #f8f9fc;
   border-radius: 8px;
   border-left: 4px solid #667eea;
 }
 
 .progress-section h4 {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: #333;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .progress-section > div {
-  margin-bottom: 8px;
-  font-size: 0.95rem;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 /* Lesson Progress List */
 .lesson-progress-list {
-  margin-top: 12px;
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f1f1f1;
+}
+
+.lesson-progress-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.lesson-progress-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.lesson-progress-list::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 2px;
+}
+
+.lesson-progress-list::-webkit-scrollbar-thumb:hover {
+  background: #5a67d8;
 }
 
 .lesson-progress-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 6px 10px;
   background: white;
   border-radius: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   border: 1px solid #e2e8f0;
+  font-size: 0.8rem;
 }
 
 .lesson-progress-item.completed {
@@ -708,20 +781,139 @@
 }
 
 .lesson-status {
-  font-size: 1.2rem;
-  min-width: 20px;
+  font-size: 1rem;
+  min-width: 16px;
 }
 
 .lesson-title {
   flex: 1;
   font-weight: 500;
   color: #333;
+  font-size: 0.8rem;
 }
 
 .lesson-completion-date {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #666;
   font-style: italic;
+}
+
+/* Short Question Progress */
+.short-question-list {
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f1f1f1;
+}
+
+.short-question-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.short-question-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.short-question-list::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 2px;
+}
+
+.short-question-list::-webkit-scrollbar-thumb:hover {
+  background: #5a67d8;
+}
+
+.short-question-item {
+  background: white;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  font-size: 0.8rem;
+}
+
+.short-question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.short-question-header strong {
+  color: #333;
+  font-size: 0.85rem;
+}
+
+.short-question-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.short-question-details > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.status-badge.passed {
+  background: #d4edda;
+  color: #155724;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.status-badge.failed {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.status-badge.not-attempted {
+  background: #fff3cd;
+  color: #856404;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.status-badge.submitted {
+  background: #d1ecf1;
+  color: #0c5460;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.status-badge.graded {
+  background: #cce5ff;
+  color: #004085;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.grading-note {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  color: #856404;
+  font-size: 0.85rem;
 }
 
 @keyframes fadeIn {

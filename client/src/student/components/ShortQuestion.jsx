@@ -189,7 +189,7 @@ export default function ShortQuestion() {
           <div className="completed-actions">
             <button 
               className="course-btn"
-              onClick={() => navigate(`/student/courses/${courseId}/learning`)}
+              onClick={() => navigate(`/student/courses/${courseId}/learn`)}
             >
               🏠 Back to Course
             </button>
@@ -214,7 +214,7 @@ export default function ShortQuestion() {
           </button>
           <button 
             className="back-btn"
-            onClick={() => navigate(`/student/courses/${courseId}/learning`)}
+            onClick={() => navigate(`/student/courses/${courseId}/learn`)}
           >
             ← Back to Course
           </button>
@@ -228,17 +228,25 @@ export default function ShortQuestion() {
       <div className="short-question-container">
         <div className="short-question-results">
           <div className="results-header">
-            <h2>📝 Short Question Results</h2>
-            <div className="score-display">
-              <span className="score">{results.score}</span>
-              <span className="separator">/</span>
-              <span className="total">{results.totalQuestions}</span>
+            <h2>📝 Short Question Submitted</h2>
+            <div className="submission-status">
+              <div className="status-icon">⏳</div>
+              <h3>Waiting for Instructor Review</h3>
+              <p>Your short question has been submitted and is waiting for instructor grading.</p>
             </div>
-            <div className={`result-status ${results.passed ? 'passed' : 'failed'}`}>
-              {results.passed ? '✅ Passed!' : '❌ Failed'}
-            </div>
-            <div className="percentage">
-              {results.percentage.toFixed(1)}%
+            <div className="submission-details">
+              <div className="detail-item">
+                <span className="detail-label">Submitted:</span>
+                <span className="detail-value">{new Date(results.submittedAt).toLocaleString()}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Questions:</span>
+                <span className="detail-value">{results.totalQuestions}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Status:</span>
+                <span className="detail-value">{results.status}</span>
+              </div>
             </div>
           </div>
 
@@ -277,14 +285,8 @@ export default function ShortQuestion() {
 
           <div className="results-actions">
             <button 
-              className="review-btn"
-              onClick={() => navigate(`/student/courses/${courseId}/short-question/results`)}
-            >
-              📊 Review Answers
-            </button>
-            <button 
               className="course-btn"
-              onClick={() => navigate(`/student/courses/${courseId}/learning`)}
+              onClick={() => navigate(`/student/courses/${courseId}/learn`)}
             >
               🏠 Back to Course
             </button>

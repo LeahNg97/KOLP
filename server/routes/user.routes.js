@@ -28,7 +28,7 @@ const { getAllUsers, updateUserRole, deleteUser } = require('../controllers/user
  */
 router.get('/me', verifyToken, (req, res) => {
   res.json({
-    message: 'Bạn đã đăng nhập',
+    message: 'You have logged in',
     user: req.user
   });
 });
@@ -57,7 +57,7 @@ router.get('/me', verifyToken, (req, res) => {
  *         description: Forbidden - Admin access required
  */
 router.get('/admin-only', verifyToken, authorizeRole('admin'), (req, res) => {
-  res.json({ message: 'Bạn là admin!' });
+  res.json({ message: 'You are admin!' });
 });
 
 /**

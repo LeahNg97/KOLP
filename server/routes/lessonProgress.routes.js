@@ -21,4 +21,8 @@ router.get('/course/:courseId/progress', lessonProgressController.getCourseProgr
 // Update lesson access time
 router.post('/access', lessonProgressController.updateLessonAccess);
 
+// Instructor routes to view student progress
+router.get('/course/:courseId/student/:studentId', lessonProgressController.getStudentLessonProgress);
+router.get('/course/:courseId/student/:studentId/progress', lessonProgressController.getStudentCourseProgress);
+
 module.exports = router;

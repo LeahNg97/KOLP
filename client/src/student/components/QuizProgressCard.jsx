@@ -43,7 +43,7 @@ export default function QuizProgressCard({ courseId, courseTitle }) {
   };
 
   const handleViewResults = () => {
-    navigate(`/student/courses/${courseId}/quiz/results`);
+    navigate(`/student/courses/${courseId}/quiz`);
   };
 
   if (loading) {

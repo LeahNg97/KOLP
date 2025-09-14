@@ -410,6 +410,58 @@
   margin-bottom: 30px;
 }
 
+/* Submission Status */
+.submission-status {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.status-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.submission-status h3 {
+  color: #495057;
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.submission-status p {
+  color: #6c757d;
+  margin: 0 0 20px 0;
+  font-size: 16px;
+}
+
+.submission-details {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.detail-value {
+  color: #6c757d;
+  font-weight: 500;
+}
+
 /* Progress Summary */
 .progress-summary {
   background: #f8f9fa;

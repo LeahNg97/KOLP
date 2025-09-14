@@ -7,6 +7,14 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [updateForm, setUpdateForm] = useState({
+    name: '',
+    email: '',
+    role: 'student'
+  });
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -38,9 +46,56 @@ export default function UserManagement() {
     }
   };
 
-  const handleUpdate = (id) => {
-    // You can implement a modal or redirect to an edit page
-    alert('Update user feature coming soon!');
+  const handleUpdate = (user) => {
+    setSelectedUser(user);
+    setUpdateForm({
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
+    setShowUpdateModal(true);
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    setUpdateLoading(true);
+    try {
+      // Chỉ gửi tên để cập nhật
+      await axios.put(`http://localhost:8080/api/users/${selectedUser._id}`, {
+        name: updateForm.name
+      });
+      // Cập nhật danh sách users
+      setUsers(users.map(user => 
+        user._id === selectedUser._id 
+          ? { ...user, name: updateForm.name }
+          : user
+      ));
+      setShowUpdateModal(false);
+      setSelectedUser(null);
+      alert('User updated successfully!');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update user.');
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
+  const handleUpdateCancel = () => {
+    setShowUpdateModal(false);
+    setSelectedUser(null);
+    setUpdateForm({
+      name: '',
+      email: '',
+      role: 'student'
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -71,7 +126,7 @@ export default function UserManagement() {
                     <td>{user.role}</td>
                     <td>{new Date(user.createdAt).toLocaleString()}</td>
                     <td>
-                      <button className="user-btn user-update" onClick={() => handleUpdate(user._id)}>
+                      <button className="user-btn user-update" onClick={() => handleUpdate(user)}>
                         Update
                       </button>
                       <button
@@ -89,6 +144,62 @@ export default function UserManagement() {
           </div>
         )}
       </main>
+
+      {/* Update User Modal */}
+      {showUpdateModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Update User</h2>
+              <button className="modal-close" onClick={handleUpdateCancel}>
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleUpdateSubmit} className="update-form">
+              <div className="form-group">
+                <label htmlFor="name">Name:</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={updateForm.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email:</label>
+                <div className="readonly-field">
+                  {updateForm.email}
+                </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="role">Role:</label>
+                <div className="readonly-field">
+                  {updateForm.role.charAt(0).toUpperCase() + updateForm.role.slice(1)}
+                </div>
+              </div>
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={handleUpdateCancel}
+                  disabled={updateLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-update"
+                  disabled={updateLoading}
+                >
+                  {updateLoading ? 'Updating...' : 'Update User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

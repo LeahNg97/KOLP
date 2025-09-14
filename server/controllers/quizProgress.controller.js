@@ -380,10 +380,144 @@ const getCourseProgress = asyncHandler(async (req, res) => {
   });
 });
 
+// Get student quiz progress for instructor
+const getStudentQuizProgress = asyncHandler(async (req, res) => {
+  const { courseId, studentId } = req.params;
+  const instructorId = req.user.id;
+
+  // Check if instructor owns the course
+  const course = await Course.findOne({
+    _id: courseId,
+    instructorId: instructorId
+  });
+
+  if (!course) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to view this student\'s progress'
+    });
+  }
+
+  // Check if student is enrolled in the course
+  const enrollment = await Enrollment.findOne({
+    studentId,
+    courseId,
+    status: 'approved'
+  });
+
+  if (!enrollment) {
+    return res.status(404).json({
+      success: false,
+      message: 'Student is not enrolled in this course or enrollment is not approved'
+    });
+  }
+
+  // Check if course has quiz
+  if (!course.flags.hasQuiz) {
+    return res.json({
+      success: true,
+      data: {
+        hasQuiz: false,
+        quizProgress: null,
+        canTakeQuiz: false,
+        reason: 'Course does not have a quiz'
+      }
+    });
+  }
+
+  // Get quiz for the course
+  const quiz = await Quiz.findOne({ courseId, isPublished: true });
+  if (!quiz) {
+    return res.json({
+      success: true,
+      data: {
+        hasQuiz: false,
+        quizProgress: null,
+        canTakeQuiz: false,
+        reason: 'Quiz not published'
+      }
+    });
+  }
+
+  // Get lesson progress to check if student can take quiz
+  const lessonProgress = await LessonProgress.find({ 
+    courseId, 
+    studentId: studentId 
+  });
+
+  const totalLessons = course.stats.totalLessons || 0;
+  const completedLessons = lessonProgress.filter(lp => lp.completed).length;
+  const canTakeQuiz = completedLessons >= totalLessons;
+
+  // Get quiz progress
+  const quizProgress = await QuizProgress.findOne({
+    courseId,
+    quizId: quiz._id,
+    studentId: studentId
+  });
+
+  if (!quizProgress) {
+    return res.json({
+      success: true,
+      data: {
+        hasQuiz: true,
+        quiz: {
+          _id: quiz._id,
+          title: quiz.title,
+          description: quiz.description,
+          instructions: quiz.instructions,
+          passingScore: quiz.passingScore,
+          timeLimit: quiz.timeLimit,
+          totalQuestions: quiz.questions.length
+        },
+        quizProgress: null,
+        canTakeQuiz,
+        completedLessons,
+        totalLessons,
+        reason: canTakeQuiz ? 'Student has not attempted the quiz yet' : `Must complete all ${totalLessons} lessons first`
+      }
+    });
+  }
+
+  res.json({
+    success: true,
+    data: {
+      hasQuiz: true,
+      quiz: {
+        _id: quiz._id,
+        title: quiz.title,
+        description: quiz.description,
+        instructions: quiz.instructions,
+        passingScore: quiz.passingScore,
+        timeLimit: quiz.timeLimit,
+        totalQuestions: quiz.questions.length
+      },
+      quizProgress: {
+        _id: quizProgress._id,
+        score: quizProgress.score,
+        totalQuestions: quizProgress.totalQuestions,
+        percentage: quizProgress.percentage,
+        passed: quizProgress.passed,
+        status: quizProgress.status,
+        attemptCount: quizProgress.attemptCount,
+        maxAttempts: quizProgress.maxAttempts,
+        startedAt: quizProgress.startedAt,
+        completedAt: quizProgress.completedAt,
+        timeSpent: quizProgress.timeSpent
+      },
+      canTakeQuiz,
+      completedLessons,
+      totalLessons,
+      reason: canTakeQuiz ? null : `Must complete all ${totalLessons} lessons first`
+    }
+  });
+});
+
 module.exports = {
   getQuizProgress,
   startQuiz,
   submitQuiz,
   getQuizResults,
-  getCourseProgress
+  getCourseProgress,
+  getStudentQuizProgress
 };

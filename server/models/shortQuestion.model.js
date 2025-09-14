@@ -21,12 +21,8 @@ const ShortQuestionSchema = new Schema({
     correctAnswer: { type: String, required: true }, // đáp án đúng
     explanation: { type: String }, // giải thích đáp án
     points: { type: Number, default: 1 }, // điểm cho câu hỏi
-    keywords: [{ type: String }], // từ khóa chính để chấm điểm (optional)
     maxLength: { type: Number, default: 500 }, // độ dài tối đa của câu trả lời
     minLength: { type: Number, default: 10 }, // độ dài tối thiểu của câu trả lời
-    caseSensitive: { type: Boolean, default: false }, // có phân biệt hoa thường không
-    exactMatch: { type: Boolean, default: false }, // có yêu cầu khớp chính xác không
-    partialCredit: { type: Boolean, default: true }, // có cho điểm phần trăm không
   }],
   
   // Quiz settings

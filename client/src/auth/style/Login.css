@@ -82,12 +82,12 @@
 }
 
 
-.form-group {
+.login-form-group {
   position: relative;
 }
 
 
-.form-label-login {
+.login-form-label {
   display: block;
   margin-bottom: 8px;
   color: #ffffff !important;
@@ -97,7 +97,7 @@
 }
 
 
-.form-input {
+.login-form-input {
   width: 100%;
   padding: 15px 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -112,7 +112,7 @@
 }
 
 
-.form-input:focus {
+.login-form-input:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.15) !important;
@@ -121,14 +121,14 @@
 }
 
 
-.form-input.error {
+.login-form-input.login-error {
   border-color: #ff6b6b;
   background: rgba(255, 107, 107, 0.15);
   color: #ffffff;
 }
 
 
-.form-input.error:focus {
+.login-form-input.login-error:focus {
   border-color: #ff6b6b;
   box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
   background: rgba(255, 107, 107, 0.2);
@@ -136,70 +136,24 @@
 }
 
 
-.form-input::placeholder {
+.login-form-input::placeholder {
   color: rgba(255, 255, 255, 0.7);
 }
 
-
-/* Override browser autofill styles */
-.form-input:-webkit-autofill,
-.form-input:-webkit-autofill:hover,
-.form-input:-webkit-autofill:focus,
-.form-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+/* Disable autofill styling completely */
+.login-form-input:-webkit-autofill,
+.login-form-input:-webkit-autofill:hover,
+.login-form-input:-webkit-autofill:focus,
+.login-form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: inherit !important;
+  background: transparent !important;
+  transition: background-color 5000s ease-in-out 0s !important;
 }
 
 
-.form-input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.15) inset !important;
-  border-color: rgba(255, 255, 255, 0.8) !important;
-  background: rgba(255, 255, 255, 0.15) !important;
-}
 
 
-.form-input.error:-webkit-autofill,
-.form-input.error:-webkit-autofill:hover,
-.form-input.error:-webkit-autofill:focus,
-.form-input.error:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px rgba(255, 107, 107, 0.15) inset !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background: rgba(255, 107, 107, 0.15) !important;
-  border-color: #ff6b6b !important;
-}
-
-
-/* Ensure text color is always visible */
-.form-input,
-.form-input:focus,
-.form-input:active,
-.form-input:hover {
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-
-/* Additional overrides for all possible states */
-.form-input[type="email"],
-.form-input[type="password"],
-.form-input[type="text"] {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: black !important;
-  -webkit-text-fill-color: black !important;
-}
-
-
-.form-input[type="email"]:focus,
-.form-input[type="password"]:focus,
-.form-input[type="text"]:focus {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: white !important;
-  -webkit-text-fill-color: black !important;
-}
 
 
 .login-button {
@@ -241,9 +195,14 @@
   transform: none;
 }
 
+.login-button.login-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
 
-/* .loading-spinner {
+
+/* .login-loading-spinner {
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -268,13 +227,13 @@
 }
 
 
-.register-link {
+.login-register-link {
   text-align: center;
   margin-bottom: 20px;
 }
 
 
-.register-link p {
+.login-register-link p {
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   margin-bottom: 15px;
@@ -282,7 +241,7 @@
 }
 
 
-.register-button-link {
+.login-register-button-link {
   display: inline-block;
   background: transparent;
   color: #ffffff;
@@ -299,7 +258,7 @@
 }
 
 
-.register-button-link:hover {
+.login-register-button-link:hover {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   transform: translateY(-2px);
@@ -307,7 +266,7 @@
 }
 
 
-.error-message {
+.login-error-message {
   background: rgba(255, 107, 107, 0.2);
   color: #ffffff;
   padding: 12px 16px;
@@ -328,7 +287,7 @@
 }
 
 
-.success-message {
+.login-success-message {
   background: rgba(76, 175, 80, 0.2);
   color: #ffffff;
   padding: 12px 16px;
@@ -354,13 +313,13 @@
 }
 
 
-.test-accounts {
+.login-test-accounts {
   margin-top: 20px;
   text-align: center;
 }
 
 
-.test-accounts details {
+.login-test-accounts details {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 10px;
@@ -370,7 +329,7 @@
 }
 
 
-.test-accounts summary {
+.login-test-accounts summary {
   color: #ffffff;
   font-weight: 600;
   font-size: 14px;
@@ -380,12 +339,12 @@
 }
 
 
-.test-accounts summary:hover {
+.login-test-accounts summary:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
 
-.test-accounts-list {
+.login-test-accounts-list {
   margin-top: 10px;
   text-align: left;
   font-size: 12px;
@@ -395,13 +354,13 @@
 }
 
 
-.test-accounts-list div {
+.login-test-accounts-list div {
   padding: 4px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 
-.test-accounts-list div:last-child {
+.login-test-accounts-list div:last-child {
   border-bottom: none;
 }
 
@@ -417,7 +376,7 @@
     font-size: 24px;
   }
  
-  .form-input {
+  .login-form-input {
     padding: 12px 16px;
     font-size: 14px;
   }
@@ -427,7 +386,7 @@
     font-size: 14px;
   }
  
-  .test-accounts-list {
+  .login-test-accounts-list {
     font-size: 11px;
   }
 }
@@ -448,26 +407,26 @@
     color: rgba(255, 255, 255, 0.9);
   }
  
-  .form-input {
+  .login-form-input {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
     color: #fff;
   }
  
-  .form-input:focus {
+  .login-form-input:focus {
     background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
   }
  
-  .form-input::placeholder {
+  .login-form-input::placeholder {
     color: rgba(255, 255, 255, 0.7);
   }
  
-  .test-accounts details {
+  .login-test-accounts details {
     background: rgba(255, 255, 255, 0.1);
   }
  
-  .test-accounts-list {
+  .login-test-accounts-list {
     color: rgba(255, 255, 255, 0.9);
   }
 }

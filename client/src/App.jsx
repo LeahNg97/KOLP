@@ -19,6 +19,8 @@ import CourseContentManagement from './instructor/pages/CourseContentManagement'
 import CreateCourse from './instructor/pages/CreateCourse';
 import QuizManagement from './instructor/pages/QuizManagement';
 import ShortQuestionManagement from './instructor/pages/ShortQuestionManagement';
+import ShortQuestionGrading from './instructor/components/ShortQuestionGrading';
+import ShortQuestionGradeForm from './instructor/components/ShortQuestionGradeForm';
 import StudentManagement from './instructor/pages/StudentManagement';
 import InstructorAnalytics from './instructor/pages/Analytics';
 import WorkshopManagement from './instructor/pages/WorkshopManagement';
@@ -62,6 +64,8 @@ function AppContent() {
         <Route path="/instructor/courses/:courseId/content" element={<CourseContentManagement />} />
         <Route path="/instructor/courses/:courseId/quiz" element={<QuizManagement />} />
         <Route path="/instructor/courses/:courseId/short-questions" element={<ShortQuestionManagement />} />
+        <Route path="/instructor/courses/:courseId/short-question/grading" element={<ShortQuestionGrading />} />
+        <Route path="/instructor/courses/:courseId/short-question/grade/:progressId" element={<ShortQuestionGradeForm />} />
         <Route path="/instructor/students" element={<StudentManagement />} />
         <Route path="/instructor/analytics" element={<InstructorAnalytics />} />
         {/* Student routes */}

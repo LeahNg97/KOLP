@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { getStudentsByCourse, approveEnrollment, rejectEnrollment } from '../api/enrollmentApi';
+import { getStudentsByCourse, approveEnrollment, rejectEnrollment, getStudentLessonProgress, getStudentCourseProgress, getStudentQuizProgress, getStudentShortQuestionProgress } from '../api/enrollmentApi';
 import { getCourseById } from '../api/courseApi';
 import './CourseStudents.css';
 
@@ -140,35 +140,46 @@ export default function CourseStudents() {
     setProgressDetails(null);
     setProgressLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const studentId = student.studentId._id;
       
-      // Get lesson progress
-      const lessonProgressRes = await axios.get(`http://localhost:8080/api/lesson-progress/course/${courseId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Get lesson progress for the specific student
+      const lessonProgress = await getStudentLessonProgress(courseId, studentId);
       
-      // Get quiz progress (if available)
+      // Get course progress for the specific student
+      const courseProgress = await getStudentCourseProgress(courseId, studentId);
+      
+      // Get quiz progress for the specific student
       let quizProgress = null;
       try {
-        const quizRes = await axios.get(`http://localhost:8080/api/quizzes/course/${courseId}/student/${student.studentId._id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const quizRes = await getStudentQuizProgress(courseId, studentId);
         quizProgress = quizRes.data;
       } catch (quizErr) {
-        console.log('No quiz progress available');
+        console.log('No quiz progress available:', quizErr.message);
       }
       
-      // Combine lesson and quiz progress
+      // Get short question progress for the specific student
+      let shortQuestionProgress = null;
+      try {
+        const shortQuestionRes = await getStudentShortQuestionProgress(courseId, studentId);
+        shortQuestionProgress = shortQuestionRes.data;
+      } catch (shortQuestionErr) {
+        console.log('No short question progress available:', shortQuestionErr.message);
+      }
+      
+      // Combine all progress data
       const combinedProgress = {
-        lessonProgress: lessonProgressRes.data,
+        lessonProgress: lessonProgress,
+        courseProgress: courseProgress,
         quizProgress: quizProgress,
-        totalLessons: lessonProgressRes.data.length,
-        completedLessons: lessonProgressRes.data.filter(p => p.completed).length,
-        progress: student.progress || 0
+        shortQuestionProgress: shortQuestionProgress,
+        totalLessons: courseProgress.totalLessons || 0,
+        completedLessons: courseProgress.completedLessons || 0,
+        progress: courseProgress.progress || student.progress || 0
       };
       
       setProgressDetails(combinedProgress);
     } catch (err) {
+      console.error('Error fetching progress:', err);
       setProgressDetails({ error: err.response?.data?.message || 'Failed to fetch progress.' });
     } finally {
       setProgressLoading(false);
@@ -193,6 +204,36 @@ export default function CourseStudents() {
     if (progress >= 80) return '#28a745';
     if (progress >= 50) return '#ffc107';
     return '#dc3545';
+  };
+
+  const getShortQuestionStatusClass = (progress) => {
+    if (!progress) return 'not-attempted';
+    
+    switch (progress.status) {
+      case 'submitted':
+        return 'submitted';
+      case 'graded':
+        return 'graded';
+      case 'completed':
+        return progress.passed ? 'passed' : 'failed';
+      default:
+        return 'not-attempted';
+    }
+  };
+
+  const getShortQuestionStatusText = (progress) => {
+    if (!progress) return '⏳ Not Attempted';
+    
+    switch (progress.status) {
+      case 'submitted':
+        return '📝 Submitted (Waiting for Grading)';
+      case 'graded':
+        return '✅ Graded (Awaiting Finalization)';
+      case 'completed':
+        return progress.passed ? '✅ Passed' : '❌ Failed';
+      default:
+        return '⏳ Not Attempted';
+    }
   };
 
   // Calculate completion statistics
@@ -534,19 +575,68 @@ export default function CourseStudents() {
                   </div>
                   
                   {/* Quiz Progress (if available) */}
-                  {progressDetails.quizProgress && (
+                  {progressDetails.quizProgress && progressDetails.quizProgress.hasQuiz && (
                     <div className="progress-section">
                       <h4>🧠 Quiz Progress</h4>
-                      <div><strong>Quiz Sets Attempted:</strong> {progressStudent.attemptedQuizSets?.length || 0}</div>
-                      <div><strong>Quiz Sets Passed:</strong> {progressStudent.completedQuizSets?.length || 0}</div>
-                      <div><strong>Quiz Details:</strong></div>
-                      <ul>
-                        {progressDetails.quizProgress.quizSets?.map((set, idx) => (
-                          <li key={set.quizSetId || idx}>
-                            <strong>{set.name}:</strong> {set.submission ? `${set.submission.score}/${set.submission.totalQuestions} (${set.submission.percentage}%) - ${set.submission.passed ? '✅ Passed' : '❌ Failed'}` : 'Not attempted'}
-                          </li>
-                        ))}
-                      </ul>
+                      {progressDetails.quizProgress.quizProgress ? (
+                        <>
+                          <div><strong>Quiz Status:</strong> {progressDetails.quizProgress.quizProgress.status || 'Not attempted'}</div>
+                          <div><strong>Score:</strong> {progressDetails.quizProgress.quizProgress.score || 0}/{progressDetails.quizProgress.quizProgress.totalQuestions || 0}</div>
+                          <div><strong>Percentage:</strong> {progressDetails.quizProgress.quizProgress.percentage || 0}%</div>
+                          <div><strong>Passed:</strong> {progressDetails.quizProgress.quizProgress.passed ? '✅ Yes' : '❌ No'}</div>
+                          <div><strong>Attempts:</strong> {progressDetails.quizProgress.quizProgress.attemptCount || 0}/{progressDetails.quizProgress.quizProgress.maxAttempts || 0}</div>
+                          {progressDetails.quizProgress.quizProgress.completedAt && (
+                            <div><strong>Completed:</strong> {new Date(progressDetails.quizProgress.quizProgress.completedAt).toLocaleDateString()}</div>
+                          )}
+                        </>
+                      ) : (
+                        <div><strong>Status:</strong> {progressDetails.quizProgress.reason || 'Not attempted'}</div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Short Question Progress (if available) */}
+                  {progressDetails.shortQuestionProgress && progressDetails.shortQuestionProgress.hasShortQuestions && (
+                    <div className="progress-section">
+                      <h4>📝 Short Question Progress</h4>
+                      <div><strong>Total Short Questions:</strong> {progressDetails.shortQuestionProgress.totalShortQuestions || 0}</div>
+                      <div><strong>Completed:</strong> {progressDetails.shortQuestionProgress.completedShortQuestions || 0}</div>
+                      {progressDetails.shortQuestionProgress.shortQuestionProgress && progressDetails.shortQuestionProgress.shortQuestionProgress.length > 0 && (
+                        <div className="short-question-list">
+                          {progressDetails.shortQuestionProgress.shortQuestionProgress.map((sq, idx) => (
+                            <div key={sq.shortQuestionId || idx} className="short-question-item">
+                              <div className="short-question-header">
+                                <strong>{sq.title}</strong>
+                                <span className={`status-badge ${getShortQuestionStatusClass(sq.progress)}`}>
+                                  {getShortQuestionStatusText(sq.progress)}
+                                </span>
+                              </div>
+                              {sq.progress && (
+                                <div className="short-question-details">
+                                  {sq.progress.status === 'completed' && (
+                                    <>
+                                      <div><strong>Score:</strong> {sq.progress.score || 0}/{sq.progress.totalQuestions || 0}</div>
+                                      <div><strong>Percentage:</strong> {sq.progress.percentage || 0}%</div>
+                                    </>
+                                  )}
+                                  <div><strong>Status:</strong> {sq.progress.status || 'Unknown'}</div>
+                                  {sq.progress.submittedAt && (
+                                    <div><strong>Submitted:</strong> {new Date(sq.progress.submittedAt).toLocaleDateString()}</div>
+                                  )}
+                                  {sq.progress.gradedAt && (
+                                    <div><strong>Graded:</strong> {new Date(sq.progress.gradedAt).toLocaleDateString()}</div>
+                                  )}
+                                  {sq.progress.status === 'submitted' && (
+                                    <div className="grading-note">
+                                      <em>📝 This submission is waiting for instructor grading</em>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                   

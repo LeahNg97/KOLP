@@ -96,24 +96,24 @@ export default function Register() {//khởi tạo component Register
         </div>
         
         {error && (
-          <div className="error-message">
+          <div className="register-error-message">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="success-message">
+          <div className="register-success-message">
             {success}
           </div>
         )}
 
         <form className="register-form" onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
+          <div className="register-form-row">
+            <div className="register-form-group">
               <input
                 type="text"
                 name="name"
-                className="form-input"
+                className="register-form-input"
                 placeholder="Name (Full Name)"
                 value={formData.name}
                 onChange={handleChange}
@@ -122,10 +122,10 @@ export default function Register() {//khởi tạo component Register
               />
             </div>
             
-            <div className="form-group">
+            <div className="register-form-group">
               <select
                 name="role"
-                className="form-select"
+                className="register-form-select"
                 value={formData.role}
                 onChange={handleChange}
                 disabled={loading}
@@ -137,11 +137,11 @@ export default function Register() {//khởi tạo component Register
             </div>
           </div>
           
-          <div className="form-group full-width">
+          <div className="register-form-group register-full-width">
             <input
               type="email"
               name="email"
-              className="form-input"
+              className="register-form-input"
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
@@ -150,12 +150,12 @@ export default function Register() {//khởi tạo component Register
             />
           </div>
           
-          <div className="form-row">
-            <div className="form-group">
+          <div className="register-form-row">
+            <div className="register-form-group">
               <input
                 type="password"
                 name="password"
-                className="form-input"
+                className="register-form-input"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
@@ -164,11 +164,11 @@ export default function Register() {//khởi tạo component Register
               />
             </div>
             
-            <div className="form-group">
+            <div className="register-form-group">
               <input
                 type="password"
                 name="confirmPassword"
-                className="form-input"
+                className="register-form-input"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -183,14 +183,14 @@ export default function Register() {//khởi tạo component Register
             className="register-button"
             disabled={loading}
           >
-            {loading && <span className="loading"></span>}
+            {loading && <span className="register-loading"></span>}
             {loading ? 'Loading' : 'Register'}
           </button>
         </form>
 
-        <div className="login-link">
+        <div className="register-login-link">
           <p>Already have an account?</p>
-          <Link to="/login" className="login-button-link">
+          <Link to="/login" className="register-login-button-link">
             Sign in now  
           </Link>
         </div>

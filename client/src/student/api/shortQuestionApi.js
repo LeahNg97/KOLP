@@ -88,6 +88,20 @@ export const shortQuestionProgressApi = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch short question');
     }
+  },
+
+  // Get short question progress (using results endpoint)
+  getShortQuestionProgress: async (shortQuestionId) => {
+    try {
+      const response = await api.get(`/short-questions/${shortQuestionId}/results`);
+      return response.data;
+    } catch (error) {
+      // If no results found, return null progress
+      if (error.response?.status === 404) {
+        return { success: true, data: null };
+      }
+      throw new Error(error.response?.data?.message || 'Failed to fetch short question progress');
+    }
   }
 };
 

@@ -323,22 +323,18 @@ const submitShortQuestion = asyncHandler(async (req, res) => {
 
     console.log('Updated answers:', progress.answers);
 
-    // Auto grade
-    progress.autoGrade();
-    console.log('Auto grading completed. Score:', progress.score, 'Percentage:', progress.percentage);
-    
-    // Check if passed
-    progress.checkPassed(shortQuestion.passingScore);
-    console.log('Passed check completed. Passed:', progress.passed);
-    
-    // Update progress
-    progress.status = 'completed';
+    // Set status to submitted (waiting for manual grading)
+    progress.status = 'submitted';
     progress.submittedAt = new Date();
     progress.timeSpent = timeSpent || 0;
     progress.attemptNumber = (await ShortQuestionProgress.countDocuments({
       shortQuestionId: new Types.ObjectId(id),
       studentId: new Types.ObjectId(studentId)
     })) + 1;
+    
+    // For manual grading, we don't auto grade or check passed status
+    // This will be done by instructor later
+    console.log('Short question submitted for manual grading');
 
     await progress.save();
     console.log('Progress saved successfully');
@@ -351,14 +347,12 @@ const submitShortQuestion = asyncHandler(async (req, res) => {
     res.json({
       success: true,
       data: {
-        score: progress.score,
+        status: progress.status,
         totalQuestions: progress.totalQuestions,
-        percentage: progress.percentage,
-        passed: progress.passed,
-        answers: progress.answers,
+        submittedAt: progress.submittedAt,
         courseProgress
       },
-      message: 'Short question submitted successfully'
+      message: 'Short question submitted successfully. Waiting for instructor grading.'
     });
   } catch (error) {
     console.error('Error submitting short question:', error);
@@ -447,6 +441,226 @@ const calculateCourseProgress = async (courseId, studentId) => {
   }
 };
 
+// Get all submitted short questions waiting for grading
+const getPendingGradingShortQuestions = asyncHandler(async (req, res) => {
+  const instructorId = req.user.id;
+  const { courseId } = req.params;
+
+  // Check if instructor owns the course
+  const Course = require('../models/course.model');
+  const course = await Course.findOne({
+    _id: courseId,
+    instructorId: instructorId
+  });
+
+  if (!course) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to view this course'
+    });
+  }
+
+  // Get all submitted short question progress waiting for grading
+  const pendingProgress = await ShortQuestionProgress.find({
+    courseId: courseId,
+    status: 'submitted'
+  })
+  .populate('studentId', 'firstName lastName email')
+  .populate('shortQuestionId', 'title questions')
+  .sort({ submittedAt: -1 });
+
+  res.json({
+    success: true,
+    data: pendingProgress
+  });
+});
+
+// Get specific short question progress for grading
+const getShortQuestionProgressForGrading = asyncHandler(async (req, res) => {
+  const { progressId } = req.params;
+  const instructorId = req.user.id;
+
+  const progress = await ShortQuestionProgress.findById(progressId)
+    .populate('studentId', 'firstName lastName email')
+    .populate('shortQuestionId', 'title questions passingScore')
+    .populate('courseId', 'title instructorId');
+
+  if (!progress) {
+    return res.status(404).json({
+      success: false,
+      message: 'Progress not found'
+    });
+  }
+
+  // Check if instructor owns the course
+  if (progress.courseId.instructorId.toString() !== instructorId) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to grade this submission'
+    });
+  }
+
+  res.json({
+    success: true,
+    data: progress
+  });
+});
+
+// Grade short question manually
+const gradeShortQuestion = asyncHandler(async (req, res) => {
+  const { progressId } = req.params;
+  const instructorId = req.user.id;
+  const { gradedAnswers, overallFeedback, instructorNotes, finalize } = req.body;
+
+  const progress = await ShortQuestionProgress.findById(progressId)
+    .populate('shortQuestionId', 'passingScore');
+
+  if (!progress) {
+    return res.status(404).json({
+      success: false,
+      message: 'Progress not found'
+    });
+  }
+
+  // Check if instructor owns the course
+  const Course = require('../models/course.model');
+  const course = await Course.findById(progress.courseId);
+  if (course.instructorId.toString() !== instructorId) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to grade this submission'
+    });
+  }
+
+  // Apply manual grading
+  progress.manualGrade(gradedAnswers, instructorId);
+  progress.overallFeedback = overallFeedback || '';
+  progress.instructorNotes = instructorNotes || '';
+
+  // If finalize is true, mark as completed
+  if (finalize) {
+    progress.completeGrading(progress.shortQuestionId.passingScore);
+  }
+
+  await progress.save();
+
+  // Update course progress
+  const CourseProgressService = require('../services/courseProgress.service');
+  await CourseProgressService.updateCourseProgress(progress.courseId, progress.studentId);
+
+  res.json({
+    success: true,
+    data: {
+      score: progress.score,
+      totalQuestions: progress.totalQuestions,
+      percentage: progress.percentage,
+      passed: progress.passed,
+      status: progress.status,
+      gradedAt: progress.gradedAt
+    },
+    message: finalize ? 'Short question graded and finalized successfully' : 'Short question graded successfully'
+  });
+});
+
+// Get student short question progress for instructor
+const getStudentShortQuestionProgress = asyncHandler(async (req, res) => {
+  const { courseId, studentId } = req.params;
+  const instructorId = req.user.id;
+
+  // Check if instructor owns the course
+  const Course = require('../models/course.model');
+  const course = await Course.findOne({
+    _id: courseId,
+    instructorId: instructorId
+  });
+
+  if (!course) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to view this student\'s progress'
+    });
+  }
+
+  // Check if student is enrolled in the course
+  const Enrollment = require('../models/enrollment.model');
+  const enrollment = await Enrollment.findOne({
+    studentId,
+    courseId,
+    status: 'approved'
+  });
+
+  if (!enrollment) {
+    return res.status(404).json({
+      success: false,
+      message: 'Student is not enrolled in this course or enrollment is not approved'
+    });
+  }
+
+  // Get all short questions for the course
+  const shortQuestions = await ShortQuestion.find({ courseId, isPublished: true });
+
+  if (!shortQuestions || shortQuestions.length === 0) {
+    return res.json({
+      success: true,
+      data: {
+        hasShortQuestions: false,
+        shortQuestionProgress: null,
+        reason: 'Course does not have any short questions'
+      }
+    });
+  }
+
+  // Get short question progress for each short question
+  const shortQuestionProgress = [];
+  
+  for (const shortQuestion of shortQuestions) {
+    const progress = await ShortQuestionProgress.findOne({
+      courseId,
+      shortQuestionId: shortQuestion._id,
+      studentId: studentId
+    });
+
+    shortQuestionProgress.push({
+      shortQuestionId: shortQuestion._id,
+      title: shortQuestion.title,
+      description: shortQuestion.description,
+      totalQuestions: shortQuestion.questions.length,
+      passingScore: shortQuestion.passingScore,
+      timeLimit: shortQuestion.timeLimit,
+      progress: progress ? {
+        attemptId: progress.attemptId,
+        attemptNumber: progress.attemptNumber,
+        score: progress.score,
+        totalQuestions: progress.totalQuestions,
+        percentage: progress.percentage,
+        passed: progress.passed,
+        status: progress.status,
+        timeSpent: progress.timeSpent,
+        startedAt: progress.startedAt,
+        submittedAt: progress.submittedAt,
+        answers: progress.answers.map(answer => ({
+          questionIndex: answer.questionIndex,
+          studentAnswer: answer.studentAnswer,
+          correctAnswer: answer.correctAnswer,
+          isCorrect: answer.isCorrect,
+          points: answer.points,
+          maxPoints: answer.maxPoints
+        }))
+      } : null
+    });
+  }
+
+  res.json({
+    success: true,
+    data: {
+      hasShortQuestions: true,
+      shortQuestionProgress,
+      totalShortQuestions: shortQuestions.length,
+      completedShortQuestions: shortQuestionProgress.filter(sq => sq.progress && sq.progress.status === 'completed').length
+    }
+  });
+});
+
 module.exports = {
   createShortQuestion,
   getShortQuestionsByCourseId,
@@ -456,5 +670,9 @@ module.exports = {
   startShortQuestion,
   submitShortQuestion,
   getShortQuestionResults,
-  getShortQuestionResultsByCourseId
+  getShortQuestionResultsByCourseId,
+  getStudentShortQuestionProgress,
+  getPendingGradingShortQuestions,
+  getShortQuestionProgressForGrading,
+  gradeShortQuestion
 };

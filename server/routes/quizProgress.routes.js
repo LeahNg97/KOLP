@@ -5,7 +5,8 @@ const {
   startQuiz,
   submitQuiz,
   getQuizResults,
-  getCourseProgress
+  getCourseProgress,
+  getStudentQuizProgress
 } = require('../controllers/quizProgress.controller');
 const { verifyToken, authorizeRole } = require('../middleware/auth.middleware');
 
@@ -18,5 +19,8 @@ router.get('/courses/:courseId/progress/summary', getCourseProgress);
 router.post('/courses/:courseId/start', startQuiz);
 router.post('/courses/:courseId/submit', submitQuiz);
 router.get('/courses/:courseId/results', getQuizResults);
+
+// Instructor routes to view student progress
+router.get('/courses/:courseId/student/:studentId', getStudentQuizProgress);
 
 module.exports = router;

@@ -130,27 +130,27 @@ export default function Login() {
         </div>
        
         {error && (
-          <div className="error-message">
+          <div className="login-error-message">
             <span>⚠️ {error}</span>
           </div>
         )}
 
 
         {success && (
-          <div className="success-message">
+          <div className="login-success-message">
             <span> {success}</span>
           </div>
         )}
 
 
         <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email" className="form-label-login">Email</label>
+          <div className="login-form-group">
+            <label htmlFor="email" className="login-form-label">Email</label>
             <input
               id="email"
               name="email"
               type="email"
-              className={`form-input ${error && !formData.email ? 'error' : ''}`}
+              className={`login-form-input ${error && !formData.email ? 'login-error' : ''}`}
               placeholder="Please enter your email"
               value={formData.email}
               onChange={handleChange}
@@ -161,13 +161,13 @@ export default function Login() {
             />
           </div>
          
-          <div className="form-group">
-            <label htmlFor="password" className="form-label-login">Password</label>
+          <div className="login-form-group">
+            <label htmlFor="password" className="login-form-label">Password</label>
             <input
               id="password"
               name="password"
               type="password"
-              className={`form-input ${error && !formData.password ? 'error' : ''}`}
+              className={`login-form-input ${error && !formData.password ? 'login-error' : ''}`}
               placeholder="Please enter your password"
               value={formData.password}
               onChange={handleChange}
@@ -180,7 +180,7 @@ export default function Login() {
          
           <button
             type="submit"
-            className={`login-button ${loading ? 'loading' : ''}`}
+            className={`login-button ${loading ? 'login-loading' : ''}`}
             disabled={loading}
           >
             {loading ? (
@@ -196,9 +196,9 @@ export default function Login() {
 
 
         <div className="login-footer">
-          <div className="register-link">
+          <div className="login-register-link">
             <p>Don't have an account yet?</p>
-            <Link to="/register" className="register-button-link">
+            <Link to="/register" className="login-register-button-link">
               Register Now
             </Link>
           </div>

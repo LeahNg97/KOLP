@@ -155,6 +155,12 @@ label{color:var(--muted);font-size:.92rem}
 .modal__content p{color:var(--muted);margin:.3rem 0 .9rem}
 .modal__actions{display:flex;gap:.6rem;flex-wrap:wrap}
 
+/* Grading */
+.grading__header h2{margin:.2rem 0}
+.grading__header p{color:var(--muted);margin:.25rem 0 0}
+.grading__empty{text-align:center;padding:2rem 0;color:var(--muted)}
+.grading__emptyIcon{font-size:3rem;margin-bottom:1rem;opacity:0.6}
+
 /* Focus visibility */
 :where(button,[href],input,textarea):focus-visible{
   outline: none;

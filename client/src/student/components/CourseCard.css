@@ -24,7 +24,7 @@
   box-shadow:var(--shadow);
   transition:transform .18s ease, box-shadow .18s ease;
   position:relative;
-  min-height: 400px;
+  height: 520px; /* Fixed height thay vì min-height */
 }
 .cc-card:hover{ 
   transform:translateY(-2px); 
@@ -34,6 +34,7 @@
 /* Header - Course Title */
 .cc-header {
   padding: 20px 20px 16px;
+  flex-shrink: 0; /* Không cho phép co lại */
 }
 
 .cc-title{
@@ -47,6 +48,7 @@
   -webkit-line-clamp:2; 
   -webkit-box-orient: vertical; 
   overflow:hidden;
+  min-height: 57px; /* Đảm bảo chiều cao tối thiểu cho 2 dòng */
 }
 
 /* Course Image Container */
@@ -57,6 +59,7 @@
   overflow: hidden;
   aspect-ratio: 16/9;
   background: #f3f4f6;
+  flex-shrink: 0; /* Không cho phép co lại */
 }
 
 .cc-course-image {
@@ -132,6 +135,7 @@
   padding: 0 20px 16px;
   display: flex;
   justify-content: flex-start;
+  flex-shrink: 0; /* Không cho phép co lại */
 }
 
 .cc-price-free-container {
@@ -174,7 +178,12 @@
   color: var(--muted);
   font-size: 14px;
   line-height: 1.5;
-  flex: 1;
+  flex: 1; /* Chiếm không gian còn lại */
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Giới hạn 3 dòng */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 63px; /* Đảm bảo chiều cao tối thiểu cho 3 dòng */
 }
 
 /* Meta Info */
@@ -202,6 +211,8 @@
 /* Action Button */
 .cc-action {
   padding: 0 20px 20px;
+  flex-shrink: 0; /* Không cho phép co lại */
+  margin-top: auto; /* Đẩy button xuống dưới cùng */
 }
 
 .cc-btn{
@@ -249,7 +260,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .cc-card {
-    min-height: 360px;
+    height: 440px; /* Fixed height cho mobile */
   }
   
   .cc-header {

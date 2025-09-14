@@ -145,7 +145,7 @@ exports.getInstructorStudents = async (req, res) => {
     
     res.json(enrollments);
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };
 

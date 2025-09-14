@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
       user: { id: user._id, name: user.name, role: user.role }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Lỗi server: ' + err.message });
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };
 exports.register = async (req, res) => {

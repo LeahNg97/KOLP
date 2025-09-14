@@ -55,10 +55,6 @@ export default function Navbar() {
               <span className="nav-icon">🎓</span>
               Certificate Management
             </Link>
-            <Link to="/admin/analytics" className="nav-link">
-              <span className="nav-icon">📊</span>
-              Analytics
-            </Link>
           </>
         )}
 

@@ -222,6 +222,110 @@ exports.updateLessonAccess = asyncHandler(async (req, res) => {
   });
 });
 
+// Get lesson progress for instructor to view student progress
+exports.getStudentLessonProgress = asyncHandler(async (req, res) => {
+  const { courseId, studentId } = req.params;
+  const instructorId = req.user.id;
+
+  // Check if instructor owns the course
+  const Course = require('../models/course.model');
+  const course = await Course.findOne({
+    _id: courseId,
+    instructorId: instructorId
+  });
+
+  if (!course) {
+    return res.status(403).json({
+      message: 'You are not authorized to view this student\'s progress'
+    });
+  }
+
+  // Check if student is enrolled in the course
+  const enrollment = await Enrollment.findOne({
+    studentId,
+    courseId,
+    status: 'approved'
+  });
+
+  if (!enrollment) {
+    return res.status(404).json({
+      message: 'Student is not enrolled in this course or enrollment is not approved'
+    });
+  }
+
+  const lessonProgress = await LessonProgress.find({
+    studentId,
+    courseId
+  }).populate('lessonId', 'title order');
+
+  // Transform the data to make it easier for frontend to use
+  const transformedProgress = lessonProgress.map(progress => ({
+    _id: progress._id,
+    lessonId: progress.lessonId._id,
+    moduleId: progress.moduleId,
+    completed: progress.completed,
+    completedAt: progress.completedAt,
+    timeSpent: progress.timeSpent,
+    lastAccessedAt: progress.lastAccessedAt,
+    lessonTitle: progress.lessonId?.title,
+    lessonOrder: progress.lessonId?.order
+  }));
+
+  res.json(transformedProgress);
+});
+
+// Get student course progress for instructor
+exports.getStudentCourseProgress = asyncHandler(async (req, res) => {
+  const { courseId, studentId } = req.params;
+  const instructorId = req.user.id;
+
+  // Check if instructor owns the course
+  const Course = require('../models/course.model');
+  const course = await Course.findOne({
+    _id: courseId,
+    instructorId: instructorId
+  });
+
+  if (!course) {
+    return res.status(403).json({
+      message: 'You are not authorized to view this student\'s progress'
+    });
+  }
+
+  // Check if student is enrolled in the course
+  const enrollment = await Enrollment.findOne({
+    studentId,
+    courseId,
+    status: 'approved'
+  });
+
+  if (!enrollment) {
+    return res.status(404).json({
+      message: 'Student is not enrolled in this course or enrollment is not approved'
+    });
+  }
+
+  const completedLessons = await LessonProgress.countDocuments({
+    studentId,
+    courseId,
+    completed: true
+  });
+
+  // Get total lessons from Lesson model
+  const totalLessons = await Lesson.countDocuments({
+    courseId
+  });
+
+  const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+  res.json({
+    completedLessons,
+    totalLessons,
+    progress,
+    enrollment
+  });
+});
+
 // Helper function to update overall course progress
 async function updateCourseProgress(studentId, courseId) {
   try {

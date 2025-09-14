@@ -82,24 +82,24 @@
 }
 
 
-.form-row {
+.register-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
 
 
-.form-group {
+.register-form-group {
   position: relative;
 }
 
 
-.form-group.full-width {
+.register-form-group.register-full-width {
   grid-column: 1 / -1;
 }
 
 
-.form-input {
+.register-form-input {
   width: 100%;
   padding: 15px 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -114,7 +114,7 @@
 }
 
 
-.form-input:focus {
+.register-form-input:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.15);
@@ -123,16 +123,16 @@
 }
 
 
-.form-input::placeholder {
+.register-form-input::placeholder {
   color: rgba(255, 255, 255, 0.7);
 }
 
 
 /* Override browser autofill styles */
-.form-input:-webkit-autofill,
-.form-input:-webkit-autofill:hover,
-.form-input:-webkit-autofill:focus,
-.form-input:-webkit-autofill:active {
+.register-form-input:-webkit-autofill,
+.register-form-input:-webkit-autofill:hover,
+.register-form-input:-webkit-autofill:focus,
+.register-form-input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
   -webkit-text-fill-color: #ffffff !important;
   background: rgba(255, 255, 255, 0.1) !important;
@@ -142,14 +142,14 @@
 }
 
 
-.form-input:-webkit-autofill:focus {
+.register-form-input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.15) inset !important;
   border-color: rgba(255, 255, 255, 0.8) !important;
   background: rgba(255, 255, 255, 0.15) !important;
 }
 
 
-.form-select {
+.register-form-select {
   width: 100%;
   padding: 15px 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -164,8 +164,29 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Style cho dropdown options */
+.register-form-select option {
+  background: rgba(0, 0, 0, 0.9) !important;
+  color: #ffffff !important;
+  padding: 10px;
+  border: none;
+  font-weight: 500;
+}
 
-.form-select:focus {
+/* Hover state cho options */
+.register-form-select option:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+/* Selected option */
+.register-form-select option:checked {
+  background: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+
+.register-form-select:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.15);
@@ -174,10 +195,10 @@
 }
 
 
-.form-select:-webkit-autofill,
-.form-select:-webkit-autofill:hover,
-.form-select:-webkit-autofill:focus,
-.form-select:-webkit-autofill:active {
+.register-form-select:-webkit-autofill,
+.register-form-select:-webkit-autofill:hover,
+.register-form-select:-webkit-autofill:focus,
+.register-form-select:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
   -webkit-text-fill-color: #ffffff !important;
   background: rgba(255, 255, 255, 0.1) !important;
@@ -187,7 +208,7 @@
 }
 
 
-.form-select:-webkit-autofill:focus {
+.register-form-select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.15) inset !important;
   border-color: rgba(255, 255, 255, 0.8) !important;
   background: rgba(255, 255, 255, 0.15) !important;
@@ -195,20 +216,20 @@
 
 
 /* Ensure text color is always visible */
-.form-input,
-.form-input:focus,
-.form-input:active,
-.form-input:hover,
-.form-select,
-.form-select:focus,
-.form-select:active,
-.form-select:hover {
+.register-form-input,
+.register-form-input:focus,
+.register-form-input:active,
+.register-form-input:hover,
+.register-form-select,
+.register-form-select:focus,
+.register-form-select:active,
+.register-form-select:hover {
   color: #ffffff !important;
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
 
-.form-input:focus {
+.register-form-input:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.15) !important;
@@ -217,7 +238,7 @@
 }
 
 
-.form-select:focus {
+.register-form-select:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.15) !important;
@@ -227,22 +248,22 @@
 
 
 /* Additional overrides for all possible states */
-.form-input[type="email"],
-.form-input[type="password"],
-.form-input[type="text"],
-.form-input[type="name"],
-.form-select {
+.register-form-input[type="email"],
+.register-form-input[type="password"],
+.register-form-input[type="text"],
+.register-form-input[type="name"],
+.register-form-select {
   background: rgba(255, 255, 255, 0.1) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
 
 
-.form-input[type="email"]:focus,
-.form-input[type="password"]:focus,
-.form-input[type="text"]:focus,
-.form-input[type="name"]:focus,
-.form-select:focus {
+.register-form-input[type="email"]:focus,
+.register-form-input[type="password"]:focus,
+.register-form-input[type="text"]:focus,
+.register-form-input[type="name"]:focus,
+.register-form-select:focus {
   background: rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
@@ -285,7 +306,7 @@
 }
 
 
-.error-message {
+.register-error-message {
   background: rgba(255, 107, 107, 0.2);
   color: #ffffff;
   padding: 12px 16px;
@@ -298,7 +319,7 @@
 }
 
 
-.success-message {
+.register-success-message {
   background: rgba(76, 175, 80, 0.2);
   color: #ffffff;
   padding: 12px 16px;
@@ -321,7 +342,7 @@
 }
 
 
-.login-link {
+.register-login-link {
   text-align: center;
   margin-top: 30px;
   padding-top: 20px;
@@ -329,7 +350,7 @@
 }
 
 
-.login-link p {
+.register-login-link p {
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   margin-bottom: 15px;
@@ -337,7 +358,7 @@
 }
 
 
-.login-button-link {
+.register-login-button-link {
   display: inline-block;
   background: transparent;
   color: #ffffff;
@@ -354,7 +375,7 @@
 }
 
 
-.login-button-link:hover {
+.register-login-button-link:hover {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   transform: translateY(-2px);
@@ -373,13 +394,13 @@
     font-size: 24px;
   }
  
-  .form-row {
+  .register-form-row {
     grid-template-columns: 1fr;
     gap: 15px;
   }
  
-  .form-input,
-  .form-select {
+  .register-form-input,
+  .register-form-select {
     padding: 12px 16px;
     font-size: 14px;
   }
@@ -406,25 +427,25 @@
     color: rgba(255, 255, 255, 0.9);
   }
  
-  .form-input,
-  .form-select {
+  .register-form-input,
+  .register-form-select {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
     color: white;
   }
  
-  .form-input:focus,
-  .form-select:focus {
+  .register-form-input:focus,
+  .register-form-select:focus {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.8);
     color: #ffffff;
   }
  
-  .form-input::placeholder {
+  .register-form-input::placeholder {
     color: rgba(255, 255, 255, 0.7);
   }
  
-  .login-link {
+  .register-login-link {
     color: rgba(255, 255, 255, 0.9);
   }
 }

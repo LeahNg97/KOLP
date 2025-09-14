@@ -91,6 +91,37 @@ export const shortQuestionApi = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch short question results');
     }
+  },
+
+  // Manual grading functions
+  // Get pending grading short questions
+  getPendingGradingShortQuestions: async (courseId) => {
+    try {
+      const response = await api.get(`/short-questions/course/${courseId}/pending-grading`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch pending grading short questions');
+    }
+  },
+
+  // Get short question progress for grading
+  getShortQuestionProgressForGrading: async (progressId) => {
+    try {
+      const response = await api.get(`/short-questions/progress/${progressId}/for-grading`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch short question progress for grading');
+    }
+  },
+
+  // Grade short question manually
+  gradeShortQuestion: async (progressId, gradingData) => {
+    try {
+      const response = await api.post(`/short-questions/progress/${progressId}/grade`, gradingData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to grade short question');
+    }
   }
 };
 

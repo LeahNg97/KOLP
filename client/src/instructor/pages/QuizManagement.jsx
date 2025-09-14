@@ -3,18 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './QuizManagement.css';
 import { getCourseById } from '../api/courseApi';
-import { getQuizByCourseId, getQuizResultsByCourseId, createQuiz, updateQuiz } from '../api/quizApi';
+import { getQuizByCourseId, createQuiz, updateQuiz } from '../api/quizApi';
+import { shortQuestionApi } from '../api/shortQuestionApi';
 
 export default function QuizManagement() {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [quiz, setQuiz] = useState(null);
-  const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('quiz'); // 'quiz' or 'results'
+  const [activeTab, setActiveTab] = useState('quiz'); // 'quiz', 'short-quiz', 'grading'
   const [editing, setEditing] = useState(true); // Always start in editing mode
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -36,6 +36,19 @@ export default function QuizManagement() {
   
   // UI state for collapsible sections
   const [expandedQuestions, setExpandedQuestions] = useState(new Set());
+
+  // Short Quiz state
+  const [shortQuestions, setShortQuestions] = useState([]);
+  const [shortQuestionData, setShortQuestionData] = useState({
+    title: '',
+    description: '',
+    instructions: '',
+    passingScore: 70,
+    timeLimit: null,
+    questions: []
+  });
+  const [expandedShortQuestions, setExpandedShortQuestions] = useState(new Set());
+  const [newShortQuestionCount, setNewShortQuestionCount] = useState(3);
 
   useEffect(() => {
     fetchCourseAndQuiz();
@@ -156,12 +169,29 @@ export default function QuizManagement() {
         });
       }
 
-      // Fetch quiz results
+
+      // Fetch short questions
       try {
-        const resultsRes = await getQuizResultsByCourseId(token, courseId);
-        setSubmissions(resultsRes.submissions || []);
+        const shortQuestionsRes = await shortQuestionApi.getShortQuestionsByCourseId(courseId);
+        console.log('📝 Short questions response:', shortQuestionsRes);
+        if (shortQuestionsRes && Array.isArray(shortQuestionsRes)) {
+          setShortQuestions(shortQuestionsRes);
+          // Load the first short question for editing if exists
+          if (shortQuestionsRes.length > 0) {
+            const firstShortQuestion = shortQuestionsRes[0];
+            setShortQuestionData({
+              title: firstShortQuestion.title || '',
+              description: firstShortQuestion.description || '',
+              instructions: firstShortQuestion.instructions || '',
+              passingScore: firstShortQuestion.passingScore || 70,
+              timeLimit: firstShortQuestion.timeLimit || null,
+              questions: firstShortQuestion.questions || []
+            });
+          }
+        }
       } catch (err) {
-        console.log('No submissions found:', err.message);
+        console.log('No short questions found:', err.message);
+        setShortQuestions([]);
       }
 
     } catch (err) {
@@ -307,6 +337,138 @@ export default function QuizManagement() {
     if (newCount < 1 || newCount > 20) return;
     
     setNewQuestionCount(newCount);
+  };
+
+  // Short Quiz handlers
+  const handleShortQuestionDataChange = (field, value) => {
+    setShortQuestionData(prev => ({ ...prev, [field]: value }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleGenerateShortQuestions = () => {
+    if (newShortQuestionCount < 1 || newShortQuestionCount > 10) {
+      setError('Short question count must be between 1 and 10');
+      return;
+    }
+
+    const generatedQuestions = [];
+    for (let i = 0; i < newShortQuestionCount; i++) {
+      generatedQuestions.push({
+        question: `Short Question ${i + 1}`,
+        correctAnswer: '',
+        explanation: '',
+        points: 1,
+        maxLength: 500,
+        minLength: 10
+      });
+    }
+    
+    setShortQuestionData(prev => ({ 
+      ...prev, 
+      questions: generatedQuestions,
+      title: prev.title || 'Short Questions',
+      description: prev.description || 'Short answer questions',
+      instructions: prev.instructions || 'Answer the following questions in detail'
+    }));
+    setHasUnsavedChanges(true);
+    
+    // Auto expand all questions
+    setExpandedShortQuestions(new Set(generatedQuestions.map((_, index) => index)));
+    
+    setError('');
+    setSuccessMessage(`✅ Generated ${newShortQuestionCount} short questions. Don't forget to save!`);
+    
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 3000);
+  };
+
+  const handleShortQuestionChange = (questionIndex, field, value) => {
+    const updatedQuestions = [...shortQuestionData.questions];
+    updatedQuestions[questionIndex][field] = value;
+    
+    setShortQuestionData(prev => ({ ...prev, questions: updatedQuestions }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleSaveShortQuiz = async () => {
+    // Validate short quiz data
+    if (!shortQuestionData.title.trim()) {
+      setError('Please enter a short quiz title');
+      return;
+    }
+
+    if (shortQuestionData.questions.length === 0) {
+      setError('Please generate questions for the short quiz');
+      return;
+    }
+
+    // Filter out empty questions and validate
+    const validQuestions = shortQuestionData.questions.filter(q => q && q.question && q.question.trim());
+    if (validQuestions.length === 0) {
+      setError('Please generate and fill in questions for the short quiz');
+      return;
+    }
+
+    // Validate each question has valid answer
+    for (let i = 0; i < validQuestions.length; i++) {
+      const question = validQuestions[i];
+      if (!question.correctAnswer || !question.correctAnswer.trim()) {
+        setError(`Question ${i + 1} must have a correct answer`);
+        return;
+      }
+    }
+
+    const cleanedShortQuestionData = {
+      ...shortQuestionData,
+      questions: validQuestions
+    };
+    
+    console.log('🧹 Cleaned short quiz data for saving:', cleanedShortQuestionData);
+
+    try {
+      setSaving(true);
+      setError('');
+      const token = localStorage.getItem('token');
+      
+      if (shortQuestions.length > 0) {
+        // Update existing short quiz
+        const existingShortQuestion = shortQuestions[0];
+        console.log('🔄 Updating existing short quiz with ID:', existingShortQuestion._id);
+        const updateResponse = await shortQuestionApi.updateShortQuestion(existingShortQuestion._id, cleanedShortQuestionData);
+        console.log('✅ Update response:', updateResponse);
+      } else {
+        // Create new short quiz
+        console.log('🆕 Creating new short quiz with data:', { ...cleanedShortQuestionData, courseId });
+        const newShortQuizResponse = await shortQuestionApi.createShortQuestion({
+          ...cleanedShortQuestionData,
+          courseId
+        });
+        console.log('🆕 Create response:', newShortQuizResponse);
+      }
+
+      // Refresh short questions data
+      const shortQuestionsRes = await shortQuestionApi.getShortQuestionsByCourseId(courseId);
+      if (shortQuestionsRes && Array.isArray(shortQuestionsRes)) {
+        setShortQuestions(shortQuestionsRes);
+      }
+
+      // Clear unsaved changes after saving
+      setHasUnsavedChanges(false);
+      
+      // Show success message
+      setError('');
+      setSuccessMessage('✅ Short quiz saved successfully!');
+      
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save short quiz');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSaveAndContinue = async () => {
@@ -465,22 +627,6 @@ export default function QuizManagement() {
     return '#dc3545';
   };
 
-  // Calculate total questions for stats
-  const getTotalQuestions = () => {
-    return quizData.questions.filter(q => q && q.question && q.question.trim()).length || 1; // Prevent division by zero
-  };
-
-  const totalQuestionsForStats = getTotalQuestions();
-
-  const stats = {
-    totalSubmissions: submissions.length,
-    averageScore: submissions.length > 0 
-      ? (submissions.reduce((sum, s) => sum + (s.score || 0), 0) / submissions.length).toFixed(1)
-      : 0,
-    highestScore: submissions.length > 0 ? Math.max(...submissions.map(s => s.score || 0)) : 0,
-    lowestScore: submissions.length > 0 ? Math.min(...submissions.map(s => s.score || 0)) : 0,
-    passedCount: submissions.filter(s => ((s.score || 0) / totalQuestionsForStats) * 100 >= quizData.passingScore).length
-  };
 
   if (loading) {
     return (
@@ -528,14 +674,24 @@ export default function QuizManagement() {
                 📝 Quiz Editor
               </button>
               <button
-                id="tab-results"
+                id="tab-short-quiz"
                 role="tab"
-                aria-selected={activeTab === 'results'}
-                aria-controls="panel-results"
-                className={`tabs__btn ${activeTab === 'results' ? 'is-active' : ''}`}
-                onClick={() => setActiveTab('results')}
+                aria-selected={activeTab === 'short-quiz'}
+                aria-controls="panel-short-quiz"
+                className={`tabs__btn ${activeTab === 'short-quiz' ? 'is-active' : ''}`}
+                onClick={() => setActiveTab('short-quiz')}
               >
-                📊 Quiz Results ({submissions.length})
+                📝 Short Quiz ({shortQuestions.length})
+              </button>
+              <button
+                id="tab-grading"
+                role="tab"
+                aria-selected={activeTab === 'grading'}
+                aria-controls="panel-grading"
+                className={`tabs__btn ${activeTab === 'grading' ? 'is-active' : ''}`}
+                onClick={() => setActiveTab('grading')}
+              >
+                📊 Grading
               </button>
             </nav>
     
@@ -778,77 +934,276 @@ export default function QuizManagement() {
                 </form>
               </div>
             </section>
-    
-            {/* Results */}
+
+            {/* Short Quiz Editor */}
             <section
-              id="panel-results"
+              id="panel-short-quiz"
               className="qm__panel"
               role="tabpanel"
-              aria-labelledby="tab-results"
-              hidden={activeTab !== 'results'}
+              aria-labelledby="tab-short-quiz"
+              hidden={activeTab !== 'short-quiz'}
             >
-              <header className="results__header">
-                <h2>Student Quiz Results</h2>
-                {quizData.questions.filter(q => q && q.question && q.question.trim()).length > 0 && (
-                  <p>
-                    Total Questions: {quizData.questions.filter(q => q && q.question && q.question.trim()).length} | Passing Score: {quizData.passingScore}%
-                  </p>
-                )}
-              </header>
-    
-              <div className="stats">
-                <div className="stat"><div className="stat__icon">📊</div><div className="stat__content"><h3>{stats.totalSubmissions}</h3><p>Total Submissions</p></div></div>
-                <div className="stat"><div className="stat__icon">📈</div><div className="stat__content"><h3>{stats.averageScore}</h3><p>Average Score</p></div></div>
-                <div className="stat"><div className="stat__icon">🏆</div><div className="stat__content"><h3>{stats.highestScore}</h3><p>Highest Score</p></div></div>
-                <div className="stat"><div className="stat__icon">✅</div><div className="stat__content"><h3>{stats.passedCount}</h3><p>Students Passed</p></div></div>
-              </div>
-    
-              <div className="results card">
-                {submissions.length === 0 ? (
-                  <div className="results__empty">
-                    <div className="results__emptyIcon">📊</div>
-                    <h3>No quiz submissions yet</h3>
-                    <p>Students haven't taken the quiz yet.</p>
+              <div className="editor">
+                <div className="editor__top">
+                  <h2 className="editor__title">Short Quiz Settings</h2>
+                  <div className="editor__actions">
+                    {hasUnsavedChanges && <div className="editor__warning">⚠️ You have unsaved changes!</div>}
+                    <button id="btn-save-short" className="btn btn--primary" onClick={handleSaveShortQuiz} disabled={saving}>
+                      {saving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save Short Quiz*' : '💾 Save Short Quiz'}
+                    </button>
                   </div>
-                ) : (
-                  <div className="tableWrap">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Student</th><th>Email</th><th>Score</th><th>Percentage</th><th>Status</th><th>Submitted</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {submissions.map((submission) => {
-                          const totalQuestions = quizData.questions.filter(q => q).length || 1;
-                          const score = submission.score || 0;
-                          const percentage = (score / totalQuestions) * 100;
-                          const passed = percentage >= quizData.passingScore;
-                          return (
-                            <tr key={submission._id || Math.random()}>
-                              <td>
-                                <div className="student">
-                                  <div className="student__avatar">
-                                    {submission.studentId?.name?.charAt(0).toUpperCase() || 'S'}
+                </div>
+
+                <form id="short-quiz-form" className="form" noValidate>
+                  {/* Basic Settings */}
+                  <fieldset className="card" aria-labelledby="legend-short-basic">
+                    <legend id="legend-short-basic" className="card__legend">Basic Settings</legend>
+
+                    <div className="grid">
+                      <div className="field">
+                        <label htmlFor="short-quiz-title">Short Quiz Title</label>
+                        <input
+                          id="short-quiz-title"
+                          type="text"
+                          value={shortQuestionData.title}
+                          onChange={(e) => handleShortQuestionDataChange('title', e.target.value)}
+                          placeholder="Enter short quiz title..."
+                          className="input"
+                          required
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label htmlFor="short-quiz-desc">Description</label>
+                        <textarea
+                          id="short-quiz-desc"
+                          value={shortQuestionData.description}
+                          onChange={(e) => handleShortQuestionDataChange('description', e.target.value)}
+                          placeholder="Enter short quiz description..."
+                          rows={2}
+                          className="textarea"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid">
+                      <div className="field">
+                        <label htmlFor="short-quiz-instructions">Instructions</label>
+                        <textarea
+                          id="short-quiz-instructions"
+                          value={shortQuestionData.instructions}
+                          onChange={(e) => handleShortQuestionDataChange('instructions', e.target.value)}
+                          placeholder="Enter instructions for students..."
+                          rows={2}
+                          className="textarea"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid">
+                      <div className="field">
+                        <label htmlFor="short-quiz-pass">Passing Score (%)</label>
+                        <input
+                          id="short-quiz-pass"
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={shortQuestionData.passingScore}
+                          onChange={(e) => handleShortQuestionDataChange('passingScore', parseInt(e.target.value) || 70)}
+                          className="input input--sm"
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label htmlFor="short-quiz-time">Time Limit (minutes)</label>
+                        <input
+                          id="short-quiz-time"
+                          type="number"
+                          min="1"
+                          value={shortQuestionData.timeLimit || ''}
+                          onChange={(e) => handleShortQuestionDataChange('timeLimit', e.target.value ? parseInt(e.target.value) : null)}
+                          placeholder="No limit"
+                          className="input input--sm"
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  {/* Short Questions */}
+                  <fieldset className="card" aria-labelledby="legend-short-questions">
+                    <legend id="legend-short-questions" className="card__legend">Short Answer Questions</legend>
+
+                    <div className="qs__header">
+                      <div className="qs__controls">
+                        <label htmlFor="short-qs-count">Number of Questions</label>
+                        <input
+                          id="short-qs-count"
+                          type="number"
+                          min="1"
+                          max="10"
+                          value={newShortQuestionCount}
+                          onChange={(e) => setNewShortQuestionCount(parseInt(e.target.value) || 3)}
+                          className="input input--xs"
+                        />
+                        <button id="btn-generate-short" className="btn btn--accent" onClick={handleGenerateShortQuestions} type="button">
+                          🎲 Generate Short Questions
+                        </button>
+                      </div>
+
+                      {hasUnsavedChanges && (
+                        <p className="qs__notice">📝 Short questions generated! Click "Save Short Quiz" to persist changes.</p>
+                      )}
+                    </div>
+
+                    {shortQuestionData.questions.filter(q => q && q.question && q.question.trim()).length > 0 && (
+                      <div className="qs__list">
+                        <p className="qs__info">
+                          {shortQuestionData.questions.filter(q => q && q.question && q.question.trim()).length} short questions in this quiz
+                          {hasUnsavedChanges && <span className="qs__unsaved"> ⚠️ Unsaved changes</span>}
+                        </p>
+
+                        {shortQuestionData.questions
+                          .filter(q => q && q.question && q.question.trim())
+                          .map((question, questionIndex) => {
+                            const isExpanded = expandedShortQuestions.has(questionIndex);
+                            return (
+                              <section key={questionIndex} className="qItem" aria-label={`Short Question ${questionIndex + 1}`}>
+                                <header className="qItem__head">
+                                  <button
+                                    className="qItem__toggle"
+                                    aria-expanded={isExpanded}
+                                    aria-controls={`short-q-body-${questionIndex}`}
+                                    onClick={() => {
+                                      setExpandedShortQuestions(prev => {
+                                        const s = new Set(prev);
+                                        isExpanded ? s.delete(questionIndex) : s.add(questionIndex);
+                                        return s;
+                                      });
+                                    }}
+                                  >
+                                    {isExpanded ? '▼' : '▶'} Short Question {questionIndex + 1}
+                                  </button>
+                                </header>
+
+                                {isExpanded && (
+                                  <div id={`short-q-body-${questionIndex}`} className="qItem__body">
+                                    <div className="field">
+                                      <label htmlFor={`short-q-text-${questionIndex}`}>Question Text</label>
+                                      <textarea
+                                        id={`short-q-text-${questionIndex}`}
+                                        value={question.question || ''}
+                                        onChange={(e) => handleShortQuestionChange(questionIndex, 'question', e.target.value)}
+                                        placeholder="Enter your short answer question here..."
+                                        rows={3}
+                                        className="textarea"
+                                      />
+                                    </div>
+
+                                    <div className="field">
+                                      <label htmlFor={`short-q-answer-${questionIndex}`}>Correct Answer</label>
+                                      <textarea
+                                        id={`short-q-answer-${questionIndex}`}
+                                        value={question.correctAnswer || ''}
+                                        onChange={(e) => handleShortQuestionChange(questionIndex, 'correctAnswer', e.target.value)}
+                                        placeholder="Enter the correct answer..."
+                                        rows={3}
+                                        className="textarea"
+                                      />
+                                    </div>
+
+                                    <div className="grid">
+                                      <div className="field">
+                                        <label htmlFor={`short-q-exp-${questionIndex}`}>Explanation</label>
+                                        <textarea
+                                          id={`short-q-exp-${questionIndex}`}
+                                          value={question.explanation || ''}
+                                          onChange={(e) => handleShortQuestionChange(questionIndex, 'explanation', e.target.value)}
+                                          placeholder="Explain the answer and provide context..."
+                                          rows={2}
+                                          className="textarea"
+                                        />
+                                      </div>
+
+                                      <div className="field">
+                                        <label htmlFor={`short-q-pts-${questionIndex}`}>Points</label>
+                                        <input
+                                          id={`short-q-pts-${questionIndex}`}
+                                          type="number"
+                                          min="1"
+                                          max="10"
+                                          className="input input--xs"
+                                          value={question.points || 1}
+                                          onChange={(e) => handleShortQuestionChange(questionIndex, 'points', parseInt(e.target.value) || 1)}
+                                        />
+                                      </div>
+                                    </div>
+
+                                    <div className="grid">
+                                      <div className="field">
+                                        <label htmlFor={`short-q-min-${questionIndex}`}>Minimum Length</label>
+                                        <input
+                                          id={`short-q-min-${questionIndex}`}
+                                          type="number"
+                                          min="1"
+                                          className="input input--xs"
+                                          value={question.minLength || 10}
+                                          onChange={(e) => handleShortQuestionChange(questionIndex, 'minLength', parseInt(e.target.value) || 10)}
+                                        />
+                                      </div>
+
+                                      <div className="field">
+                                        <label htmlFor={`short-q-max-${questionIndex}`}>Maximum Length</label>
+                                        <input
+                                          id={`short-q-max-${questionIndex}`}
+                                          type="number"
+                                          min="1"
+                                          className="input input--xs"
+                                          value={question.maxLength || 500}
+                                          onChange={(e) => handleShortQuestionChange(questionIndex, 'maxLength', parseInt(e.target.value) || 500)}
+                                        />
+                                      </div>
+                                    </div>
                                   </div>
-                                  <span>{submission.studentId?.name || 'Unknown Student'}</span>
-                                </div>
-                              </td>
-                              <td>{submission.studentId?.email || 'No email'}</td>
-                              <td><span className="score">{score}/{totalQuestions}</span></td>
-                              <td>
-                                <div className="pctBar"><div className="pctBar__fill" style={{ width: `${percentage}%`, backgroundColor: getScoreColor(score, totalQuestions) }} /></div>
-                                <span className="pctText">{percentage.toFixed(1)}%</span>
-                              </td>
-                              <td><span className={`badge ${passed ? 'badge--pass' : 'badge--fail'}`}>{passed ? '✅ Passed' : '❌ Failed'}</span></td>
-                              <td>{new Date(submission.createdAt || Date.now()).toLocaleDateString()}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                                )}
+                              </section>
+                            );
+                          })}
+                      </div>
+                    )}
+                  </fieldset>
+                </form>
+              </div>
+            </section>
+
+            {/* Grading Panel */}
+            <section
+              id="panel-grading"
+              className="qm__panel"
+              role="tabpanel"
+              aria-labelledby="tab-grading"
+              hidden={activeTab !== 'grading'}
+            >
+              <div className="grading">
+                <header className="grading__header">
+                  <h2>Short Quiz Grading</h2>
+                  <p>Review and grade student submissions for short answer questions</p>
+                </header>
+
+                <div className="grading__content">
+                  <div className="card">
+                    <div className="grading__empty">
+                      <div className="grading__emptyIcon">📝</div>
+                      <h3>Short Quiz Grading</h3>
+                      <p>Grade student submissions for short answer questions.</p>
+                      <button 
+                        className="btn btn--primary"
+                        onClick={() => navigate(`/instructor/courses/${courseId}/short-question/grading`)}
+                      >
+                        📊 Go to Grading Page
+                      </button>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             </section>
           </article>

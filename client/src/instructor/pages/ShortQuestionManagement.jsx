@@ -12,7 +12,7 @@ export default function ShortQuestionManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  // Removed activeTab state since we only need the editor
+  const [activeTab, setActiveTab] = useState('editor'); // 'editor'
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -35,6 +35,7 @@ export default function ShortQuestionManagement() {
   
   // UI state for collapsible sections
   const [expandedQuestions, setExpandedQuestions] = useState(new Set());
+
 
   useEffect(() => {
     fetchCourseAndShortQuestions();
@@ -108,12 +109,8 @@ export default function ShortQuestionManagement() {
         correctAnswer: `Sample correct answer for question ${i + 1}`,
         explanation: `Explanation for question ${i + 1}`,
         points: 1,
-        keywords: [],
         maxLength: 500,
-        minLength: 10,
-        caseSensitive: false,
-        exactMatch: false,
-        partialCredit: true
+        minLength: 10
       });
     }
     
@@ -145,29 +142,6 @@ export default function ShortQuestionManagement() {
     setHasUnsavedChanges(true);
   };
 
-  const handleKeywordChange = (questionIndex, keywordIndex, value) => {
-    const updatedQuestions = [...shortQuestionData.questions];
-    updatedQuestions[questionIndex].keywords[keywordIndex] = value;
-    
-    setShortQuestionData(prev => ({ ...prev, questions: updatedQuestions }));
-    setHasUnsavedChanges(true);
-  };
-
-  const addKeyword = (questionIndex) => {
-    const updatedQuestions = [...shortQuestionData.questions];
-    updatedQuestions[questionIndex].keywords.push('');
-    
-    setShortQuestionData(prev => ({ ...prev, questions: updatedQuestions }));
-    setHasUnsavedChanges(true);
-  };
-
-  const removeKeyword = (questionIndex, keywordIndex) => {
-    const updatedQuestions = [...shortQuestionData.questions];
-    updatedQuestions[questionIndex].keywords.splice(keywordIndex, 1);
-    
-    setShortQuestionData(prev => ({ ...prev, questions: updatedQuestions }));
-    setHasUnsavedChanges(true);
-  };
 
   const handleSaveShortQuestion = async () => {
     // Validate short question data
@@ -275,6 +249,7 @@ export default function ShortQuestionManagement() {
     }
   };
 
+
   if (loading) {
     return (
       <div className="instructor-layout">
@@ -312,7 +287,19 @@ export default function ShortQuestionManagement() {
             </button>
           </header>
 
-          {/* No tabs needed - only editor */}
+          {/* Tabs */}
+          <nav id="sqm-tabs" className="tabs" role="tablist" aria-label="Short Quiz sections">
+            <button
+              id="tab-editor"
+              role="tab"
+              aria-selected={activeTab === 'editor'}
+              aria-controls="panel-editor"
+              className={`tabs__btn ${activeTab === 'editor' ? 'is-active' : ''}`}
+              onClick={() => setActiveTab('editor')}
+            >
+              📝 Quiz Editor
+            </button>
+          </nav>
 
           {/* Alerts */}
           {error && (
@@ -330,6 +317,9 @@ export default function ShortQuestionManagement() {
           <section
             id="panel-editor"
             className="sqm__panel"
+            role="tabpanel"
+            aria-labelledby="tab-editor"
+            hidden={activeTab !== 'editor'}
           >
             <div className="editor">
               <div className="editor__top">
@@ -367,6 +357,16 @@ export default function ShortQuestionManagement() {
                   </div>
                   <div style={{ marginTop: '0.5rem', fontSize: '0.9em' }}>
                     You can edit it below or delete it to create a new one.
+                  </div>
+                  <div style={{ marginTop: '1rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/instructor/courses/${courseId}/short-question/grading`)}
+                      className="btn btn--secondary"
+                      style={{ marginRight: '0.5rem' }}
+                    >
+                      📝 Grade Submissions
+                    </button>
                   </div>
                 </div>
               )}
@@ -582,71 +582,6 @@ export default function ShortQuestionManagement() {
                                     </div>
                                   </div>
 
-                                  <div className="field">
-                                    <label>Keywords (for grading)</label>
-                                    <div className="keywords-container">
-                                      {question.keywords?.map((keyword, keywordIndex) => (
-                                        <div key={keywordIndex} className="keyword-row">
-                                          <input
-                                            type="text"
-                                            className="input"
-                                            value={keyword || ''}
-                                            onChange={(e) => handleKeywordChange(questionIndex, keywordIndex, e.target.value)}
-                                            placeholder={`Keyword ${keywordIndex + 1}`}
-                                          />
-                                          <button
-                                            type="button"
-                                            className="btn btn--sm btn--danger"
-                                            onClick={() => removeKeyword(questionIndex, keywordIndex)}
-                                          >
-                                            ×
-                                          </button>
-                                        </div>
-                                      ))}
-                                      <button
-                                        type="button"
-                                        className="btn btn--sm btn--accent"
-                                        onClick={() => addKeyword(questionIndex)}
-                                      >
-                                        + Add Keyword
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  <div className="grid">
-                                    <div className="field">
-                                      <label className="checkbox-label">
-                                        <input
-                                          type="checkbox"
-                                          checked={question.caseSensitive || false}
-                                          onChange={(e) => handleQuestionChange(questionIndex, 'caseSensitive', e.target.checked)}
-                                        />
-                                        Case Sensitive
-                                      </label>
-                                    </div>
-
-                                    <div className="field">
-                                      <label className="checkbox-label">
-                                        <input
-                                          type="checkbox"
-                                          checked={question.exactMatch || false}
-                                          onChange={(e) => handleQuestionChange(questionIndex, 'exactMatch', e.target.checked)}
-                                        />
-                                        Exact Match Required
-                                      </label>
-                                    </div>
-
-                                    <div className="field">
-                                      <label className="checkbox-label">
-                                        <input
-                                          type="checkbox"
-                                          checked={question.partialCredit || true}
-                                          onChange={(e) => handleQuestionChange(questionIndex, 'partialCredit', e.target.checked)}
-                                        />
-                                        Allow Partial Credit
-                                      </label>
-                                    </div>
-                                  </div>
                                 </div>
                               )}
                             </section>
@@ -658,6 +593,7 @@ export default function ShortQuestionManagement() {
               </form>
             </div>
           </section>
+
 
         </article>
       </main>

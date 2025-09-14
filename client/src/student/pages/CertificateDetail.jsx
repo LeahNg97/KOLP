@@ -39,12 +39,6 @@ export default function CertificateDetail() {
           <div className="cert-error">{error}</div>
         ) : certificate ? (
           <div className="certificate">
-            {/* Decorative corner elements */}
-            <div className="corner-decoration top-left"></div>
-            <div className="corner-decoration top-right"></div>
-            <div className="corner-decoration bottom-left"></div>
-            <div className="corner-decoration bottom-right"></div>
-            
             {/* Background pattern */}
             <div className="background-pattern"></div>
             

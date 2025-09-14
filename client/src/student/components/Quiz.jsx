@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Quiz.css';
-import { startQuiz, submitQuiz } from '../api/quizProgressApi';
+import { startQuiz, submitQuiz, getQuizResults, getQuizProgress } from '../api/quizProgressApi';
 
 
 export default function Quiz() {
@@ -43,7 +43,59 @@ export default function Quiz() {
         return;
       }
 
+      // First, try to get existing quiz progress
+      try {
+        const progressResponse = await getQuizProgress(token, courseId);
+        console.log('Quiz progress response:', progressResponse);
+        
+        if (progressResponse.success && progressResponse.data) {
+          const { quizProgress } = progressResponse.data;
+          
+          // Check if quiz is completed
+          if (quizProgress && quizProgress.status === 'completed') {
+            console.log('Quiz already completed, showing results');
+            
+            // Try to get detailed results
+            try {
+              const resultsResponse = await getQuizResults(token, courseId);
+              if (resultsResponse.success && resultsResponse.data) {
+                setResults(resultsResponse.data);
+              } else {
+                // Use progress data as fallback
+                setResults({
+                  score: quizProgress.score || 0,
+                  totalQuestions: quizProgress.totalQuestions || 0,
+                  percentage: quizProgress.percentage || 0,
+                  passed: quizProgress.passed || false,
+                  lessonProgress: { percentage: 0 },
+                  quizProgress: { percentage: quizProgress.passed ? 20 : 0 },
+                  courseProgress: 0
+                });
+              }
+            } catch (err) {
+              // Use progress data as fallback
+              setResults({
+                score: quizProgress.score || 0,
+                totalQuestions: quizProgress.totalQuestions || 0,
+                percentage: quizProgress.percentage || 0,
+                passed: quizProgress.passed || false,
+                lessonProgress: { percentage: 0 },
+                quizProgress: { percentage: quizProgress.passed ? 20 : 0 },
+                courseProgress: 0
+              });
+            }
+            
+            setQuizCompleted(true);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        // No progress found, continue to start new quiz
+        console.log('No existing quiz progress found, starting new quiz:', err.message);
+      }
 
+      // Start new quiz if no results found
       const response = await startQuiz(token, courseId);
      
       if (response.success) {
@@ -184,12 +236,12 @@ export default function Quiz() {
           >
             🔄 Retry
           </button>
-          <button
-            className="back-btn"
-            onClick={() => navigate(`/student/courses/${courseId}`)}
-          >
-            ← Back to Course
-          </button>
+            <button
+              className="back-btn"
+              onClick={() => navigate(`/student/courses/${courseId}/learn`)}
+            >
+              ← Back to Course
+            </button>
         </div>
       </div>
     );
@@ -220,29 +272,29 @@ export default function Quiz() {
             <h3>Course Progress</h3>
             <div className="progress-bars">
               <div className="progress-item">
-                <label>Lessons: {results.lessonProgress.percentage}%</label>
+                <label>Lessons: {results.lessonProgress?.percentage || 0}%</label>
                 <div className="progress-bar">
                   <div
                     className="progress-fill lesson-progress"
-                    style={{ width: `${results.lessonProgress.percentage}%` }}
+                    style={{ width: `${results.lessonProgress?.percentage || 0}%` }}
                   ></div>
                 </div>
               </div>
               <div className="progress-item">
-                <label>Quiz: {results.quizProgress.percentage}%</label>
+                <label>Quiz: {results.quizProgress?.percentage || 0}%</label>
                 <div className="progress-bar">
                   <div
                     className="progress-fill quiz-progress"
-                    style={{ width: `${results.quizProgress.percentage}%` }}
+                    style={{ width: `${results.quizProgress?.percentage || 0}%` }}
                   ></div>
                 </div>
               </div>
               <div className="progress-item total">
-                <label>Total: {results.courseProgress}%</label>
+                <label>Total: {results.courseProgress || 0}%</label>
                 <div className="progress-bar">
                   <div
                     className="progress-fill total-progress"
-                    style={{ width: `${results.courseProgress}%` }}
+                    style={{ width: `${results.courseProgress || 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -252,14 +304,24 @@ export default function Quiz() {
 
           <div className="results-actions">
             <button
-              className="review-btn"
-              onClick={() => navigate(`/student/courses/${courseId}/quiz/results`)}
+              className="retake-btn"
+              onClick={() => {
+                // Reset state and start new quiz
+                setQuizCompleted(false);
+                setResults(null);
+                setQuizStarted(false);
+                setQuizData(null);
+                setCurrentQuestion(0);
+                setAnswers([]);
+                setTimeSpent(0);
+                initializeQuiz();
+              }}
             >
-              📊 Review Answers
+              🔄 Retake Quiz
             </button>
             <button
               className="course-btn"
-              onClick={() => navigate(`/student/courses/${courseId}`)}
+              onClick={() => navigate(`/student/courses/${courseId}/learn`)}
             >
               🏠 Back to Course
             </button>

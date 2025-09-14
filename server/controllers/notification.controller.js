@@ -42,14 +42,14 @@ class NotificationController {
     if (!notification) {
       return res.status(404).json({
         success: false,
-        message: 'Thông báo không tồn tại'
+        message: 'Notification not found'
       });
     }
     
     res.json({
       success: true,
       data: notification,
-      message: 'Đã đánh dấu thông báo đã đọc'
+      message: 'Notification marked as read'
     });
   });
 
@@ -62,7 +62,7 @@ class NotificationController {
     res.json({
       success: true,
       data: result,
-      message: 'Đã đánh dấu tất cả thông báo đã đọc'
+      message: 'All notifications marked as read'
     });
   });
 
@@ -76,13 +76,13 @@ class NotificationController {
     if (!notification) {
       return res.status(404).json({
         success: false,
-        message: 'Thông báo không tồn tại'
+        message: 'Notification not found'
       });
     }
     
     res.json({
       success: true,
-      message: 'Đã xóa thông báo'
+      message: 'Notification deleted'
     });
   });
 
@@ -142,7 +142,7 @@ class NotificationController {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Không có quyền tạo thông báo'
+        message: 'No permission to create notification'
       });
     }
     
@@ -162,7 +162,7 @@ class NotificationController {
     res.status(201).json({
       success: true,
       data: notification,
-      message: 'Đã tạo thông báo thành công'
+      message: 'Notification created successfully'
     });
   });
 
@@ -174,7 +174,7 @@ class NotificationController {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Không có quyền gửi thông báo hàng loạt'
+        message: 'No permission to send bulk notifications'
       });
     }
     
@@ -198,7 +198,7 @@ class NotificationController {
     res.status(201).json({
       success: true,
       data: notifications,
-      message: `Đã gửi thông báo cho ${notifications.length} người dùng`
+      message: `Notifications sent to ${notifications.length} users`
     });
   });
 
@@ -208,7 +208,7 @@ class NotificationController {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Không có quyền xem thống kê'
+        message: 'No permission to view statistics'
       });
     }
     

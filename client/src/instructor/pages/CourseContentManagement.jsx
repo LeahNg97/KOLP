@@ -26,7 +26,6 @@ export default function CourseContentManagement() {
   const [showModuleForm, setShowModuleForm] = useState(false);
   const [showLessonForm, setShowLessonForm] = useState(false);
   const [selectedModuleId, setSelectedModuleId] = useState(null);
-  const [activeTab, setActiveTab] = useState('content'); // 'content', 'quiz', 'short-questions'
 
   useEffect(() => {
     console.log('CourseContentManagement loaded with courseId:', courseId);
@@ -350,33 +349,6 @@ export default function CourseContentManagement() {
             </button>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="course-nav-tabs">
-            <button 
-              className={`nav-tab ${activeTab === 'content' ? 'active' : ''}`}
-              onClick={() => setActiveTab('content')}
-            >
-              📚 Content
-            </button>
-            <button 
-              className={`nav-tab ${activeTab === 'quiz' ? 'active' : ''}`}
-              onClick={() => navigate(`/instructor/courses/${courseId}/quiz`)}
-            >
-              🧠 Quiz
-            </button>
-            <button 
-              className={`nav-tab ${activeTab === 'short-questions' ? 'active' : ''}`}
-              onClick={() => navigate(`/instructor/courses/${courseId}/short-questions`)}
-            >
-              📝 Short Questions
-            </button>
-            <button 
-              className={`nav-tab ${activeTab === 'students' ? 'active' : ''}`}
-              onClick={() => navigate(`/instructor/courses/${courseId}/students`)}
-            >
-              👥 Students
-            </button>
-          </div>
 
           <div className="course-overview">
             <div className="course-info">

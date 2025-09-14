@@ -30,25 +30,22 @@ const ShortQuestionProgressSchema = new Schema({
     maxPoints: { type: Number, required: true }, // điểm tối đa cho câu này
     timeSpent: { type: Number, default: 0 }, // thời gian làm câu này (giây)
     feedback: { type: String }, // phản hồi cho câu trả lời
-    keywords: [{ type: String }], // từ khóa được tìm thấy trong câu trả lời
-    similarity: { type: Number, default: 0 }, // độ tương đồng với đáp án đúng (0-1)
   }],
   
   // Trạng thái
   status: { 
     type: String, 
-    enum: ['in_progress', 'completed', 'abandoned'], 
+    enum: ['in_progress', 'submitted', 'graded', 'completed', 'abandoned'], 
     default: 'in_progress' 
   },
   
   // Cài đặt chấm điểm
-  gradingMethod: { 
-    type: String, 
-    enum: ['exact', 'keyword', 'similarity', 'manual'], 
-    default: 'keyword' 
-  },
-  autoGraded: { type: Boolean, default: true }, // có được chấm tự động không
   manuallyGraded: { type: Boolean, default: false }, // có được chấm thủ công không
+  requiresManualGrading: { type: Boolean, default: true }, // yêu cầu chấm thủ công
+  
+  // Thông tin chấm điểm
+  gradedBy: { type: Types.ObjectId, ref: 'User' }, // người chấm điểm
+  gradedAt: { type: Date }, // thời điểm chấm điểm
   
   // Feedback tổng thể
   overallFeedback: { type: String },
@@ -72,8 +69,9 @@ ShortQuestionProgressSchema.virtual('completionTime').get(function() {
 
 // Method để tính điểm phần trăm
 ShortQuestionProgressSchema.methods.calculatePercentage = function() {
-  if (this.totalQuestions === 0) return 0;
-  this.percentage = Math.round((this.score / this.totalQuestions) * 100);
+  const totalMaxPoints = this.answers.reduce((sum, answer) => sum + answer.maxPoints, 0);
+  if (totalMaxPoints === 0) return 0;
+  this.percentage = Math.round((this.score / totalMaxPoints) * 100);
   return this.percentage;
 };
 
@@ -83,51 +81,17 @@ ShortQuestionProgressSchema.methods.checkPassed = function(passingScore = 70) {
   return this.passed;
 };
 
-// Method để tính điểm tương đồng (simple string similarity)
-ShortQuestionProgressSchema.methods.calculateSimilarity = function(str1, str2) {
-  if (!str1 || !str2) return 0;
-  
-  const s1 = str1.toLowerCase().trim();
-  const s2 = str2.toLowerCase().trim();
-  
-  if (s1 === s2) return 1;
-  
-  // Simple Jaccard similarity
-  const words1 = new Set(s1.split(/\s+/));
-  const words2 = new Set(s2.split(/\s+/));
-  
-  const intersection = new Set([...words1].filter(x => words2.has(x)));
-  const union = new Set([...words1, ...words2]);
-  
-  return intersection.size / union.size;
-};
 
-// Method để chấm điểm tự động
-ShortQuestionProgressSchema.methods.autoGrade = function() {
-  this.answers.forEach((answer, index) => {
-    const studentAnswer = answer.studentAnswer.toLowerCase().trim();
-    const correctAnswer = answer.correctAnswer.toLowerCase().trim();
-    
-    // Exact match
-    if (studentAnswer === correctAnswer) {
-      answer.isCorrect = true;
-      answer.points = answer.maxPoints;
-      answer.similarity = 1;
-    } else {
-      // Calculate similarity
-      answer.similarity = this.calculateSimilarity(studentAnswer, correctAnswer);
-      
-      // Partial credit based on similarity
-      if (answer.similarity >= 0.8) {
-        answer.isCorrect = true;
-        answer.points = Math.round(answer.maxPoints * answer.similarity);
-      } else if (answer.similarity >= 0.5) {
-        answer.isCorrect = false;
-        answer.points = Math.round(answer.maxPoints * answer.similarity * 0.5);
-      } else {
-        answer.isCorrect = false;
-        answer.points = 0;
-      }
+
+// Method để chấm điểm thủ công
+ShortQuestionProgressSchema.methods.manualGrade = function(gradedAnswers, instructorId) {
+  // Cập nhật điểm cho từng câu trả lời
+  gradedAnswers.forEach((gradedAnswer) => {
+    const answer = this.answers.find(a => a.questionIndex === gradedAnswer.questionIndex);
+    if (answer) {
+      answer.points = gradedAnswer.points;
+      answer.isCorrect = gradedAnswer.isCorrect;
+      answer.feedback = gradedAnswer.feedback || '';
     }
   });
   
@@ -135,6 +99,19 @@ ShortQuestionProgressSchema.methods.autoGrade = function() {
   this.score = this.answers.reduce((sum, answer) => sum + answer.points, 0);
   this.calculatePercentage();
   
+  // Cập nhật trạng thái
+  this.status = 'graded';
+  this.manuallyGraded = true;
+  this.gradedBy = instructorId;
+  this.gradedAt = new Date();
+  
+  return this;
+};
+
+// Method để hoàn thành chấm điểm
+ShortQuestionProgressSchema.methods.completeGrading = function(passingScore = 70) {
+  this.status = 'completed';
+  this.checkPassed(passingScore);
   return this;
 };
 

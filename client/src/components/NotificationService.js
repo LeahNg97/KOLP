@@ -4,7 +4,7 @@ export const getDefaultNotifications = (userRole) => {
   const baseNotifications = [
     {
       id: 1,
-      title: 'Welcome !',
+      title: 'Welcome!',
       message: 'Welcome to KOLP',
       time: 'Just Now',
       isRead: true,

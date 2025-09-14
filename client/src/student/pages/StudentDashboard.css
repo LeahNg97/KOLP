@@ -63,22 +63,47 @@
 
 .student-courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 32px;
+  width: 100%;
+  min-width: 0; /* Đảm bảo grid không bị overflow */
 }
 
-@media (max-width: 768px) {
+/* Ensure cards fill available space properly */
+.student-courses-grid > * {
+  min-width: 0; /* Prevent grid items from overflowing */
+  width: 100%;
+}
+
+/* Responsive adjustments while maintaining 4 columns */
+@media (max-width: 1400px) {
   .student-courses-grid {
-    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .student-courses-grid {
     gap: 16px;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1200px) {
+@media (max-width: 992px) {
   .student-courses-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-courses-grid {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .student-courses-grid {
+    gap: 8px;
   }
 }
 
@@ -131,7 +156,7 @@
     padding: 15px 2px;
   }
   .student-courses-grid {
-    gap: 10px;
+    gap: 6px;
   }
   .student-search-input {
     width: 120px;

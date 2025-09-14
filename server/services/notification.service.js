@@ -29,8 +29,8 @@ class NotificationService {
         recipientId: enrollment.courseId.instructorId,
         senderId: enrollment.studentId._id,
         type: 'enrollment_request',
-        title: 'Yêu cầu đăng ký khóa học mới',
-        message: `Học sinh ${enrollment.studentId.name} đã đăng ký khóa học "${enrollment.courseId.title}"`,
+        title: 'New Course Enrollment Request',
+        message: `Student ${enrollment.studentId.name} has enrolled in course "${enrollment.courseId.title}"`,
         relatedId: enrollmentId,
         relatedModel: 'Enrollment',
         priority: 'medium',
@@ -59,10 +59,10 @@ class NotificationService {
       const notification = await this.createNotification({
         recipientId: enrollment.studentId._id,
         type: approved ? 'enrollment_approved' : 'enrollment_rejected',
-        title: approved ? 'Đăng ký khóa học được duyệt' : 'Đăng ký khóa học bị từ chối',
+        title: approved ? 'Course Enrollment Approved' : 'Course Enrollment Rejected',
         message: approved 
-          ? `Khóa học "${enrollment.courseId.title}" của bạn đã được duyệt. Bạn có thể bắt đầu học ngay!`
-          : `Khóa học "${enrollment.courseId.title}" của bạn chưa được duyệt. Vui lòng liên hệ instructor để biết thêm chi tiết.`,
+          ? `Your enrollment in course "${enrollment.courseId.title}" has been approved. You can start learning now!`
+          : `Your enrollment in course "${enrollment.courseId.title}" has not been approved. Please contact the instructor for more details.`,
         relatedId: enrollmentId,
         relatedModel: 'Enrollment',
         priority: approved ? 'high' : 'medium',
@@ -96,8 +96,8 @@ class NotificationService {
           recipientId: admin._id,
           senderId: course.instructorId._id,
           type: 'course_created',
-          title: 'Khóa học mới cần duyệt',
-          message: `Instructor ${course.instructorId.name} đã tạo khóa học mới "${course.title}" cần được duyệt`,
+          title: 'New Course Needs Approval',
+          message: `Instructor ${course.instructorId.name} has created a new course "${course.title}" that needs approval`,
           relatedId: courseId,
           relatedModel: 'Course',
           priority: 'medium',
@@ -127,10 +127,10 @@ class NotificationService {
       const notification = await this.createNotification({
         recipientId: course.instructorId._id,
         type: approved ? 'course_approved' : 'course_rejected',
-        title: approved ? 'Khóa học được duyệt' : 'Khóa học bị từ chối',
+        title: approved ? 'Course Approved' : 'Course Rejected',
         message: approved 
-          ? `Khóa học "${course.title}" của bạn đã được duyệt và có thể xuất bản!`
-          : `Khóa học "${course.title}" của bạn chưa được duyệt. Lý do: ${adminNote}`,
+          ? `Your course "${course.title}" has been approved and can be published!`
+          : `Your course "${course.title}" has not been approved. Reason: ${adminNote}`,
         relatedId: courseId,
         relatedModel: 'Course',
         priority: approved ? 'high' : 'medium',
@@ -160,8 +160,8 @@ class NotificationService {
         recipientId: course.instructorId,
         senderId: studentId,
         type: 'assignment_submitted',
-        title: 'Bài tập mới được nộp',
-        message: `Học sinh ${student.name} đã nộp bài tập trong khóa học "${course.title}"`,
+        title: 'New Assignment Submitted',
+        message: `Student ${student.name} has submitted an assignment in course "${course.title}"`,
         relatedId: assignmentId,
         relatedModel: 'Assignment',
         priority: 'medium',
@@ -188,8 +188,8 @@ class NotificationService {
       const notification = await this.createNotification({
         recipientId: studentId,
         type: 'assignment_graded',
-        title: 'Bài tập đã được chấm điểm',
-        message: `Bài tập của bạn đã được chấm điểm: ${grade}/100${feedback ? `. Phản hồi: ${feedback}` : ''}`,
+        title: 'Assignment Graded',
+        message: `Your assignment has been graded: ${grade}/100${feedback ? `. Feedback: ${feedback}` : ''}`,
         relatedId: assignmentId,
         relatedModel: 'Assignment',
         priority: 'high',
@@ -218,8 +218,8 @@ class NotificationService {
         const notification = await this.createNotification({
           recipientId: studentId,
           type: 'quiz_available',
-          title: 'Quiz mới có sẵn',
-          message: `Quiz mới đã có sẵn trong khóa học "${course.title}"`,
+          title: 'New Quiz Available',
+          message: `A new quiz is now available in course "${course.title}"`,
           relatedId: quizId,
           relatedModel: 'Quiz',
           priority: 'medium',
@@ -247,8 +247,8 @@ class NotificationService {
       const notification = await this.createNotification({
         recipientId: studentId,
         type: 'certificate_earned',
-        title: 'Chúc mừng! Bạn đã nhận được chứng chỉ',
-        message: `Bạn đã hoàn thành khóa học "${course.title}" và nhận được chứng chỉ!`,
+        title: 'Congratulations! You have earned a certificate',
+        message: `You have completed the course "${course.title}" and earned a certificate!`,
         relatedId: certificateId,
         relatedModel: 'Certificate',
         priority: 'high',
@@ -274,10 +274,10 @@ class NotificationService {
       const notification = await this.createNotification({
         recipientId: studentId,
         type: success ? 'payment_success' : 'payment_failed',
-        title: success ? 'Thanh toán thành công' : 'Thanh toán thất bại',
+        title: success ? 'Payment Successful' : 'Payment Failed',
         message: success 
-          ? `Bạn đã thanh toán thành công khóa học "${course.title}"`
-          : `Thanh toán khóa học "${course.title}" thất bại. Vui lòng thử lại.`,
+          ? `You have successfully paid for course "${course.title}"`
+          : `Payment for course "${course.title}" failed. Please try again.`,
         relatedId: paymentId,
         relatedModel: 'Payment',
         priority: success ? 'high' : 'urgent',
@@ -300,14 +300,14 @@ class NotificationService {
       let title, message;
       
       if (userRole === 'student') {
-        title = 'Chào mừng bạn đến với KOLP!';
-        message = 'Chào mừng bạn đến với nền tảng học tập trực tuyến KOLP. Hãy khám phá các khóa học thú vị!';
+        title = 'Welcome to KOLP!';
+        message = 'Welcome to KOLP online learning platform. Explore our exciting courses!';
       } else if (userRole === 'instructor') {
-        title = 'Chào mừng Instructor!';
-        message = 'Chào mừng bạn đến với KOLP! Bạn có thể tạo và quản lý các khóa học của mình.';
+        title = 'Welcome Instructor!';
+        message = 'Welcome to KOLP! You can create and manage your courses.';
       } else {
-        title = 'Chào mừng Admin!';
-        message = 'Chào mừng bạn đến với hệ thống quản lý KOLP.';
+        title = 'Welcome Admin!';
+        message = 'Welcome to KOLP management system.';
       }
 
       const notification = await this.createNotification({

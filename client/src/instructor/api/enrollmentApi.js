@@ -102,4 +102,48 @@ export const rejectEnrollment = async (enrollmentId) => {
     console.error('API: Error data:', error.response?.data);
     throw error;
   }
+};
+
+// Get student lesson progress for instructor
+export const getStudentLessonProgress = async (courseId, studentId) => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`${API_BASE_URL}/lesson-progress/course/${courseId}/student/${studentId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+// Get student course progress for instructor
+export const getStudentCourseProgress = async (courseId, studentId) => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`${API_BASE_URL}/lesson-progress/course/${courseId}/student/${studentId}/progress`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+// Get student quiz progress for instructor
+export const getStudentQuizProgress = async (courseId, studentId) => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`${API_BASE_URL}/quiz-progress/courses/${courseId}/student/${studentId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+// Get student short question progress for instructor
+export const getStudentShortQuestionProgress = async (courseId, studentId) => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`${API_BASE_URL}/short-questions/course/${courseId}/student/${studentId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
 }; 

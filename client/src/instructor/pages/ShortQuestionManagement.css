@@ -343,21 +343,6 @@
   padding: 20px;
 }
 
-/* Keywords */
-.keywords-container {
-  margin-top: 10px;
-}
-
-.keyword-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.keyword-row .input {
-  flex: 1;
-}
 
 /* Checkboxes */
 .checkbox-label {

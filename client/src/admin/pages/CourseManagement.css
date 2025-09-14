@@ -424,6 +424,32 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-overlay.fullscreen-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 20px;
+  border: none;
+  z-index: 1000;
+}
+
+/* Prevent body scroll when fullscreen modal is open */
+body.modal-open {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .modal {
@@ -434,6 +460,21 @@
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.fullscreen-modal {
+  width: 90vw;
+  height: 80vh;
+  max-width: 1200px;
+  max-height: 800px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  border: none;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: white;
 }
 
 .large-modal {
@@ -1408,5 +1449,304 @@
   .admin-notes-display small {
     font-size: 0.8rem;
     padding: 6px 8px;
+  }
+}
+
+/* Loading Details */
+.loading-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Course Modules */
+.course-modules {
+  margin: 30px 0;
+}
+
+.course-modules h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.modules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.module-item {
+  background: #fff;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.module-header h4 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.module-description {
+  color: #666;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+/* Module Lessons */
+.module-lessons,
+.module-quizzes,
+.module-short-questions {
+  margin: 20px 0;
+}
+
+.module-lessons h5,
+.module-quizzes h5,
+.module-short-questions h5 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.lessons-grid,
+.quizzes-grid,
+.short-questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.lesson-card,
+.quiz-card,
+.short-question-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  transition: all 0.2s ease;
+}
+
+.lesson-card:hover,
+.quiz-card:hover,
+.short-question-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.lesson-header,
+.quiz-header,
+.short-question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.lesson-title,
+.quiz-title,
+.short-question-title {
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.lesson-type-badge,
+.quiz-type-badge,
+.short-question-type-badge {
+  background: #667eea;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.lesson-type-badge.video {
+  background: #e74c3c;
+}
+
+.lesson-type-badge.text {
+  background: #3498db;
+}
+
+.lesson-type-badge.audio {
+  background: #9b59b6;
+}
+
+.lesson-description,
+.quiz-description,
+.short-question-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.lesson-meta,
+.quiz-meta,
+.short-question-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.lesson-duration,
+.quiz-questions,
+.quiz-time-limit,
+.short-question-points {
+  background: #e9ecef;
+  color: #495057;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.published-badge {
+  background: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Modal Footer Actions */
+.modal-footer {
+  border-top: 1px solid #e1e5e9;
+  padding: 20px 24px;
+  background: #f8f9fa;
+}
+
+.admin-notes-section {
+  margin-bottom: 20px;
+}
+
+.admin-notes-section label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.admin-notes-section textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.admin-notes-section textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.action-buttons button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+  background: #e9e9e9;
+  color: #333;
+}
+
+.approve-btn {
+  background: #28a745;
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.approve-btn:hover:not(:disabled) {
+  background: #218838;
+  border-color: #218838;
+}
+
+.reject-btn {
+  background: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.reject-btn:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #c82333;
+}
+
+.action-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile Responsive for New Components */
+@media (max-width: 768px) {
+  .lessons-grid,
+  .quizzes-grid,
+  .short-questions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+  
+  .fullscreen-modal {
+    width: 95vw;
+    height: 90vh;
+    max-width: none;
+    max-height: none;
   }
 } 
