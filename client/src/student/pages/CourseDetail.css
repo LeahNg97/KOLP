@@ -1009,11 +1009,15 @@
   }
   
   .cd-content {
-    padding: 60px 24px;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
   
   .cd-section {
-    padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
   }
 }
 
@@ -1535,8 +1539,8 @@
   font-size: 0.85rem;
   color: #64748b;
   font-style: italic;
-  max-width: 200px;
-  text-align: right;
+  max-width: 650px;
+  text-align: left;
   line-height: 1.4;
 }
 

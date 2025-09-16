@@ -25,7 +25,7 @@ const AdminWorkshopManagement = () => {
       const data = await getAllWorkshops();
       setWorkshops(data);
     } catch (err) {
-      setError('Không thể tải danh sách workshop');
+      setError('Cannot load workshops');
       console.error('Error loading workshops:', err);
     } finally {
       setLoading(false);
@@ -43,13 +43,13 @@ const AdminWorkshopManagement = () => {
   };
 
   const handleDeleteWorkshop = async (workshop) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa workshop "${workshop.title}"?`)) {
+    if (window.confirm(`are you sure deleting this workshop? "${workshop.title}"?`)) {
       try {
         await deleteWorkshop(workshop._id);
         setWorkshops(prev => prev.filter(w => w._id !== workshop._id));
         setError(null);
       } catch (err) {
-        setError('Không thể xóa workshop');
+        setError('can delete workshop');
         console.error('Error deleting workshop:', err);
       }
     }
@@ -83,7 +83,7 @@ const AdminWorkshopManagement = () => {
   if (loading) {
     return (
       <div className="admin-workshop-management">
-        <div className="loading">Đang tải...</div>
+        <div className="loading">Loading...</div>
       </div>
     );
   }
@@ -91,8 +91,8 @@ const AdminWorkshopManagement = () => {
   return (
     <div className="admin-workshop-management">
       <div className="page-header">
-        <h1>Quản lý Workshop</h1>
-        <p>Xem và quản lý tất cả workshop trong hệ thống</p>
+        <h1>Workshop Management</h1>
+        <p>View and manage all workshops</p>
       </div>
 
       {error && (
@@ -106,13 +106,13 @@ const AdminWorkshopManagement = () => {
         <form onSubmit={handleSearch} className="search-form">
           <input
             type="text"
-            placeholder="Tìm kiếm workshop..."
+            placeholder="search workshop..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
           />
           <button type="submit" className="search-btn">
-            Tìm kiếm
+            Search
           </button>
         </form>
 
@@ -122,11 +122,11 @@ const AdminWorkshopManagement = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="filter-select"
           >
-            <option value="">Tất cả trạng thái</option>
-            <option value="scheduled">Đã lên lịch</option>
-            <option value="live">Đang diễn ra</option>
-            <option value="completed">Đã hoàn thành</option>
-            <option value="canceled">Đã hủy</option>
+            <option value="">All Status</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="live">Live</option>
+            <option value="completed">Finished</option>
+            <option value="canceled">Canceled</option>
           </select>
 
           <select
@@ -134,7 +134,7 @@ const AdminWorkshopManagement = () => {
             onChange={(e) => setInstructorFilter(e.target.value)}
             className="filter-select"
           >
-            <option value="">Tất cả giảng viên</option>
+            <option value="">All instructor</option>
             {instructors.map(instructor => (
               <option key={instructor._id} value={instructor._id}>
                 {instructor.name}
@@ -147,30 +147,30 @@ const AdminWorkshopManagement = () => {
       <div className="workshop-stats">
         <div className="stat-item">
           <span className="stat-number">{workshops.length}</span>
-          <span className="stat-label">Tổng số workshop</span>
+          <span className="stat-label">Number of workshop</span>
         </div>
         <div className="stat-item">
           <span className="stat-number">{workshops.filter(w => w.isPublished).length}</span>
-          <span className="stat-label">Đã xuất bản</span>
+          <span className="stat-label">Published</span>
         </div>
         <div className="stat-item">
           <span className="stat-number">{workshops.filter(w => w.status === 'scheduled').length}</span>
-          <span className="stat-label">Đã lên lịch</span>
+          <span className="stat-label">Scheduled</span>
         </div>
         <div className="stat-item">
           <span className="stat-number">{workshops.filter(w => w.status === 'live').length}</span>
-          <span className="stat-label">Đang diễn ra</span>
+          <span className="stat-label">Live</span>
         </div>
         <div className="stat-item">
           <span className="stat-number">{workshops.filter(w => w.status === 'completed').length}</span>
-          <span className="stat-label">Đã hoàn thành</span>
+          <span className="stat-label">Finished</span>
         </div>
       </div>
 
       <div className="workshop-list">
         {filteredWorkshops.length === 0 ? (
           <div className="no-workshops">
-            <p>Không tìm thấy workshop nào</p>
+            <p>Cannot fine workshop</p>
           </div>
         ) : (
           filteredWorkshops.map(workshop => (
@@ -183,9 +183,9 @@ const AdminWorkshopManagement = () => {
                 <button 
                   className="btn btn-danger btn-sm"
                   onClick={() => handleDeleteWorkshop(workshop)}
-                  title="Xóa workshop"
+                  title="Delete workshop"
                 >
-                  🗑️ Xóa
+                  Delete
                 </button>
               </div>
             </div>
@@ -195,7 +195,7 @@ const AdminWorkshopManagement = () => {
 
       {filteredWorkshops.length > 0 && (
         <div className="workshop-stats-footer">
-          <p>Hiển thị {filteredWorkshops.length} trong tổng số {workshops.length} workshop</p>
+          <p>Showing {filteredWorkshops.length} out of {workshops.length} workshop</p>
         </div>
       )}
 

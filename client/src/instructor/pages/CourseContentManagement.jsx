@@ -355,9 +355,9 @@ export default function CourseContentManagement() {
               <h2>{course?.title}</h2>
               {course?.subtitle && <p className="subtitle">{course.subtitle}</p>}
               <div className="course-stats">
-                <span>📚 {syllabus?.modules?.length || 0} modules</span>
-                <span>📖 {syllabus?.lessons?.length || 0} lessons</span>
-                <span>⏱ {Math.floor((course?.stats?.totalDurationSec || 0) / 60)} min</span>
+                <span>{syllabus?.modules?.length || 0} modules</span>
+                <span>{syllabus?.lessons?.length || 0} lessons</span>
+                <span>{Math.floor((course?.stats?.totalDurationSec || 0) / 60)} min</span>
               </div>
             </div>
           </div>
@@ -365,14 +365,14 @@ export default function CourseContentManagement() {
           {/* Error and Success Messages */}
           {error && (
             <div className="error-message">
-              <span>❌ {error}</span>
+              <span>{error}</span>
               <button onClick={() => setError('')} className="close-error">×</button>
             </div>
           )}
           
           {successMessage && (
             <div className="success-message">
-              <span>✅ {successMessage}</span>
+              <span>{successMessage}</span>
             </div>
           )}
 

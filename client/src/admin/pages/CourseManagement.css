@@ -143,7 +143,7 @@
   font-weight: 700;
   font-size: 15px;
   padding: 18px 20px;
-  text-align: left;
+  text-align: centre;
   border-bottom: 2px solid #e1e5e9;
 }
 
@@ -173,8 +173,8 @@
 }
 
 .course-thumbnail {
-  width: 60px;
-  height: 60px;
+  width: 350px;
+  height: 100px;
   border-radius: 8px;
   object-fit: cover;
   border: 1px solid #e1e5e9;
@@ -254,7 +254,7 @@
 .price-paid {
   background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
   color: white;
-  padding: 6px 12px;
+  padding: 15px 15px;
   border-radius: 16px;
   font-size: 11px;
   font-weight: 600;
@@ -265,7 +265,7 @@
 .price-sale {
   background: #dc3545;
   color: white;
-  padding: 4px 8px;
+  padding: 15px 15px;
   border-radius: 12px;
   font-size: 10px;
   font-weight: 600;
@@ -359,6 +359,7 @@
   border: none;
   border-radius: 6px;
   font-size: 16px;
+  color: Black;
   cursor: pointer;
   margin-right: 5px;
   transition: all 0.2s;
@@ -1105,7 +1106,7 @@ body.modal-open {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
-  margin-top: 24px;
+  margin-top: 0px;
 }
 
 .admin-notes-display::before {
@@ -1161,7 +1162,7 @@ body.modal-open {
   font-style: italic;
   font-size: 0.9rem;
   text-align: center;
-  padding: 20px;
+  padding: 0px;
   background: #f8f9fa;
   border-radius: 8px;
   border: 2px dashed #e1e5e9;

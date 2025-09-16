@@ -25,10 +25,10 @@ const WorkshopListItem = ({ workshop, onClick }) => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'scheduled': return 'Đã lên lịch';
-      case 'live': return 'Đang diễn ra';
-      case 'completed': return 'Đã hoàn thành';
-      case 'canceled': return 'Đã hủy';
+      case 'scheduled': return 'Scheduled';
+      case 'live': return 'Live';
+      case 'completed': return 'Finished';
+      case 'canceled': return 'Canceled';
       default: return status;
     }
   };
@@ -42,14 +42,14 @@ const WorkshopListItem = ({ workshop, onClick }) => {
       const diff = startTime - now;
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return `Bắt đầu sau ${hours}h ${minutes}m`;
+      return `Start after ${hours}h ${minutes}m`;
     } else if (now >= startTime && now <= endTime) {
       const diff = endTime - now;
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return `Còn lại ${hours}h ${minutes}m`;
+      return `Remain ${hours}h ${minutes}m`;
     } else {
-      return 'Đã kết thúc';
+      return 'Finished';
     }
   };
 

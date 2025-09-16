@@ -111,7 +111,7 @@ const WorkshopList = () => {
       
       setWorkshops(filteredWorkshops);
     } catch (err) {
-      setError('Không thể tải danh sách workshop');
+      setError('Cannot load workshop list');
       console.error('Error loading workshops:', err);
     } finally {
       setLoading(false);
@@ -149,7 +149,7 @@ const WorkshopList = () => {
   if (loading) {
     return (
       <div className="workshop-list-container">
-        <div className="loading">Đang tải...</div>
+        <div className="loading">Loading...</div>
       </div>
     );
   }
@@ -157,21 +157,21 @@ const WorkshopList = () => {
   return (
     <div className="workshop-list-container">
       <div className="workshop-header">
-        <h1>Danh sách Workshop</h1>
-        <p>Tìm hiểu và tham gia các workshop hữu ích</p>
+        <h1>Workshop List</h1>
+        <p>Learn about and join useful workshops</p>
       </div>
 
       <div className="workshop-filters">
         <form onSubmit={handleSearch} className="search-form">
           <input
             type="text"
-            placeholder="Tìm kiếm workshop..."
+            placeholder="Search for workshop..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
           />
           <button type="submit" className="search-btn">
-            Tìm kiếm
+            Search
           </button>
         </form>
 
@@ -181,10 +181,10 @@ const WorkshopList = () => {
             onChange={(e) => handleFilterChange('status', e.target.value)}
             className="filter-select"
           >
-            <option value="">Tất cả trạng thái</option>
-            <option value="scheduled">Đã lên lịch</option>
-            <option value="live">Đang diễn ra</option>
-            <option value="completed">Đã hoàn thành</option>
+            <option value="">All Statuses</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="live">Live</option>
+            <option value="completed">Finished</option>
           </select>
 
           <label className="checkbox-label">
@@ -193,7 +193,7 @@ const WorkshopList = () => {
               checked={filters.upcoming}
               onChange={(e) => handleFilterChange('upcoming', e.target.checked)}
             />
-            Chỉ hiển thị workshop sắp tới
+            Show upcoming workshops only
           </label>
         </div>
       </div>
@@ -209,7 +209,7 @@ const WorkshopList = () => {
         <div className="live-workshops-section">
           <h2 className="section-title">
             <span className="live-indicator">🔴</span>
-            Workshop Đang Diễn Ra
+            Live Workshops
           </h2>
           <div className="workshop-list">
             {workshops.filter(w => w.isLive).map(workshop => (
@@ -225,11 +225,11 @@ const WorkshopList = () => {
 
       {/* All Workshops Section */}
       <div className="all-workshops-section">
-        <h2 className="section-title">Tất Cả Workshop</h2>
+        <h2 className="section-title">All Workshop</h2>
         <div className="workshop-list">
         {workshops.length === 0 ? (
           <div className="no-workshops">
-            <p>Không tìm thấy workshop nào</p>
+            <p>No workshops found</p>
           </div>
         ) : (
           workshops.map(workshop => (
@@ -252,10 +252,10 @@ const WorkshopList = () => {
 
       {workshops.length > 0 && (
         <div className="workshop-stats">
-          <p>Tìm thấy {workshops.length} workshop</p>
+          <p>Found {workshops.length} workshop</p>
           {workshops.filter(w => w.isLive).length > 0 && (
             <p className="live-count">
-              🔴 {workshops.filter(w => w.isLive).length} workshop đang diễn ra
+              {workshops.filter(w => w.isLive).length} workshop(s) currently live
             </p>
           )}
         </div>

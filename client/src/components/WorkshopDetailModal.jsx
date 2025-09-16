@@ -27,10 +27,10 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'scheduled': return 'Đã lên lịch';
-      case 'live': return 'Đang diễn ra';
-      case 'completed': return 'Đã hoàn thành';
-      case 'canceled': return 'Đã hủy';
+      case 'scheduled': return 'Scheduled';
+      case 'live': return 'Live';
+      case 'completed': return 'Finished';
+      case 'canceled': return 'Canceled';
       default: return status;
     }
   };
@@ -47,19 +47,19 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       
       if (days > 0) {
-        return `${days} ngày ${hours} giờ ${minutes} phút`;
+        return `${days} days ${hours} hours ${minutes} minutes`;
       } else if (hours > 0) {
-        return `${hours} giờ ${minutes} phút`;
+        return `${hours} hours ${minutes} minutes`;
       } else {
-        return `${minutes} phút`;
+        return `${minutes} minutes`;
       }
     } else if (now >= startTime && now <= endTime) {
       const diff = endTime - now;
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours} giờ ${minutes} phút`;
+      return `${hours} hours ${minutes} minutes remaining`;
     } else {
-      return 'Đã kết thúc';
+      return 'Finished';
     }
   };
 
@@ -93,34 +93,34 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
 
           {workshop.description && (
             <div className="workshop-description-section">
-              <h3>Mô tả</h3>
+              <h3>Description</h3>
               <p>{workshop.description}</p>
             </div>
           )}
 
           <div className="workshop-details-grid">
             <div className="detail-item">
-              <span className="detail-label">Giảng viên</span>
+              <span className="detail-label">Instructor</span>
               <span className="detail-value">{workshop.instructorId?.name || 'N/A'}</span>
             </div>
             
             <div className="detail-item">
-              <span className="detail-label">Thời gian bắt đầu</span>
+              <span className="detail-label">Start Time</span>
               <span className="detail-value">{formatDate(workshop.startAt)}</span>
             </div>
             
             <div className="detail-item">
-              <span className="detail-label">Thời gian kết thúc</span>
+              <span className="detail-label">End Time</span>
               <span className="detail-value">{formatDate(workshop.endAt)}</span>
             </div>
             
             <div className="detail-item">
-              <span className="detail-label">Múi giờ</span>
+              <span className="detail-label">TimeZone</span>
               <span className="detail-value">{workshop.timeZone}</span>
             </div>
             
             <div className="detail-item">
-              <span className="detail-label">Nền tảng</span>
+              <span className="detail-label">Platform</span>
               <span className="detail-value">
                 {workshop.meetingProvider === 'google_meet' && 'Google Meet'}
                 {workshop.meetingProvider === 'zoom' && 'Zoom'}
@@ -131,14 +131,14 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
             
             {workshop.maxParticipants && (
               <div className="detail-item">
-                <span className="detail-label">Số lượng tối đa</span>
+                <span className="detail-label">Max Participants</span>
                 <span className="detail-value">{workshop.maxParticipants} người</span>
               </div>
             )}
             
             {workshop.price > 0 && (
               <div className="detail-item">
-                <span className="detail-label">Giá</span>
+                <span className="detail-label">Price</span>
                 <span className="detail-value price">{workshop.price} {workshop.currency}</span>
               </div>
             )}
@@ -146,14 +146,14 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
 
           {workshop.requirements && (
             <div className="workshop-requirements-section">
-              <h3>Yêu cầu</h3>
+              <h3>Requirement</h3>
               <p>{workshop.requirements}</p>
             </div>
           )}
 
           {workshop.materials && workshop.materials.length > 0 && (
             <div className="workshop-materials-section">
-              <h3>Tài liệu</h3>
+              <h3>Materials</h3>
               <ul>
                 {workshop.materials.map((material, index) => (
                   <li key={index}>{material}</li>
@@ -163,9 +163,9 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
           )}
 
           <div className="workshop-meeting-section">
-            <h3>Tham gia workshop</h3>
+            <h3>Join workshop</h3>
             <div className="meeting-info">
-              <p><strong>Link phòng họp:</strong></p>
+              <p><strong>Meeting Link:</strong></p>
               <a 
                 href={workshop.meetingUrl} 
                 target="_blank" 
@@ -180,11 +180,11 @@ const WorkshopDetailModal = ({ workshop, isOpen, onClose }) => {
 
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>
-            Đóng
+            Close
           </button>
           {(workshop.status === 'live' || workshop.status === 'scheduled') && (
             <button className="btn btn-primary" onClick={handleJoinWorkshop}>
-              {workshop.status === 'live' ? 'Tham gia ngay' : 'Tham gia khi bắt đầu'}
+              {workshop.status === 'live' ? 'Join Now' : 'Join when started'}
             </button>
           )}
         </div>

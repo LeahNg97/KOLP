@@ -202,7 +202,7 @@ export default function StudentManagement() {
         <div className="student-management">
           <div className="students-header">
             <div className="header-content">
-              <h1>Student Management 👥</h1>
+              <h1>Student Management</h1>
               <p>View and manage all students enrolled in your courses</p>
             </div>
           </div>
@@ -224,7 +224,7 @@ export default function StudentManagement() {
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">✅</div>
+              <div className="stat-icon"></div>
               <div className="stat-content">
                 <h3>{stats.approvedStudents}</h3>
                 <p>Approved Students</p>

@@ -10,6 +10,7 @@ export default function UserManagement() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [updateForm, setUpdateForm] = useState({
+    
     name: '',
     email: '',
     role: 'student'
@@ -98,10 +99,40 @@ export default function UserManagement() {
     }));
   };
 
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const filteredUsers = users.filter(user => {
+  const matchesSearch =
+      user.name.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter ? user.role === roleFilter : true;
+    return matchesSearch && matchesRole;
+  });
+
   return (
     <div className="admin-layout">
       <main className="admin-main">
         <h1>User Management</h1>
+          {/* Search and Filter Controls */}
+        <div className="user-filters" style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="user-search-input"
+          />
+          <select
+            value={roleFilter}
+            onChange={e => setRoleFilter(e.target.value)}
+            className="user-role-filter"
+          >
+            <option value="">All Roles</option>
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
         {loading ? (
           <div className="user-loading">Loading users...</div>
         ) : error ? (

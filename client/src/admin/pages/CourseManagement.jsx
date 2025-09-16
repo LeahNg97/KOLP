@@ -393,14 +393,14 @@ export default function CourseManagement() {
                         className="action-btn view-btn"
                         title="View Details"
                       >
-                        👁️
+                        View Details
                       </button>
                       <button
                         onClick={() => handleUpdate(course._id)}
                         className="action-btn edit-btn"
                         title="Edit Course"
                       >
-                        ✏️
+                        Edit
                       </button>
                       {/* Show approve/reject buttons for all courses except deleted ones */}
                       {course.status !== 'deleted' && (
@@ -411,7 +411,7 @@ export default function CourseManagement() {
                               className="action-btn approve-btn"
                               title="View Course Details for Approval"
                             >
-                              ✅
+                              Approve
                             </button>
                           )}
                           {course.status !== 'inactive' && (
@@ -420,7 +420,7 @@ export default function CourseManagement() {
                               className="action-btn reject-btn"
                               title="Reject Course"
                             >
-                              ❌
+                              Reject
                             </button>
                           )}
                         </>
@@ -431,7 +431,7 @@ export default function CourseManagement() {
                         title="Delete Course"
                         disabled={deletingId === course._id}
                       >
-                        {deletingId === course._id ? '🗑️...' : '🗑️'}
+                        {deletingId === course._id ? 'Delete...' : 'Delete'}
                       </button>
                     </td>
                   </tr>

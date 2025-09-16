@@ -331,8 +331,8 @@ const WorkshopForm = ({ workshop, onSubmit, onCancel }) => {
                 onChange={handleChange}
               >
                 <option value="AUD">AUD</option>
-                <option value="USD">USD</option>
-                <option value="VND">VND</option>
+                {/* <option value="USD">USD</option>
+                <option value="VND">VND</option> */}
               </select>
             </div>
           </div>
